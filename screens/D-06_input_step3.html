@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Nobita — D-06 入力 STEP3 プロテイン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0B1D35;--blue:#1E6FD9;--sky:#5DADE2;--mint:#06C755;
+  --pale:#EBF3FF;--text:#0F2137;--sub:#5A6F84;--muted:#8FA3B8;
+  --border:#D8E5EF;--bg:#F4F8FC;--white:#fff;
+  --ok:#27AE60;--warn:#E8A030;--danger:#E53E3E;
+  --ok-bg:#EAFAF1;--warn-bg:#FFF7E6;--danger-bg:#FFF5F5;
+  --line:#06C755;--purple:#6C3483;
+  --font:'Plus Jakarta Sans','Noto Sans JP',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r:14px;
+}
+html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.phone{width:390px;height:844px;background:var(--white);border-radius:44px;box-shadow:0 0 0 10px #141F30,0 0 0 12px #0D1520,0 32px 80px rgba(0,0,0,.7);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#141F30;border-radius:0 0 22px 22px;z-index:20}
+.sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:6px;font-size:10px;color:rgba(255,255,255,.6);font-family:var(--mono);flex-shrink:0}
+.sb-light{background:var(--navy)}
+.sb-white{background:var(--white);color:var(--sub)}
+.screen{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+
+/* Header gradients */
+.hdr{background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);padding:16px 20px 52px;position:relative;overflow:hidden;flex-shrink:0}
+.hdr::after{content:'';position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-90px;right:-60px}
+.hdr-purple{background:linear-gradient(160deg,#2C1B47 0%,#6C3483 100%)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.back{display:flex;align-items:center;gap:10px}
+.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;cursor:pointer;border:1px solid rgba(255,255,255,.15)}
+.hdr-title{font-size:16px;font-weight:700;color:white;letter-spacing:-.01em}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+
+/* Stat boxes */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-box{background:rgba(255,255,255,.1);border-radius:11px;padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)}
+.stat-u{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px}
+.stat-v{font-family:var(--mono);font-size:18px;font-weight:600;color:white;line-height:1}
+.stat-l{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
+
+/* Scroll */
+.scroll{flex:1;overflow-y:auto;padding:0 16px 24px;margin-top:-34px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll-flat{flex:1;overflow-y:auto;padding:16px;background:var(--bg)}
+.scroll-flat::-webkit-scrollbar{display:none}
+.scroll-white{flex:1;overflow-y:auto;padding:20px 18px 24px;background:var(--white)}
+.scroll-white::-webkit-scrollbar{display:none}
+
+/* Cards */
+.card{background:var(--white);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(11,29,53,.07);border:1px solid rgba(216,229,239,.5)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
+.more-link{font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;padding:3px 9px;border-radius:6px;background:var(--pale);border:1px solid rgba(30,111,217,.15)}
+
+/* Form */
+.field{margin-bottom:13px}
+.f-lbl{display:block;font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px}
+.f-inp{width:100%;height:46px;border-radius:11px;border:1.5px solid var(--border);background:#FAFCFE;padding:0 14px;font-size:14px;font-family:var(--font);color:var(--text);outline:none;-webkit-appearance:none}
+.f-inp:focus{border-color:var(--blue);background:white;box-shadow:0 0 0 3px rgba(30,111,217,.1)}
+.f-inp.filled{border-color:#AED6F1;background:#F8FCFF}
+.f-select{appearance:none}
+.f-req{color:var(--danger)}
+
+/* Step bar */
+.step-wrap{padding:14px 18px 18px;flex-shrink:0;background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);position:relative;overflow:hidden}
+.step-wrap::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-80px;right:-50px}
+.step-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:8px}
+.step-title{font-size:14px;font-weight:700;color:white}
+.step-meta{font-size:10px;color:rgba(255,255,255,.5)}
+.prog{height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-bottom:12px}
+.prog-fill{height:100%;border-radius:99px;background:#06C755;transition:width .4s}
+.steps{display:flex;align-items:center;position:relative;z-index:1}
+.s-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.s-done{background:#06C755;color:var(--navy)}
+.s-act{background:white;color:var(--navy);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.s-todo{background:rgba(255,255,255,.15);color:rgba(255,255,255,.4)}
+.s-lbl{font-size:8px;color:rgba(255,255,255,.5);margin-top:3px;white-space:nowrap}
+.s-line{flex:1;height:2px;margin:0 2px;margin-bottom:14px}
+.s-line-done{background:#06C755}
+.s-line-todo{background:rgba(255,255,255,.15)}
+
+/* Buttons */
+.btn{width:100%;height:50px;border-radius:var(--r);border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:all .18s;letter-spacing:-.01em}
+.btn-blue{background:linear-gradient(135deg,#1E6FD9,#0B4DB5);color:white;box-shadow:0 4px 16px rgba(30,111,217,.3)}
+.btn-line{background:#06C755;color:white;box-shadow:0 4px 16px rgba(6,199,85,.3)}
+.btn-ghost{background:white;color:var(--blue);border:1.5px solid var(--border)}
+.btn-ok{background:linear-gradient(135deg,#27AE60,#1A7A40);color:white;box-shadow:0 4px 14px rgba(39,174,96,.3)}
+.btn-warn{background:linear-gradient(135deg,#E8A030,#C47010);color:white;box-shadow:0 4px 14px rgba(232,160,48,.3)}
+.btn-ghost-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)}
+
+/* Number input */
+.num-wrap{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;height:50px;background:#FAFCFE;margin-bottom:10px}
+.nm-btn{width:50px;background:var(--pale);border:none;font-size:22px;font-weight:300;color:var(--blue);cursor:pointer}
+.nm-c{flex:1;display:flex;align-items:center;justify-content:center;gap:5px}
+.nm-v{text-align:center;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--navy);border:none;background:transparent;outline:none;width:64px}
+.nm-u{font-size:12px;color:var(--sub)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(39,174,96,.2)}
+.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(232,160,48,.2)}
+.b-bad{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(229,62,62,.2)}
+.b-blue{background:var(--pale);color:var(--blue);border:1px solid rgba(30,111,217,.2)}
+.b-mu{background:#F2F4F6;color:var(--sub);border:1px solid var(--border)}
+.b-purple{background:#F5EEF8;color:var(--purple);border:1px solid rgba(108,52,131,.2)}
+.b-line{background:#E8FAF0;color:#059E44;border:1px solid rgba(6,199,85,.2)}
+
+/* Alert cards */
+.al{border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid}
+.al-r{background:var(--danger-bg);border-color:#F9BABA}
+.al-y{background:var(--warn-bg);border-color:#F8C471}
+.al-g{background:var(--ok-bg);border-color:#A9DFBF;opacity:.7}
+.al-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.al-ico{font-size:20px;flex-shrink:0}
+.al-ttl{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.al-meta{font-size:10px;color:var(--sub);margin-top:2px}
+.al-desc{font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:10px}
+.al-proposal{background:white;border-radius:9px;padding:11px;border:1px solid #F9BABA;margin-bottom:10px}
+.al-prop-ttl{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.al-prop-item{font-size:11px;color:var(--text);display:flex;gap:8px;margin-bottom:5px;line-height:1.45}
+
+/* Condition rings */
+.cond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.cond-box{background:#FAFCFE;border-radius:13px;padding:11px 6px;text-align:center;border:1px solid var(--border)}
+.ring{width:58px;height:58px;margin:0 auto 7px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:15px;font-weight:700;color:var(--navy)}
+.cond-name{font-size:10px;color:var(--sub);font-weight:500}
+.cond-bdg{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:4px;display:inline-block}
+
+/* Toggle */
+.tg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F0F4F8}
+.tg-row:last-child{border:none}
+.tg-info{flex:1}
+.tg-title{font-size:13px;font-weight:500;color:var(--text)}
+.tg-sub{font-size:10px;color:var(--sub);margin-top:2px}
+.tgl{width:44px;height:24px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.tgl-on{background:var(--blue)}
+.tgl-off{background:#CBD5DF}
+.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s}
+.tgl-on::after{left:22px}
+.tgl-off::after{left:2px}
+
+/* Bottom nav */
+.bnav{background:white;border-top:1px solid var(--border);display:flex;padding:9px 0 22px;flex-shrink:0;box-shadow:0 -4px 16px rgba(11,29,53,.05)}
+.nv{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0;transition:opacity .15s}
+.nv-ico{font-size:20px;opacity:.3}
+.nv-lbl{font-size:9px;color:var(--sub);font-weight:500}
+.nv.act .nv-ico{opacity:1}
+.nv.act .nv-lbl{color:var(--blue);font-weight:700}
+.nv-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);margin:0 auto}
+
+/* Separator */
+.sep{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);margin:14px 0}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Info banners */
+.banner{border-radius:11px;padding:11px 13px;margin-bottom:13px;display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.55}
+.bn-ok{background:var(--ok-bg);border:1px solid #A9DFBF;color:#1A6B3A}
+.bn-blue{background:var(--pale);border:1px solid rgba(30,111,217,.2);color:#1244A0}
+.bn-warn{background:var(--warn-bg);border:1px solid #F8C471;color:#8A4F00}
+.bn-bad{background:var(--danger-bg);border:1px solid #F9BABA;color:#9B1A1A}
+
+/* Protein card */
+.prot-card{background:linear-gradient(135deg,#EBF3FF,#E8FAF0);border:1.5px solid rgba(30,111,217,.2);border-radius:var(--r);padding:15px;margin-bottom:13px}
+
+/* プロテイン複数選択 */
+.prot-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.prot-opt{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 13px;border-radius:11px;
+  border:1.5px solid var(--border);background:#FAFCFE;
+  cursor:pointer;transition:all .15s;user-select:none;
+}
+.prot-opt:hover{background:white;border-color:#BFCFDE}
+.prot-opt.sel{
+  background:var(--pale);border-color:var(--blue);
+  box-shadow:0 2px 8px rgba(30,111,217,.12);
+}
+.prot-chk{
+  width:22px;height:22px;border-radius:6px;
+  border:1.5px solid var(--border);background:white;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;
+}
+.prot-opt.sel .prot-chk{background:var(--blue);border-color:var(--blue)}
+.prot-chk-ico{
+  font-size:13px;font-weight:900;color:white;line-height:1;opacity:0;
+  transition:opacity .15s;
+}
+.prot-opt.sel .prot-chk-ico{opacity:1}
+.prot-lbl{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.prot-opt.sel .prot-lbl{color:var(--navy)}
+.prot-tag{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:#F0F4F8;color:var(--sub);border:1px solid var(--border);
+  white-space:nowrap;
+}
+.prot-opt.sel .prot-tag{background:white;color:var(--blue);border-color:rgba(30,111,217,.3)}
+.prot-empty{
+  font-size:11px;color:var(--sub);text-align:center;padding:8px 0 2px;
+  font-style:italic;
+}
+
+/* Week calendar */
+.wk-cal{display:flex;gap:5px;justify-content:space-between}
+.wk-day{flex:1;text-align:center}
+.wk-lbl{font-size:9px;color:var(--sub);margin-bottom:5px}
+.wk-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto}
+.wk-ok{background:var(--ok)}
+.wk-ng{background:#EEF2F7;color:var(--sub)}
+.wk-td{background:linear-gradient(135deg,var(--blue),#0B4DB5);color:white;font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(30,111,217,.4)}
+
+/* Summary rows */
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F4F8}
+.sum-row:last-child{border:none}
+.sum-lbl{font-size:11px;color:var(--sub)}
+.sum-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--navy)}
+.sum-ok{font-size:10px;color:var(--ok);font-weight:600;margin-left:5px}
+.sum-bad{font-size:10px;color:var(--danger);font-weight:600;margin-left:5px}
+
+/* Nut bars */
+.nb-wrap{margin-bottom:9px}
+.nb-hdr{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px}
+.nb-bg{height:7px;background:#EEF2F7;border-radius:99px;overflow:hidden}
+.nb-fill{height:100%;border-radius:99px}
+
+/* Done icon */
+.done-ico{width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,#A8E6CF,#27AE60);display:flex;align-items:center;justify-content:center;font-size:34px;margin:16px auto 14px;box-shadow:0 8px 28px rgba(39,174,96,.35)}
+
+/* Profile */
+.prof-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--mint));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:white;margin:0 auto 14px;border:3px solid rgba(255,255,255,.5);box-shadow:0 6px 20px rgba(6,199,85,.3)}
+
+/* Sleep blocks */
+.sl-row{display:flex;gap:4px;margin-bottom:5px}
+.sl-blk{flex:1;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer}
+.slk-r{background:var(--danger-bg);color:var(--danger)}
+.slk-y{background:var(--warn-bg);color:var(--warn)}
+.slk-b{background:var(--pale);border:2px solid var(--blue);color:var(--blue)}
+.slk-g{background:var(--ok-bg);color:var(--ok)}
+
+/* Emoji row */
+.emo-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.emo{text-align:center;cursor:pointer;opacity:.3;transition:all .15s}
+.emo.sel{opacity:1;transform:scale(1.18)}
+.emo .e{font-size:28px}
+.emo .l{font-size:9px;color:var(--sub);margin-top:3px}
+.emo.sel .l{color:var(--blue);font-weight:700}
+
+/* Growth bar */
+.grow-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.grow-item{background:#FAFCFE;border-radius:11px;padding:10px 12px;border:1px solid var(--border)}
+.gi-lbl{font-size:10px;color:var(--sub);margin-bottom:2px}
+.gi-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy);line-height:1}
+.gi-sub{font-size:10px;margin-top:3px}
+
+/* Hist items */
+.hist-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F0F4F8;cursor:pointer}
+.hist-item:last-child{border:none}
+.hist-date{text-align:center;width:46px;flex-shrink:0}
+.hist-month{font-size:10px;color:var(--sub)}
+.hist-day{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--navy);line-height:1}
+.hist-vals{flex:1}
+.hist-ht{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--navy)}
+.hist-sub{font-size:10px;color:var(--sub);margin-top:2px}
+
+/* Chart */
+.ch{position:relative;height:150px}
+.ch-sm{position:relative;height:75px}
+
+/* Chip row */
+.chip-row{display:flex;gap:7px;margin-bottom:12px}
+.chip{flex:1;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid}
+.chip-sel{background:var(--pale);border-color:var(--blue);color:var(--blue)}
+.chip-idle{background:#FAFCFE;border-color:var(--border);color:var(--sub)}
+
+/* Period tabs */
+.per-tabs{display:flex;background:#F0F4F8;border-radius:9px;padding:3px;gap:2px;margin-bottom:13px}
+.per-tab{flex:1;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:500;color:var(--sub);cursor:pointer}
+.per-tab.act{background:white;color:var(--blue);font-weight:700;box-shadow:0 1px 4px rgba(11,29,53,.1)}
+
+/* toast */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:white;font-size:12px;font-weight:600;padding:11px 20px;border-radius:99px;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(11,29,53,.25);pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ iPhone等の実機モバイル対応 ══ */
+@media (max-width: 480px), (max-height: 900px) {
+  html, body { height:100%; background:var(--bg) !important; display:block !important; overflow:hidden; }
+  .phone { width:100% !important; height:100% !important; border-radius:0 !important; box-shadow:none !important; max-width:none !important; }
+  .notch { display:none !important; }
+  .sb { display:none !important; }
+  .bnav { padding-bottom: calc(9px + env(safe-area-inset-bottom)) !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="screen">
+    <div class="sb sb-light"><span>9:44</span><span>● ● 100%</span></div>
+    <div class="step-wrap">
+      <div class="step-top"><div class="step-title">プロテイン記録</div><div style="background:rgba(255,255,255,.1);border-radius:99px;padding:3px 11px;font-size:10px;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)">📅 月1回 / 3分</div></div>
+      <div class="prog"><div class="prog-fill" style="width:75%"></div></div>
+      <div class="steps">
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">身体測定</div></div>
+        <div class="s-line s-line-done"></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">生活習慣</div></div>
+        <div class="s-line s-line-done"></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">3</div><div class="s-lbl">プロテイン</div></div>
+        <div class="s-line s-line-todo"></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-todo">4</div><div class="s-lbl">確認</div></div>
+      </div>
+    </div>
+    <div class="scroll-white">
+
+      <!-- 使用中のプロテイン（複数選択） -->
+      <div class="card" style="margin-bottom:13px">
+        <div class="card-hdr" style="margin-bottom:9px">
+          <div class="card-title">💊 使用中のプロテイン</div>
+          <span class="badge b-mu" id="prot-count" style="font-size:9px">0件選択</span>
+        </div>
+        <div style="font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:11px">
+          この1ヶ月使用しているプロテインを選択（複数選択可）
+        </div>
+        <div class="prot-list" id="prot-list">
+          <div class="prot-opt" data-prot="nobita_pro" onclick="toggleProtein('nobita_pro')">
+            <div class="prot-chk"><span class="prot-chk-ico">✓</span></div>
+            <div class="prot-lbl">NOBITA Pro</div>
+            <span class="prot-tag">プレミアム</span>
+          </div>
+          <div class="prot-opt" data-prot="nobita" onclick="toggleProtein('nobita')">
+            <div class="prot-chk"><span class="prot-chk-ico">✓</span></div>
+            <div class="prot-lbl">NOBITA</div>
+            <span class="prot-tag">スタンダード</span>
+          </div>
+          <div class="prot-opt" data-prot="other_whey" onclick="toggleProtein('other_whey')">
+            <div class="prot-chk"><span class="prot-chk-ico">✓</span></div>
+            <div class="prot-lbl">その他ホエイ</div>
+            <span class="prot-tag">ホエイ</span>
+          </div>
+          <div class="prot-opt" data-prot="other_soy" onclick="toggleProtein('other_soy')">
+            <div class="prot-chk"><span class="prot-chk-ico">✓</span></div>
+            <div class="prot-lbl">その他ソイ</div>
+            <span class="prot-tag">ソイ</span>
+          </div>
+        </div>
+        <div class="prot-empty" id="prot-empty" style="display:none">未選択</div>
+      </div>
+
+      <div class="prot-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:13px">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#1E6FD9,#06C755);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💊</div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--navy)">プロテイン</div><div style="font-size:11px;color:var(--sub)">使用中 — 開始から90日目</div></div>
+        </div>
+        <div style="background:white;border-radius:11px;padding:12px;border:1px solid rgba(30,111,217,.15);margin-bottom:11px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div><div style="font-size:13px;font-weight:500;color:var(--text)">この1ヶ月、使用していますか？</div><div style="font-size:10px;color:var(--sub);margin-top:2px">継続使用と成長の相関を分析します</div></div>
+            <div class="tgl tgl-on" id="used-toggle" onclick="toggleUsed()"></div>
+          </div>
+          <div id="protein-inputs" style="padding-top:11px">
+            <label class="f-lbl">1回あたりの使用量 <span class="f-req">*</span></label>
+            <div class="num-wrap"><button class="nm-btn" onclick="adj('pg',-1)">−</button><div class="nm-c"><input class="nm-v" id="pg" value="20"><span class="nm-u">g</span></div><button class="nm-btn" onclick="adj('pg',1)">＋</button></div>
+            <label class="f-lbl" style="margin-bottom:7px">主な服用タイミング</label>
+            <div class="chip-row">
+              <div class="chip chip-sel" id="chip-after"  onclick="toggleChip('after')">練習後</div>
+              <div class="chip chip-idle" id="chip-before" onclick="toggleChip('before')">就寝前</div>
+              <div class="chip chip-idle" id="chip-morning" onclick="toggleChip('morning')">朝食時</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-hdr" style="margin-bottom:12px"><div class="card-title">今月の服用頻度</div></div>
+        <label class="f-lbl" style="margin-bottom:7px">この1ヶ月でどの程度使用しましたか？</label>
+        <div class="chip-row" style="flex-wrap:wrap">
+          <div class="chip chip-idle" id="freq-daily" onclick="toggleFreq('daily')">ほぼ毎日</div>
+          <div class="chip chip-sel"  id="freq-most"  onclick="toggleFreq('most')">週4〜5日</div>
+          <div class="chip chip-idle" id="freq-half"  onclick="toggleFreq('half')">週2〜3日</div>
+        </div>
+        <div class="chip-row" style="margin-top:6px;flex-wrap:wrap">
+          <div class="chip chip-idle" id="freq-rare"  onclick="toggleFreq('rare')">週1日以下</div>
+          <div class="chip chip-idle" id="freq-none"  onclick="toggleFreq('none')">使っていない</div>
+        </div>
+        <div id="freq-summary" style="margin-top:11px;padding:10px 12px;background:var(--ok-bg);border:1px solid #A9DFBF;border-radius:9px;font-size:11px;font-weight:600;color:#1A6B3A;display:flex;align-items:center;gap:7px">
+          <span>📊</span><span id="freq-summary-txt">推奨頻度を維持できています</span>
+        </div>
+      </div>
+      <button class="btn btn-blue" onclick="saveCurrent();window.location.href='D-07_input_step4.html'">次へ → 入力内容を確認</button>
+      <button class="btn btn-ghost" onclick="location.href='D-05_input_step2.html'">← 戻る</button>
+      <div style="text-align:center;font-size:11px;color:var(--danger);cursor:pointer;margin-top:4px" onclick="cancelInput()">✕ 入力を中止する</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+
+window._numCfg = {
+  pg: { step:1, min:0, max:100, dec:0 },
+};
+function adj(id, delta){
+  const inp = document.getElementById(id);
+  if(!inp) return;
+  const c = window._numCfg[id];
+  let v = parseFloat(inp.value) + delta;
+  v = Math.max(c.min, Math.min(c.max, v));
+  inp.value = c.dec===0 ? Math.round(v).toString() : v.toFixed(c.dec);
+}
+
+function cancelInput(){
+  if(confirm('入力を中止してホーム画面に戻りますか？\n入力中のデータは保存されません。')){
+    window.location.href='D-01_dashboard.html';
+  }
+}
+
+// ── 前回値の保存・復元 ──
+const _KEYS    = ['pg'];
+const _DEFAULT = {'pg': '20'};
+const _STORE   = 'nobita_input';
+
+function loadPrev(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(_STORE) || '{}');
+    _KEYS.forEach(k => {
+      const inp = document.getElementById(k);
+      if(!inp) return;
+      inp.value = (saved[k] !== undefined) ? saved[k] : _DEFAULT[k];
+    });
+  } catch(e) {}
+}
+
+function saveCurrent(){
+  try{
+    const existing = JSON.parse(localStorage.getItem(_STORE) || '{}');
+    _KEYS.forEach(k => {
+      const inp = document.getElementById(k);
+      if(inp) existing[k] = inp.value;
+    });
+    localStorage.setItem(_STORE, JSON.stringify(existing));
+  } catch(e) {}
+}
+
+window.addEventListener('load', () => { loadPrev(); loadTiming(); loadUsed(); });
+
+// ── 服用タイミング複数選択 ──
+const _CHIPS = { after:'練習後', before:'就寝前', morning:'朝食時' };
+let _selectedChips = new Set(['after']); // デフォルト：練習後
+
+function toggleChip(key){
+  if(_selectedChips.has(key)){
+    if(_selectedChips.size === 1) return; // 最低1つは選択必須
+    _selectedChips.delete(key);
+  } else {
+    _selectedChips.add(key);
+  }
+  Object.keys(_CHIPS).forEach(k => {
+    const el = document.getElementById('chip-' + k);
+    if(!el) return;
+    const sel = _selectedChips.has(k);
+    el.className = 'chip ' + (sel ? 'chip-sel' : 'chip-idle');
+    el.textContent = _CHIPS[k] + (sel ? ' ✓' : '');
+  });
+  // localStorageに保存
+  try {
+    const s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    s.timing = [..._selectedChips].join(',');
+    localStorage.setItem('nobita_input', JSON.stringify(s));
+  } catch(e) {}
+}
+
+function loadTiming(){
+  try {
+    const s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    if(s.timing){
+      _selectedChips = new Set(s.timing.split(','));
+      Object.keys(_CHIPS).forEach(k => {
+        const el = document.getElementById('chip-' + k);
+        if(!el) return;
+        const sel = _selectedChips.has(k);
+        el.className = 'chip ' + (sel ? 'chip-sel' : 'chip-idle');
+        el.textContent = _CHIPS[k] + (sel ? ' ✓' : '');
+      });
+    }
+  } catch(e) {}
+}
+
+// ── 今日使用したか トグル ──
+let _used = true;
+
+function toggleUsed(){
+  _used = !_used;
+  const el = document.getElementById('used-toggle');
+  el.className = 'tgl ' + (_used ? 'tgl-on' : 'tgl-off');
+  // 使用量・タイミングの入力欄をグレーアウト
+  const wrap = document.getElementById('protein-inputs');
+  if(wrap){
+    wrap.style.opacity    = _used ? '1' : '0.35';
+    wrap.style.pointerEvents = _used ? '' : 'none';
+  }
+  // localStorage保存
+  try {
+    const s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    s.pg_used = _used ? '1' : '0';
+    localStorage.setItem('nobita_input', JSON.stringify(s));
+  } catch(e){}
+}
+
+function loadUsed(){
+  try {
+    const s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    if(s.pg_used !== undefined){
+      _used = s.pg_used === '1';
+      const el = document.getElementById('used-toggle');
+      if(el) el.className = 'tgl ' + (_used ? 'tgl-on' : 'tgl-off');
+      const wrap = document.getElementById('protein-inputs');
+      if(wrap){
+        wrap.style.opacity    = _used ? '1' : '0.35';
+        wrap.style.pointerEvents = _used ? '' : 'none';
+      }
+    }
+  } catch(e){}
+}
+// ══════════════════════════════════════════════════════════════
+// 今月の服用頻度（単一選択）
+// ══════════════════════════════════════════════════════════════
+var FREQ_OPTIONS = {
+  daily: { label:'ほぼ毎日',  cls:'meal-sum-ok',   ico:'🌟', msg:'毎日服用 — 高い継続率で分析精度も最高です' },
+  most:  { label:'週4〜5日',  cls:'meal-sum-ok',   ico:'👍', msg:'推奨頻度を維持できています' },
+  half:  { label:'週2〜3日',  cls:'meal-sum-warn', ico:'📊', msg:'継続性が中程度 — 効果を最大化するには週4日以上を推奨' },
+  rare:  { label:'週1日以下', cls:'meal-sum-warn', ico:'⚠',  msg:'服用頻度が低めです — 継続使用で効果が見えやすくなります' },
+  none:  { label:'使っていない', cls:'meal-sum-bad', ico:'—', msg:'今月は使用なし — 使用開始のタイミングを検討してください' }
+};
+
+function toggleFreq(key){
+  Object.keys(FREQ_OPTIONS).forEach(function(k){
+    var el = document.getElementById('freq-' + k);
+    if(!el) return;
+    el.className = 'chip ' + (k === key ? 'chip-sel' : 'chip-idle');
+  });
+  // サマリー更新
+  var opt = FREQ_OPTIONS[key];
+  var box = document.getElementById('freq-summary');
+  var txt = document.getElementById('freq-summary-txt');
+  if(box && opt){
+    var ico = box.querySelector('span:first-child');
+    if(ico) ico.textContent = opt.ico;
+    txt.textContent = opt.msg;
+    // 色変更
+    if(opt.cls === 'meal-sum-ok'){
+      box.style.background = 'var(--ok-bg)';
+      box.style.borderColor = '#A9DFBF';
+      box.style.color = '#1A6B3A';
+    } else if(opt.cls === 'meal-sum-warn'){
+      box.style.background = 'var(--warn-bg)';
+      box.style.borderColor = '#F8C471';
+      box.style.color = '#8A4F00';
+    } else {
+      box.style.background = 'var(--danger-bg)';
+      box.style.borderColor = '#F9BABA';
+      box.style.color = '#9B1A1A';
+    }
+  }
+  try {
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    s.freq = key;
+    localStorage.setItem('nobita_input', JSON.stringify(s));
+  } catch(e){}
+}
+
+function loadFreq(){
+  try {
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    if(s.freq && FREQ_OPTIONS[s.freq]) toggleFreq(s.freq);
+  } catch(e){}
+}
+
+window.addEventListener('load', loadFreq);
+
+// ══════════════════════════════════════════════════════════════
+// 使用中のプロテイン（複数選択）
+// ══════════════════════════════════════════════════════════════
+var PROTEIN_LABELS = {
+  nobita_pro: 'NOBITA Pro',
+  nobita:     'NOBITA',
+  other_whey: 'その他ホエイ',
+  other_soy:  'その他ソイ'
+};
+
+function _loadProteins(){
+  try{
+    var arr = JSON.parse(localStorage.getItem('nobita_proteins') || '[]');
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+
+function _saveProteins(arr){
+  try{ localStorage.setItem('nobita_proteins', JSON.stringify(arr)); }catch(e){}
+}
+
+function toggleProtein(id){
+  var current = _loadProteins();
+  var idx = current.indexOf(id);
+  if(idx === -1) current.push(id);
+  else           current.splice(idx, 1);
+  _saveProteins(current);
+  _renderProteins();
+  var label = PROTEIN_LABELS[id] || id;
+  toast(idx === -1 ? label + ' を追加しました' : label + ' を解除しました');
+}
+
+function _renderProteins(){
+  var current = _loadProteins();
+  var opts = document.querySelectorAll('.prot-opt');
+  opts.forEach(function(el){
+    var key = el.dataset.prot;
+    if(current.indexOf(key) !== -1) el.classList.add('sel');
+    else                            el.classList.remove('sel');
+  });
+  var countEl = document.getElementById('prot-count');
+  var emptyEl = document.getElementById('prot-empty');
+  if(countEl) countEl.textContent = current.length + '件選択';
+  if(emptyEl) emptyEl.style.display = current.length === 0 ? 'block' : 'none';
+}
+
+window.addEventListener('load', _renderProteins);
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+</script>
+</body>
+</html>
