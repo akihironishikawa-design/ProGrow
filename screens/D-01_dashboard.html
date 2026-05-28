@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Nobita — D-01 個人ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0B1D35;--blue:#1E6FD9;--sky:#5DADE2;--mint:#06C755;
+  --pale:#EBF3FF;--text:#0F2137;--sub:#5A6F84;--muted:#8FA3B8;
+  --border:#D8E5EF;--bg:#F4F8FC;--white:#fff;
+  --ok:#27AE60;--warn:#E8A030;--danger:#E53E3E;
+  --ok-bg:#EAFAF1;--warn-bg:#FFF7E6;--danger-bg:#FFF5F5;
+  --line:#06C755;--purple:#6C3483;
+  --font:'Plus Jakarta Sans','Noto Sans JP',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r:14px;
+}
+html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.phone{width:390px;height:844px;background:var(--white);border-radius:44px;box-shadow:0 0 0 10px #141F30,0 0 0 12px #0D1520,0 32px 80px rgba(0,0,0,.7);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#141F30;border-radius:0 0 22px 22px;z-index:20}
+.sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:6px;font-size:10px;color:rgba(255,255,255,.6);font-family:var(--mono);flex-shrink:0}
+.sb-light{background:var(--navy)}
+.sb-white{background:var(--white);color:var(--sub)}
+.screen{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+
+/* Header gradients */
+.hdr{background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);padding:16px 20px 52px;position:relative;overflow:hidden;flex-shrink:0}
+.hdr::after{content:'';position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-90px;right:-60px}
+.hdr-purple{background:linear-gradient(160deg,#2C1B47 0%,#6C3483 100%)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.back{display:flex;align-items:center;gap:10px}
+.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;cursor:pointer;border:1px solid rgba(255,255,255,.15)}
+.hdr-title{font-size:16px;font-weight:700;color:white;letter-spacing:-.01em}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+
+/* Stat boxes */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-box{background:rgba(255,255,255,.1);border-radius:11px;padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)}
+.stat-u{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px}
+.stat-v{font-family:var(--mono);font-size:18px;font-weight:600;color:white;line-height:1}
+.stat-l{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
+
+/* Scroll */
+.scroll{flex:1;overflow-y:auto;padding:0 16px 24px;margin-top:-34px}
+.scroll::-webkit-scrollbar{display:none}
+.scroll-flat{flex:1;overflow-y:auto;padding:16px;background:var(--bg)}
+.scroll-flat::-webkit-scrollbar{display:none}
+.scroll-white{flex:1;overflow-y:auto;padding:20px 18px 24px;background:var(--white)}
+.scroll-white::-webkit-scrollbar{display:none}
+
+/* Cards */
+.card{background:var(--white);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(11,29,53,.07);border:1px solid rgba(216,229,239,.5)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
+.more-link{font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;padding:3px 9px;border-radius:6px;background:var(--pale);border:1px solid rgba(30,111,217,.15)}
+
+/* Form */
+.field{margin-bottom:13px}
+.f-lbl{display:block;font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px}
+.f-inp{width:100%;height:46px;border-radius:11px;border:1.5px solid var(--border);background:#FAFCFE;padding:0 14px;font-size:14px;font-family:var(--font);color:var(--text);outline:none;-webkit-appearance:none}
+.f-inp:focus{border-color:var(--blue);background:white;box-shadow:0 0 0 3px rgba(30,111,217,.1)}
+.f-inp.filled{border-color:#AED6F1;background:#F8FCFF}
+.f-select{appearance:none}
+.f-req{color:var(--danger)}
+
+/* Step bar */
+.step-wrap{padding:14px 18px 18px;flex-shrink:0;background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);position:relative;overflow:hidden}
+.step-wrap::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-80px;right:-50px}
+.step-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:8px}
+.step-title{font-size:14px;font-weight:700;color:white}
+.step-meta{font-size:10px;color:rgba(255,255,255,.5)}
+.prog{height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-bottom:12px}
+.prog-fill{height:100%;border-radius:99px;background:#06C755;transition:width .4s}
+.steps{display:flex;align-items:center;position:relative;z-index:1}
+.s-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.s-done{background:#06C755;color:var(--navy)}
+.s-act{background:white;color:var(--navy);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.s-todo{background:rgba(255,255,255,.15);color:rgba(255,255,255,.4)}
+.s-lbl{font-size:8px;color:rgba(255,255,255,.5);margin-top:3px;white-space:nowrap}
+.s-line{flex:1;height:2px;margin:0 2px;margin-bottom:14px}
+.s-line-done{background:#06C755}
+.s-line-todo{background:rgba(255,255,255,.15)}
+
+/* Buttons */
+.btn{width:100%;height:50px;border-radius:var(--r);border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:all .18s;letter-spacing:-.01em}
+.btn-blue{background:linear-gradient(135deg,#1E6FD9,#0B4DB5);color:white;box-shadow:0 4px 16px rgba(30,111,217,.3)}
+.btn-line{background:#06C755;color:white;box-shadow:0 4px 16px rgba(6,199,85,.3)}
+.btn-ghost{background:white;color:var(--blue);border:1.5px solid var(--border)}
+.btn-ok{background:linear-gradient(135deg,#27AE60,#1A7A40);color:white;box-shadow:0 4px 14px rgba(39,174,96,.3)}
+.btn-warn{background:linear-gradient(135deg,#E8A030,#C47010);color:white;box-shadow:0 4px 14px rgba(232,160,48,.3)}
+.btn-ghost-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)}
+
+/* Number input */
+.num-wrap{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;height:50px;background:#FAFCFE;margin-bottom:10px}
+.nm-btn{width:50px;background:var(--pale);border:none;font-size:22px;font-weight:300;color:var(--blue);cursor:pointer}
+.nm-c{flex:1;display:flex;align-items:center;justify-content:center;gap:5px}
+.nm-v{text-align:center;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--navy);border:none;background:transparent;outline:none;width:64px}
+.nm-u{font-size:12px;color:var(--sub)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
+.b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(39,174,96,.2)}
+.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(232,160,48,.2)}
+.b-bad{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(229,62,62,.2)}
+.b-blue{background:var(--pale);color:var(--blue);border:1px solid rgba(30,111,217,.2)}
+.b-mu{background:#F2F4F6;color:var(--sub);border:1px solid var(--border)}
+.b-purple{background:#F5EEF8;color:var(--purple);border:1px solid rgba(108,52,131,.2)}
+.b-line{background:#E8FAF0;color:#059E44;border:1px solid rgba(6,199,85,.2)}
+
+/* Alert cards */
+.al{border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid}
+.al-r{background:var(--danger-bg);border-color:#F9BABA}
+.al-y{background:var(--warn-bg);border-color:#F8C471}
+.al-g{background:var(--ok-bg);border-color:#A9DFBF;opacity:.7}
+.al-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.al-ico{font-size:20px;flex-shrink:0}
+.al-ttl{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.al-meta{font-size:10px;color:var(--sub);margin-top:2px}
+.al-desc{font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:10px}
+.al-proposal{background:white;border-radius:9px;padding:11px;border:1px solid #F9BABA;margin-bottom:10px}
+.al-prop-ttl{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:7px}
+.al-prop-item{font-size:11px;color:var(--text);display:flex;gap:8px;margin-bottom:5px;line-height:1.45}
+
+/* Condition rings */
+.cond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.cond-box{background:#FAFCFE;border-radius:13px;padding:11px 6px;text-align:center;border:1px solid var(--border)}
+.ring{width:58px;height:58px;margin:0 auto 7px;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:15px;font-weight:700;color:var(--navy)}
+.cond-name{font-size:10px;color:var(--sub);font-weight:500}
+.cond-bdg{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:4px;display:inline-block}
+
+/* Toggle */
+.tg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F0F4F8}
+.tg-row:last-child{border:none}
+.tg-info{flex:1}
+.tg-title{font-size:13px;font-weight:500;color:var(--text)}
+.tg-sub{font-size:10px;color:var(--sub);margin-top:2px}
+.tgl{width:44px;height:24px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
+.tgl-on{background:var(--blue)}
+.tgl-off{background:#CBD5DF}
+.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s}
+.tgl-on::after{left:22px}
+.tgl-off::after{left:2px}
+
+/* Bottom nav */
+.bnav{background:white;border-top:1px solid var(--border);display:flex;padding:9px 0 22px;flex-shrink:0;box-shadow:0 -4px 16px rgba(11,29,53,.05)}
+.nv{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0;transition:opacity .15s}
+.nv-ico{font-size:20px;opacity:.3}
+.nv-lbl{font-size:9px;color:var(--sub);font-weight:500}
+.nv.act .nv-ico{opacity:1}
+.nv.act .nv-lbl{color:var(--blue);font-weight:700}
+.nv-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);margin:0 auto}
+
+/* Separator */
+.sep{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);margin:14px 0}
+.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Info banners */
+.banner{border-radius:11px;padding:11px 13px;margin-bottom:13px;display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.55}
+.bn-ok{background:var(--ok-bg);border:1px solid #A9DFBF;color:#1A6B3A}
+.bn-blue{background:var(--pale);border:1px solid rgba(30,111,217,.2);color:#1244A0}
+.bn-warn{background:var(--warn-bg);border:1px solid #F8C471;color:#8A4F00}
+.bn-bad{background:var(--danger-bg);border:1px solid #F9BABA;color:#9B1A1A}
+
+/* Protein card */
+.prot-card{background:linear-gradient(135deg,#EBF3FF,#E8FAF0);border:1.5px solid rgba(30,111,217,.2);border-radius:var(--r);padding:15px;margin-bottom:13px}
+
+/* Week calendar */
+.wk-cal{display:flex;gap:5px;justify-content:space-between}
+.wk-day{flex:1;text-align:center}
+.wk-lbl{font-size:9px;color:var(--sub);margin-bottom:5px}
+.wk-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto}
+.wk-ok{background:var(--ok)}
+.wk-ng{background:#EEF2F7;color:var(--sub)}
+.wk-td{background:linear-gradient(135deg,var(--blue),#0B4DB5);color:white;font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(30,111,217,.4)}
+
+/* Summary rows */
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F4F8}
+.sum-row:last-child{border:none}
+.sum-lbl{font-size:11px;color:var(--sub)}
+.sum-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--navy)}
+.sum-ok{font-size:10px;color:var(--ok);font-weight:600;margin-left:5px}
+.sum-bad{font-size:10px;color:var(--danger);font-weight:600;margin-left:5px}
+
+/* Nut bars */
+.nb-wrap{margin-bottom:9px}
+.nb-hdr{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px}
+.nb-bg{height:7px;background:#EEF2F7;border-radius:99px;overflow:hidden}
+.nb-fill{height:100%;border-radius:99px}
+
+/* Done icon */
+.done-ico{width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,#A8E6CF,#27AE60);display:flex;align-items:center;justify-content:center;font-size:34px;margin:16px auto 14px;box-shadow:0 8px 28px rgba(39,174,96,.35)}
+
+/* Profile */
+.prof-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--mint));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:white;margin:0 auto 14px;border:3px solid rgba(255,255,255,.5);box-shadow:0 6px 20px rgba(6,199,85,.3)}
+
+/* Sleep blocks */
+.sl-row{display:flex;gap:4px;margin-bottom:5px}
+.sl-blk{flex:1;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer}
+.slk-r{background:var(--danger-bg);color:var(--danger)}
+.slk-y{background:var(--warn-bg);color:var(--warn)}
+.slk-b{background:var(--pale);border:2px solid var(--blue);color:var(--blue)}
+.slk-g{background:var(--ok-bg);color:var(--ok)}
+
+/* Emoji row */
+.emo-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.emo{text-align:center;cursor:pointer;opacity:.3;transition:all .15s}
+.emo.sel{opacity:1;transform:scale(1.18)}
+.emo .e{font-size:28px}
+.emo .l{font-size:9px;color:var(--sub);margin-top:3px}
+.emo.sel .l{color:var(--blue);font-weight:700}
+
+/* Growth bar */
+.grow-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.grow-item{background:#FAFCFE;border-radius:11px;padding:10px 12px;border:1px solid var(--border)}
+.gi-lbl{font-size:10px;color:var(--sub);margin-bottom:2px}
+.gi-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy);line-height:1}
+.gi-sub{font-size:10px;margin-top:3px}
+
+/* Hist items */
+.hist-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F0F4F8;cursor:pointer}
+.hist-item:last-child{border:none}
+.hist-date{text-align:center;width:46px;flex-shrink:0}
+.hist-month{font-size:10px;color:var(--sub)}
+.hist-day{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--navy);line-height:1}
+.hist-vals{flex:1}
+.hist-ht{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--navy)}
+.hist-sub{font-size:10px;color:var(--sub);margin-top:2px}
+
+/* Chart */
+.ch{position:relative;height:150px}
+.ch-sm{position:relative;height:75px}
+
+/* Chip row */
+.chip-row{display:flex;gap:7px;margin-bottom:12px}
+.chip{flex:1;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid}
+.chip-sel{background:var(--pale);border-color:var(--blue);color:var(--blue)}
+.chip-idle{background:#FAFCFE;border-color:var(--border);color:var(--sub)}
+
+/* Period tabs */
+.per-tabs{display:flex;background:#F0F4F8;border-radius:9px;padding:3px;gap:2px;margin-bottom:13px}
+.per-tab{flex:1;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:500;color:var(--sub);cursor:pointer}
+.per-tab.act{background:white;color:var(--blue);font-weight:700;box-shadow:0 1px 4px rgba(11,29,53,.1)}
+
+/* Maxポテンシャルカード */
+.max-pot-card{
+  background:linear-gradient(135deg,#E8FAF0,#EBF3FF);
+  border:1.5px solid rgba(6,199,85,.3);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:13px;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 14px rgba(11,29,53,.08);
+}
+.max-pot-card::after{
+  content:'';position:absolute;
+  width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(6,199,85,.12) 0%,transparent 70%);
+  top:-30px;right:-30px;pointer-events:none;
+}
+.max-pot-ico{
+  width:48px;height:48px;border-radius:13px;
+  background:linear-gradient(135deg,#06C755,#1E6FD9);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(6,199,85,.35);
+  position:relative;z-index:1;
+}
+.max-pot-body{flex:1;min-width:0;position:relative;z-index:1}
+.max-pot-lbl{font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.02em;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.max-pot-badge{
+  font-size:8px;font-weight:800;padding:2px 6px;border-radius:99px;
+  background:linear-gradient(135deg,#06C755,#1E6FD9);color:white;
+  letter-spacing:.03em;
+}
+.max-pot-row{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
+.max-pot-val{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--navy);line-height:1;letter-spacing:-.01em}
+.max-pot-unit{font-size:12px;color:var(--sub);font-weight:700}
+.max-pot-sub{font-size:10px;color:var(--sub);display:flex;align-items:center;gap:5px}
+.max-pot-delta{
+  font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ok);
+  background:rgba(6,199,85,.12);padding:1px 6px;border-radius:99px;
+}
+
+/* toast */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:white;font-size:12px;font-weight:600;padding:11px 20px;border-radius:99px;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(11,29,53,.25);pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ iPhone等の実機モバイル対応 ══ */
+@media (max-width: 480px), (max-height: 900px) {
+  html, body {
+    height: 100%;
+    background: var(--bg) !important;
+    display: block !important;
+    overflow: hidden;
+  }
+  .phone {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    max-width: none !important;
+  }
+  .notch { display: none !important; }
+  .sb { display: none !important; }
+  /* ボトムナビをセーフエリア対応 */
+  .bnav {
+    padding-bottom: calc(9px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* ══ 通知ベル & ドロップダウン ══ */
+.bell-wrap{position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);transition:all .15s}
+.bell-wrap:hover{background:rgba(255,255,255,.15)}
+.bell-wrap:active{transform:scale(.94)}
+
+/* ヘッダー右上アクション群 */
+.hdr-actions{display:flex;align-items:center;gap:8px}
+
+/* ログアウトボタン */
+.logout-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;transition:all .15s;color:white;font-size:16px;
+}
+.logout-btn:hover{background:rgba(229,62,62,.2);border-color:rgba(229,62,62,.35)}
+.logout-btn:active{transform:scale(.94)}
+.bell-ico{font-size:18px;line-height:1}
+.bell-badge{
+  position:absolute;top:4px;right:4px;min-width:16px;height:16px;
+  border-radius:99px;background:var(--danger);
+  border:2px solid var(--navy);
+  color:white;font-size:9px;font-weight:800;font-family:var(--mono);
+  display:flex;align-items:center;justify-content:center;
+  padding:0 4px;letter-spacing:-.02em;
+}
+.bell-badge.hidden{display:none}
+
+/* オーバーレイ（ドロップダウン外クリック検知） */
+.notif-overlay{
+  position:absolute;inset:0;background:transparent;
+  z-index:30;display:none;
+}
+.notif-overlay.open{display:block}
+
+/* ドロップダウン本体 */
+.notif-panel{
+  position:absolute;top:62px;right:14px;
+  width:300px;max-height:480px;
+  background:white;border-radius:14px;
+  box-shadow:0 16px 48px rgba(11,29,53,.32),0 6px 18px rgba(11,29,53,.18);
+  border:1px solid rgba(11,29,53,.08);
+  z-index:40;overflow:hidden;
+  display:flex;flex-direction:column;
+  transform:translateY(-6px) scale(.96);opacity:0;
+  pointer-events:none;transform-origin:top right;
+  transition:all .2s ease;
+}
+.notif-panel.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+
+.notif-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 14px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,#FAFCFE,white);
+  flex-shrink:0;
+}
+.notif-hdr-l{display:flex;align-items:center;gap:8px}
+.notif-ttl{font-size:13px;font-weight:800;color:var(--navy)}
+.notif-cnt{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:var(--danger);color:white;
+}
+.notif-cnt.zero{background:#E0E8EF;color:var(--sub)}
+.notif-mark{
+  font-size:10px;font-weight:600;color:var(--blue);
+  cursor:pointer;padding:3px 8px;border-radius:6px;
+  transition:background .15s;
+}
+.notif-mark:hover{background:var(--pale)}
+.notif-mark.disabled{color:#BFCFDE;cursor:default;pointer-events:none}
+
+.notif-list{flex:1;overflow-y:auto;padding:4px 0}
+.notif-list::-webkit-scrollbar{width:3px}
+.notif-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+.notif-item{
+  display:flex;gap:10px;padding:11px 14px;
+  cursor:pointer;border-left:3px solid transparent;
+  transition:background .12s;position:relative;
+}
+.notif-item:hover{background:#FAFCFE}
+.notif-item:not(:last-child){border-bottom:1px solid #F0F4F8}
+.notif-item.unread{background:#F4F9FF;border-left-color:var(--blue)}
+.notif-item.unread:hover{background:#E9F2FB}
+
+.notif-ico{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.notif-ico-r{background:var(--danger-bg);color:var(--danger);border:1px solid #F9BABA}
+.notif-ico-y{background:var(--warn-bg);color:var(--warn);border:1px solid #F8C471}
+.notif-ico-b{background:var(--pale);color:var(--blue);border:1px solid rgba(30,111,217,.2)}
+.notif-ico-g{background:var(--ok-bg);color:var(--ok);border:1px solid #A9DFBF}
+.notif-ico-p{background:#F5EEF8;color:var(--purple);border:1px solid rgba(108,52,131,.25)}
+
+.notif-body{flex:1;min-width:0}
+.notif-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:3px}
+.notif-title{font-size:12px;font-weight:700;color:var(--text);line-height:1.35;flex:1;min-width:0}
+.notif-time{font-size:9px;color:var(--muted);font-weight:500;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.notif-desc{font-size:11px;color:var(--sub);line-height:1.45;margin-bottom:2px}
+.notif-meta{display:flex;align-items:center;gap:6px;margin-top:4px}
+.notif-tag{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:#F0F4F8;color:var(--sub);border:1px solid var(--border);
+}
+.notif-tag-r{background:var(--danger-bg);color:var(--danger);border-color:#F9BABA}
+.notif-tag-y{background:var(--warn-bg);color:var(--warn);border-color:#F8C471}
+.notif-tag-b{background:var(--pale);color:var(--blue);border-color:rgba(30,111,217,.2)}
+.notif-tag-g{background:var(--ok-bg);color:var(--ok);border-color:#A9DFBF}
+
+.notif-empty{
+  padding:28px 14px;text-align:center;color:var(--sub);
+  font-size:12px;line-height:1.6;
+}
+.notif-empty-ico{font-size:32px;margin-bottom:8px;opacity:.4}
+
+.notif-foot{
+  border-top:1px solid var(--border);background:#FAFCFE;
+  padding:9px 14px;text-align:center;flex-shrink:0;
+}
+.notif-foot a{
+  font-size:11px;font-weight:600;color:var(--blue);
+  cursor:pointer;text-decoration:none;
+}
+.notif-foot a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="screen">
+    <div class="sb sb-light"><span>9:41</span><span>● ● 100%</span></div>
+    <div class="hdr" style="padding-bottom:52px">
+      <div class="hdr-top" style="margin-top:6px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5DADE2,#06C755);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--navy);border:2px solid rgba(255,255,255,.3)">山</div>
+          <div><div style="font-size:14px;font-weight:700;color:white">山田 太郎</div><div style="font-size:10px;color:rgba(255,255,255,.55)">中学2年 ／ 東京FC ジュニア</div></div>
+        </div>
+        <div class="hdr-actions">
+          <div class="bell-wrap" id="bell-trigger" onclick="toggleNotif(event)" role="button" aria-label="通知" tabindex="0">
+            <span class="bell-ico">🔔</span>
+            <span class="bell-badge" id="bell-badge">3</span>
+          </div>
+          <div class="logout-btn" onclick="logout()" role="button" aria-label="ログアウト" tabindex="0" title="ログアウト">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-u">現在身長</div><div class="stat-v">162.4</div><div class="stat-l">cm</div></div>
+        <div class="stat-box"><div class="stat-u">先月比</div><div class="stat-v" style="color:#A8E6CF">+1.2</div><div class="stat-l">cm</div></div>
+        <div class="stat-box"><div class="stat-u">成長余地</div><div class="stat-v">12.6</div><div class="stat-l">cm</div></div>
+      </div>
+    </div>
+    <div class="scroll">
+
+      <!-- Maxポテンシャル身長 -->
+      <div class="max-pot-card">
+        <div class="max-pot-ico">🚀</div>
+        <div class="max-pot-body">
+          <div class="max-pot-lbl">Maxポテンシャル身長 <span class="max-pot-badge">PREDICTED</span></div>
+          <div class="max-pot-row">
+            <span class="max-pot-val" id="max-pot-val">188.0</span>
+            <span class="max-pot-unit">cm</span>
+          </div>
+          <div class="max-pot-sub">
+            <span>現在身長から</span>
+            <span class="max-pot-delta" id="max-pot-delta">+25.6 cm</span>
+            <span>の伸びしろ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📈 身長・体重推移</div><span class="more-link" onclick="location.href='D-02_condition.html'" style="cursor:pointer">詳細 ›</span></div>
+        <div style="display:flex;gap:14px;justify-content:center;margin-bottom:8px;font-size:10px">
+          <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#1E6FD9;border-radius:99px;display:inline-block"></span><span style="color:var(--sub);font-weight:600">身長(cm)</span></div>
+          <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#E8A030;border-radius:99px;display:inline-block"></span><span style="color:var(--sub);font-weight:600">体重(kg)</span></div>
+          <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:rgba(72,201,176,.6);border-radius:99px;display:inline-block;border-top:1px dashed rgba(72,201,176,.6)"></span><span style="color:var(--sub);font-weight:600">予想身長</span></div>
+        </div>
+        <div class="per-tabs"><div class="per-tab">3ヶ月</div><div class="per-tab act">6ヶ月</div><div class="per-tab">1年</div></div>
+        <div class="ch"><canvas id="c1"></canvas></div>
+        <div class="grow-grid">
+          <div class="grow-item"><div class="gi-lbl">半年の成長</div><div class="gi-val">+5.8<span style="font-size:12px;font-weight:400"> cm</span></div><div class="gi-sub" style="color:var(--ok);font-weight:600">↑ 目標比 115%</div></div>
+          <div class="grow-item"><div class="gi-lbl">予想到達身長</div><div class="gi-val">175<span style="font-size:12px;font-weight:400"> cm</span></div><div class="gi-sub" style="color:var(--warn);font-weight:600">あと 12.6cm</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">💪 コンディション</div><span class="more-link" onclick="location.href='D-02_condition.html'" style="cursor:pointer">詳細 ›</span></div>
+        <div class="cond-grid">
+          <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#27AE60" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="24.9" stroke-linecap="round"/></svg><div class="ring-val">82</div></div><div class="cond-name">睡眠</div><div class="cond-bdg" style="background:var(--ok-bg);color:var(--ok)">良好</div></div>
+          <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#E8A030" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="55.3" stroke-linecap="round"/></svg><div class="ring-val" style="color:var(--warn)">60</div></div><div class="cond-name">栄養</div><div class="cond-bdg" style="background:var(--warn-bg);color:var(--warn)">注意</div></div>
+          <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#E53E3E" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="81.4" stroke-linecap="round"/></svg><div class="ring-val" style="color:var(--danger)">41</div></div><div class="cond-name">練習</div><div class="cond-bdg" style="background:var(--danger-bg);color:var(--danger)">過負荷</div></div>
+        </div>
+      </div>
+      <div class="al al-r"><div class="al-top"><div class="al-ico">🔴</div><div style="flex:1"><div class="al-ttl">練習過負荷<span class="badge b-bad">未対応</span></div><div class="al-meta">週7日・3.5h継続中</div></div></div><div style="font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;margin-top:3px"><span onclick="location.href='D-03_alerts.html'" style="cursor:pointer">→ アラート一覧を見る</span></div></div>
+      <div class="prot-card">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+          <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1E6FD9,#06C755);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💊</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--navy)">NOBITAプロテイン 使用中</div><div style="font-size:10px;color:var(--sub)">開始から90日目</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">開始日</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">2026/1/10</div></div>
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">使用量</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">20g/日</div></div>
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">身長増加</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ok)">+3.2cm</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="nv act" onclick="location.href='D-01_dashboard.html'" style="cursor:pointer"><div class="nv-ico">🏠</div><div class="nv-lbl">ホーム</div>
+      <div class="nv-dot"></div></div>
+      <div class="nv" onclick="location.href='D-04_input_step1.html'" style="cursor:pointer"><div class="nv-ico">✏️</div><div class="nv-lbl">入力</div></div>
+      <div class="nv" onclick="location.href='D-08_history.html'" style="cursor:pointer"><div class="nv-ico">📋</div><div class="nv-lbl">履歴</div></div>
+      <div class="nv" onclick="location.href='D-09_profile.html'" style="cursor:pointer"><div class="nv-ico">👤</div><div class="nv-lbl">設定</div></div>
+    </div>
+
+    <!-- 通知ドロップダウン -->
+    <div class="notif-overlay" id="notif-overlay" onclick="closeNotif()"></div>
+    <div class="notif-panel" id="notif-panel" role="dialog" aria-label="通知">
+      <div class="notif-hdr">
+        <div class="notif-hdr-l">
+          <div class="notif-ttl">通知</div>
+          <span class="notif-cnt" id="notif-unread-cnt">3</span>
+        </div>
+        <div class="notif-mark" id="notif-mark-all" onclick="markAllRead()">すべて既読にする</div>
+      </div>
+      <div class="notif-list" id="notif-list"></div>
+      <div class="notif-foot">
+        <a onclick="location.href='D-03_alerts.html'">アラート一覧を見る →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
+<script>
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ══════════════════════════════════════════════════════════════
+// ログアウト
+// ══════════════════════════════════════════════════════════════
+function logout(){
+  if(confirm('ログアウトしますか？')){
+    window.location.href = '../index.html';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Maxポテンシャル身長
+// 算出式:
+//   年間伸び幅(cm/年) = 骨端線幅(mm) × 2
+//   Maxポテンシャル   = 現在身長 + 年間伸び幅 × 残り成長年数
+//   ※残り成長年数: 男子は17歳まで、女子は15歳まで（学年から逆算）
+// ══════════════════════════════════════════════════════════════
+function renderMaxPotential(){
+  try {
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    var currentHt = parseFloat(s.ht || '162.4');
+    var epMm      = parseFloat(s.ep || '3.2'); // 骨端線幅 mm
+    // 性別取得（'female'/'male'）。デフォルトは男性
+    var gender = (s.gender === 'female') ? 'female' : 'male';
+
+    // 残り成長年数の推定（学年情報がなければ中2 = 13歳と仮定）
+    var ageNow = parseFloat(s.age_years || 13);
+    var growEndAge = gender === 'female' ? 15 : 17;
+    var remainingYears = Math.max(0, growEndAge - ageNow);
+
+    // 年間伸び幅(cm/年) = 骨端線幅(mm) × 2
+    var perYearCm = epMm * 2;
+    var addCm = perYearCm * remainingYears;
+    var maxPot = currentHt + addCm;
+    var delta  = maxPot - currentHt;
+
+    var valEl = document.getElementById('max-pot-val');
+    var dltEl = document.getElementById('max-pot-delta');
+    if(valEl) valEl.textContent = (Math.round(maxPot * 10) / 10).toFixed(1);
+    if(dltEl) dltEl.textContent = '+' + (Math.round(delta * 10) / 10).toFixed(1) + ' cm';
+  } catch(e){ console.error('renderMaxPotential failed:', e); }
+}
+
+window.addEventListener('load', renderMaxPotential);
+
+// ══════════════════════════════════════════════════════════════
+// 通知ドロップダウン
+// ══════════════════════════════════════════════════════════════
+// 通知データ（要件定義書のアラート種別＋運用通知）
+var _NOTIFICATIONS = [
+  {
+    id:'n1', icoCls:'notif-ico-b', ico:'📅',
+    title:'今月の月次測定がまだです',
+    desc:'5月の測定入力がまだ完了していません。月1回、約3分の入力で月次レポートが更新されます。',
+    time:'本日',
+    tagCls:'notif-tag-b', tagText:'リマインド',
+    href:'D-04_input_step1.html'
+  },
+  {
+    id:'n2', icoCls:'notif-ico-r', ico:'🚨',
+    title:'練習過負荷を検知',
+    desc:'プロフィール登録の練習時間（3.5h/日・週7日）が推奨を超えています。休息日の確保を検討してください。',
+    time:'3日前',
+    tagCls:'notif-tag-r', tagText:'重要',
+    href:'D-03_alerts.html'
+  },
+  {
+    id:'n3', icoCls:'notif-ico-y', ico:'🥗',
+    title:'栄養スコアが低下傾向',
+    desc:'今月の栄養スコアが60点。三食しっかり摂ることでスコア改善が見込めます。',
+    time:'先月',
+    tagCls:'notif-tag-y', tagText:'要注意',
+    href:'D-02_condition.html'
+  },
+  {
+    id:'n4', icoCls:'notif-ico-y', ico:'📉',
+    title:'成長停滞の兆候',
+    desc:'過去3ヶ月の身長の伸びが月平均を下回っています。睡眠と栄養を見直しましょう。',
+    time:'先月',
+    tagCls:'notif-tag-y', tagText:'要注意',
+    href:'D-02_condition.html'
+  },
+  {
+    id:'n5', icoCls:'notif-ico-g', ico:'💬',
+    title:'指導者からコメント',
+    desc:'田中コーチ：「先月の入力ありがとう。練習後のプロテイン摂取を続けてください。」',
+    time:'1週間前',
+    tagCls:'notif-tag-g', tagText:'コメント',
+    href:'D-02_condition.html'
+  }
+];
+
+function _loadReadIds(){
+  try{
+    var raw = localStorage.getItem('nobita_notif_read');
+    var arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){ return []; }
+}
+
+function _saveReadIds(ids){
+  try{ localStorage.setItem('nobita_notif_read', JSON.stringify(ids)); }catch(e){}
+}
+
+function _renderNotif(){
+  var readIds = _loadReadIds();
+  var list = document.getElementById('notif-list');
+  var unreadCount = 0;
+  var html = '';
+
+  _NOTIFICATIONS.forEach(function(n){
+    var isUnread = readIds.indexOf(n.id) === -1;
+    if(isUnread) unreadCount++;
+    html +=
+      '<div class="notif-item ' + (isUnread ? 'unread' : '') + '" data-id="' + n.id + '" data-href="' + n.href + '">' +
+        '<div class="notif-ico ' + n.icoCls + '">' + n.ico + '</div>' +
+        '<div class="notif-body">' +
+          '<div class="notif-row">' +
+            '<div class="notif-title">' + n.title + '</div>' +
+            '<div class="notif-time">' + n.time + '</div>' +
+          '</div>' +
+          '<div class="notif-desc">' + n.desc + '</div>' +
+          '<div class="notif-meta">' +
+            '<span class="notif-tag ' + n.tagCls + '">' + n.tagText + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  });
+
+  if(_NOTIFICATIONS.length === 0){
+    html =
+      '<div class="notif-empty">' +
+        '<div class="notif-empty-ico">🔕</div>' +
+        '<div>新しい通知はありません</div>' +
+      '</div>';
+  }
+
+  list.innerHTML = html;
+
+  // 各項目クリックで該当画面へ
+  list.querySelectorAll('.notif-item').forEach(function(el){
+    el.addEventListener('click', function(){
+      var id = this.dataset.id;
+      var href = this.dataset.href;
+      _markRead(id);
+      if(href) window.location.href = href;
+    });
+  });
+
+  // バッジ更新
+  var badge = document.getElementById('bell-badge');
+  var hdrCnt = document.getElementById('notif-unread-cnt');
+  var mark = document.getElementById('notif-mark-all');
+  if(badge){
+    if(unreadCount > 0){
+      badge.classList.remove('hidden');
+      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+  if(hdrCnt){
+    hdrCnt.textContent = String(unreadCount);
+    hdrCnt.classList.toggle('zero', unreadCount === 0);
+  }
+  if(mark){
+    mark.classList.toggle('disabled', unreadCount === 0);
+  }
+}
+
+function _markRead(id){
+  var ids = _loadReadIds();
+  if(ids.indexOf(id) === -1){
+    ids.push(id);
+    _saveReadIds(ids);
+  }
+}
+
+function markAllRead(){
+  var allIds = _NOTIFICATIONS.map(function(n){ return n.id; });
+  _saveReadIds(allIds);
+  _renderNotif();
+  toast('すべて既読にしました');
+}
+
+function toggleNotif(e){
+  if(e) e.stopPropagation();
+  var panel = document.getElementById('notif-panel');
+  var overlay = document.getElementById('notif-overlay');
+  var open = panel.classList.contains('open');
+  if(open){
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+  } else {
+    _renderNotif();
+    panel.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeNotif(){
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('notif-overlay').classList.remove('open');
+}
+
+// 通知パネル内クリックでは閉じない
+document.addEventListener('DOMContentLoaded', function(){
+  var panel = document.getElementById('notif-panel');
+  if(panel) panel.addEventListener('click', function(e){ e.stopPropagation(); });
+  _renderNotif();
+});
+
+window.addEventListener('load',()=>{
+  const c=document.getElementById('c1');
+  new Chart(c,{
+    type:'line',
+    data:{
+      labels:['10月','11月','12月','1月','2月','3月'],
+      datasets:[
+        // 身長（実測・左軸）
+        {
+          label:'身長',
+          data:[156.6,157.4,158.5,159.8,161.2,162.4],
+          borderColor:'#1E6FD9',
+          backgroundColor:'rgba(30,111,217,.08)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#1E6FD9',
+          fill:true,tension:.4,yAxisID:'yH'
+        },
+        // 予想身長（破線・左軸）
+        {
+          label:'予想身長',
+          data:[162,163,164,165,166,167],
+          borderColor:'rgba(72,201,176,.6)',
+          borderWidth:1.5,pointRadius:0,
+          fill:false,tension:.4,borderDash:[5,3],yAxisID:'yH'
+        },
+        // 体重（実測・右軸）
+        {
+          label:'体重',
+          data:[48.2,49.1,49.8,50.6,51.5,52.8],
+          borderColor:'#E8A030',
+          backgroundColor:'rgba(232,160,48,.08)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#E8A030',
+          fill:false,tension:.4,yAxisID:'yW'
+        }
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:function(ctx){
+              var unit = ctx.dataset.yAxisID === 'yW' ? 'kg' : 'cm';
+              return ctx.dataset.label + ': ' + ctx.parsed.y + unit;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:9},color:'#8FA3B8'}},
+        // 左軸：身長
+        yH:{
+          position:'left',
+          grid:{color:'rgba(0,0,0,.04)'},
+          ticks:{font:{size:9},color:'#1E6FD9',callback:v=>v+'cm'},
+          min:154,max:170
+        },
+        // 右軸：体重
+        yW:{
+          position:'right',
+          grid:{display:false},
+          ticks:{font:{size:9},color:'#E8A030',callback:v=>v+'kg'},
+          min:44,max:58
+        }
+      }
+    }
+  });
+});
+
+</script>
+</body>
+</html>

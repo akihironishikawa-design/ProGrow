@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProGrow — チームダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── 薄パステルグラデーションテーマ ── */
+  --bg:#F0F7FB;             /* メインの薄水色背景（フォールバック） */
+  --bg-grad:linear-gradient(135deg,#EBF5FB 0%,#EAF7F0 100%); /* 水色→薄緑 */
+  --surf:#FFFFFF;           /* サイドバーなどの面色 */
+  --card:#FFFFFF;           /* カード背景 */
+  --card2:#F7FAFC;          /* セカンダリ要素背景 */
+  --bdr:#D8E5EF;            /* メインの枠線 */
+  --bdr2:#E8EEF4;           /* 薄い区切り */
+
+  /* アクセント色（青〜緑のスポーティ配色） */
+  --teal:#0FB8A0;
+  --amber:#E8A030;
+  --sky:#3B8FE8;
+
+  /* ステータス色 */
+  --ok:#27AE60;--danger:#E53E3E;--warn:#E8A030;
+
+  /* テキスト */
+  --text:#0F2137;           /* メインテキスト（濃いネイビー） */
+  --muted:#5A6F84;          /* 補助テキスト */
+  --dim:#8FA3B8;            /* 最も薄いテキスト */
+
+  --font:'Instrument Sans','Noto Sans JP',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);background-image:var(--bg-grad);color:var(--text)}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ─ サイドバー ─ */
+.sidebar{width:224px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;box-shadow:2px 0 8px rgba(11,29,53,.04)}
+.sb-head{padding:16px 18px 14px;border-bottom:1px solid var(--bdr)}
+.sb-logo{display:flex;align-items:center;gap:9px}
+.sb-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--sky));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(15,184,160,.3)}
+.sb-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.sb-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.sb-scroll{flex:1;overflow-y:auto;padding:10px 0}
+.sb-scroll::-webkit-scrollbar{width:2px}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
+.sb-sec{padding:5px 14px 2px}
+.sb-sec-lbl{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:7px;margin:1px 5px;cursor:pointer;transition:all .15s}
+.sb-item:hover{background:rgba(15,184,160,.06)}
+.sb-item.act{background:rgba(15,184,160,.12);border:1px solid rgba(15,184,160,.2)}
+.sb-item.act .sb-icon{opacity:1}
+.sb-item.act .sb-lbl{color:var(--teal)}
+.sb-icon{font-size:14px;opacity:.45;width:18px;text-align:center;flex-shrink:0}
+.sb-lbl{font-size:11px;color:var(--muted);font-weight:500;flex:1}
+.sb-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.sbb-red{background:rgba(238,75,75,.18);color:var(--danger);border:1px solid rgba(238,75,75,.3)}
+.sbb-teal{background:rgba(15,184,160,.15);color:var(--teal);border:1px solid rgba(15,184,160,.25)}
+.sb-foot{padding:12px 18px;border-top:1px solid var(--bdr)}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(15,184,160,.3),rgba(59,143,232,.3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--teal);border:1.5px solid rgba(15,184,160,.3);flex-shrink:0}
+.sb-uname{font-size:11px;font-weight:600;color:var(--text)}
+.sb-urole{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ─ メイン ─ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:46px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0;box-shadow:0 1px 4px rgba(11,29,53,.04)}
+.tb-title{font-size:14px;font-weight:700;color:var(--text)}
+.tb-spacer{flex:1}
+.tb-btn{height:28px;padding:0 13px;border-radius:7px;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px}
+.tb-ghost{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+.tb-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.tb-teal{background:var(--teal);color:#FFFFFF;box-shadow:0 3px 10px rgba(15,184,160,.3)}
+.tb-notif{position:relative;cursor:pointer;margin-left:4px}
+.notif-dot{position:absolute;top:1px;right:1px;width:7px;height:7px;border-radius:50%;background:var(--danger);border:1.5px solid var(--surf)}
+.tab-row{display:flex;gap:3px;background:var(--card2);padding:3px;border-radius:7px;border:1px solid var(--bdr)}
+.tab{padding:4px 12px;border-radius:5px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab.act{background:var(--teal);color:#FFFFFF}
+
+.content{flex:1;overflow-y:auto;padding:22px;background:transparent}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
+
+/* ─ KPI ─ */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border-radius:13px;padding:16px 18px;border:1px solid var(--bdr);position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(11,29,53,.05)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0}
+.kpi-t::before{background:linear-gradient(90deg,var(--teal),var(--sky))}
+.kpi-a::before{background:linear-gradient(90deg,var(--amber),#E86010)}
+.kpi-d::before{background:linear-gradient(90deg,var(--danger),#AA1010)}
+.kpi-o::before{background:linear-gradient(90deg,var(--ok),#159042)}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.kpi-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--text);line-height:1;margin-bottom:4px}
+.kpi-unit{font-size:13px;font-weight:400;color:var(--muted);margin-left:2px}
+.kpi-diff{font-size:10px;font-weight:600}
+.kd-ok{color:var(--ok)}.kd-warn{color:var(--warn)}.kd-bad{color:var(--danger)}
+
+/* ─ グリッド ─ */
+.g2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-bottom:16px}
+.g2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ─ カード ─ */
+.card{background:var(--card);border-radius:13px;padding:18px;border:1px solid var(--bdr);box-shadow:0 2px 10px rgba(11,29,53,.05)}
+.c-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.c-title{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.c-more{font-size:10px;color:var(--teal);cursor:pointer;padding:3px 9px;border-radius:5px;border:1px solid rgba(15,184,160,.25);background:rgba(15,184,160,.06)}
+
+/* ─ チャート ─ */
+.ch{position:relative;height:188px}
+.ch-sm{position:relative;height:110px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.ld{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* ─ ヒートマップ ─ */
+.hm-wrap{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:10px}
+.hm{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.hm:hover{transform:scale(1.06)}
+.hok{background:rgba(40,199,111,.18);color:var(--ok)}
+.hwn{background:rgba(232,160,48,.18);color:var(--amber)}
+.hbd{background:rgba(238,75,75,.18);color:var(--danger)}
+
+/* ─ テーブル ─ */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--bdr);text-align:left;background:var(--card2);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--bdr2);font-size:11px;vertical-align:middle;color:var(--text)}
+.tbl tr:hover td{background:rgba(15,184,160,.06)}
+.tbl tr:last-child td{border:none}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:10px;color:var(--muted)}
+.pager-btns{display:flex;gap:4px}
+
+/* ─ プレイヤー ─ */
+.pc{display:flex;align-items:center;gap:9px}
+.pav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1.5px solid}
+.av-t{background:rgba(15,184,160,.12);border-color:rgba(15,184,160,.35);color:var(--teal)}
+.av-a{background:rgba(232,160,48,.12);border-color:rgba(232,160,48,.35);color:var(--amber)}
+.av-d{background:rgba(238,75,75,.12);border-color:rgba(238,75,75,.35);color:var(--danger)}
+.av-o{background:rgba(40,199,111,.12);border-color:rgba(40,199,111,.35);color:var(--ok)}
+.av-s{background:rgba(59,143,232,.12);border-color:rgba(59,143,232,.35);color:var(--sky)}
+.pn{font-size:11px;font-weight:600;color:var(--text)}
+.pm{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ─ コンディションバー ─ */
+.cb{display:flex;align-items:center;gap:5px}
+.cb-bg{width:54px;height:5px;background:var(--card2);border-radius:99px;overflow:hidden}
+.cb-fill{height:100%;border-radius:99px}
+.cv{font-size:9px;font-weight:600;width:22px;text-align:right}
+
+/* ─ バッジ ─ */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;white-space:nowrap}
+.b-ok{background:rgba(40,199,111,.12);color:var(--ok);border:1px solid rgba(40,199,111,.2)}
+.b-wn{background:rgba(232,160,48,.12);color:var(--amber);border:1px solid rgba(232,160,48,.2)}
+.b-bd{background:rgba(238,75,75,.12);color:var(--danger);border:1px solid rgba(238,75,75,.2)}
+.b-tl{background:rgba(15,184,160,.12);color:var(--teal);border:1px solid rgba(15,184,160,.2)}
+.b-mu{background:var(--card2);color:var(--muted);border:1px solid var(--bdr)}
+
+/* ─ アクションボタン ─ */
+.ab{padding:3px 10px;border-radius:5px;border:none;font-size:9px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.ab-t{background:rgba(15,184,160,.15);color:var(--teal);border:1px solid rgba(15,184,160,.25)}
+.ab-g{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+
+/* ─ アラートカード ─ */
+.al{border-radius:10px;padding:12px 14px;margin-bottom:9px;border:1px solid;cursor:pointer}
+.al:hover{filter:brightness(1.08)}
+.al-r{background:rgba(238,75,75,.07);border-color:rgba(238,75,75,.25)}
+.al-a{background:rgba(232,160,48,.07);border-color:rgba(232,160,48,.25)}
+.al-o{background:rgba(40,199,111,.05);border-color:rgba(40,199,111,.15);opacity:.6}
+.al-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
+.al-ico{font-size:18px;flex-shrink:0}
+.al-ttl{font-size:11px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.al-meta{font-size:9px;color:var(--muted);margin-top:2px}
+.al-desc{font-size:10px;color:var(--muted);line-height:1.5;margin-bottom:9px;padding-left:28px}
+.al-btns{display:flex;gap:7px;padding-left:28px}
+.al-btn{padding:4px 12px;border-radius:6px;border:none;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.alb-t{background:var(--teal);color:#FFFFFF}
+.alb-g{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+
+/* ─ スクリーン ─ */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ─ トースト ─ */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0F2137;color:#FFFFFF;font-size:11px;font-weight:700;padding:9px 20px;border-radius:99px;pointer-events:none;opacity:0;transition:opacity .3s;z-index:9999;white-space:nowrap;box-shadow:0 6px 20px rgba(11,29,53,.25)}
+
+/* ══════════════════════════════════════════════════
+   アニメーション & インタラクション拡張
+   ══════════════════════════════════════════════════ */
+
+/* ── キーフレーム定義 ── */
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+@keyframes pulse {
+  0%, 100% { box-shadow:0 0 0 0 rgba(238,75,75,.5); }
+  50%      { box-shadow:0 0 0 6px rgba(238,75,75,0); }
+}
+@keyframes pulseTeal {
+  0%, 100% { box-shadow:0 0 0 0 rgba(15,184,160,.55); }
+  50%      { box-shadow:0 0 0 5px rgba(15,184,160,0); }
+}
+@keyframes shake {
+  0%, 100% { transform:translateX(0); }
+  20%, 60% { transform:translateX(-2px); }
+  40%, 80% { transform:translateX(2px); }
+}
+@keyframes flash {
+  0% { background:rgba(238,75,75,.18); }
+  100% { background:rgba(238,75,75,.07); }
+}
+@keyframes slideInLeft {
+  from { opacity:0; transform:translateX(-12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes spin {
+  to { transform:rotate(360deg); }
+}
+
+/* ── カードのフェードイン（IntersectionObserver連携） ── */
+.kpi, .card {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .5s ease, transform .5s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.kpi.in-view, .card.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── ホバー時のカード浮き上がり ── */
+.kpi:hover, .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(11,29,53,.10);
+  border-color: rgba(15,184,160,.35);
+}
+
+/* ── サイドバーアイテムのホバー時アイコンスライド ── */
+.sb-item { transition: background .15s ease, transform .15s ease, border-color .15s ease; }
+.sb-item:hover { transform: translateX(2px); }
+.sb-icon { transition: transform .2s ease, opacity .15s; }
+.sb-item:hover .sb-icon { transform: scale(1.15); }
+
+/* ── アラートバッジのパルス点滅 ── */
+.sb-badge.pulse, .badge.pulse-red {
+  animation: pulse 2s ease-out infinite;
+}
+
+/* ── 通知ドット ── */
+.notif-dot {
+  animation: pulse 2s ease-out infinite;
+}
+
+/* ── 「LIVE」インジケータ ── */
+.live-dot {
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#27AE60;margin-right:5px;vertical-align:middle;
+  animation: pulseTeal 1.8s ease-out infinite;
+  box-shadow:0 0 0 0 rgba(39,174,96,.55);
+}
+.live-label {
+  font-size:9px;font-weight:700;color:var(--ok);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+
+/* ── 最終更新表示 ── */
+.last-update {
+  font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px;
+}
+.last-update::before {
+  content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--ok);animation:pulseTeal 2s ease-out infinite;
+}
+
+/* ── テーブル行のフェードイン ── */
+.tbl tbody tr {
+  opacity: 0;
+  animation: fadeInUp .35s ease forwards;
+}
+.tbl tbody tr:nth-child(1) { animation-delay: .05s; }
+.tbl tbody tr:nth-child(2) { animation-delay: .10s; }
+.tbl tbody tr:nth-child(3) { animation-delay: .15s; }
+.tbl tbody tr:nth-child(4) { animation-delay: .20s; }
+.tbl tbody tr:nth-child(5) { animation-delay: .25s; }
+.tbl tbody tr.fading {
+  animation: none;
+  opacity: .4;
+  text-decoration: line-through;
+  transition: opacity .4s, background .4s;
+}
+
+/* ── 新着アラート行のフラッシュ ── */
+.al.fresh { animation: flash 2.5s ease; }
+.al.shake { animation: shake .4s ease; }
+
+/* ── スクリーン切替アニメーション ── */
+.screen {
+  animation: fadeInUp .35s ease;
+}
+.screen.active {
+  display: block;
+}
+
+/* ── ソート可能なテーブルヘッダー ── */
+.tbl th.sortable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 20px;
+  transition: color .15s, background .15s;
+}
+.tbl th.sortable:hover {
+  color: var(--teal);
+  background: rgba(15,184,160,.06);
+}
+.tbl th.sortable::after {
+  content: '⇅';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .35;
+  font-size: 9px;
+}
+.tbl th.sortable.asc::after  { content: '↑'; opacity: 1; color: var(--teal); }
+.tbl th.sortable.desc::after { content: '↓'; opacity: 1; color: var(--teal); }
+
+/* ── 検索ボックス ── */
+.tbl-search {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card2); border: 1px solid var(--bdr);
+  border-radius: 7px; padding: 5px 10px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.tbl-search:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(15,184,160,.12);
+}
+.tbl-search input {
+  border: none; outline: none; background: transparent;
+  font-size: 11px; font-family: var(--font); color: var(--text);
+  width: 140px; padding: 1px 0;
+}
+.tbl-search input::placeholder { color: var(--dim); }
+
+/* ── 期間タブのアクティブ感 ── */
+.period-tab {
+  padding: 3px 9px; border-radius: 3px;
+  font-size: 9px; font-weight: 700; cursor: pointer;
+  transition: all .2s ease;
+}
+.period-tab:not(.act) { color: var(--muted); }
+.period-tab:not(.act):hover { background: rgba(15,184,160,.08); color: var(--teal); }
+.period-tab.act {
+  background: var(--teal); color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(15,184,160,.3);
+}
+
+/* ── 操作禁止時の見た目 ── */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
+/* ══ レポート生成 クイック設定モーダル ══ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(11,29,53,.45);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9990;opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{
+  background:var(--card);border-radius:14px;
+  width:440px;max-width:calc(100vw - 40px);
+  box-shadow:0 20px 60px rgba(11,29,53,.35),0 8px 20px rgba(11,29,53,.18);
+  border:1px solid var(--bdr);
+  transform:translateY(8px) scale(.96);
+  transition:transform .25s cubic-bezier(.2,.9,.3,1.1), opacity .2s;
+  opacity:0;overflow:hidden;
+}
+.modal-overlay.open .modal{transform:translateY(0) scale(1);opacity:1}
+.modal-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid var(--bdr);
+  background:linear-gradient(135deg,#FAFCFE,white);
+}
+.modal-title{font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal-close{
+  width:28px;height:28px;border-radius:7px;border:none;background:transparent;
+  color:var(--muted);font-size:18px;cursor:pointer;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.modal-close:hover{background:var(--card2);color:var(--text)}
+.modal-body{padding:18px 20px}
+.modal-sec-lbl{
+  font-size:10px;font-weight:700;color:var(--muted);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;
+}
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:16px}
+.opt-grid.cols3{grid-template-columns:repeat(3,1fr)}
+.opt-btn{
+  height:42px;border-radius:9px;border:1.5px solid var(--bdr);
+  background:var(--card2);color:var(--muted);
+  font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all .15s;user-select:none;
+}
+.opt-btn:hover{background:white;border-color:#BFCFDE;color:var(--text)}
+.opt-btn.sel{
+  background:rgba(15,184,160,.10);border-color:var(--teal);color:var(--teal);
+  font-weight:700;box-shadow:0 2px 8px rgba(15,184,160,.15);
+}
+.opt-btn .opt-ico{font-size:14px}
+.modal-foot{
+  padding:14px 20px;border-top:1px solid var(--bdr);background:var(--card2);
+  display:flex;gap:9px;align-items:center;
+}
+.modal-foot .ft-hint{flex:1;font-size:10px;color:var(--muted)}
+.modal-btn{
+  height:36px;padding:0 18px;border-radius:8px;border:none;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);
+  transition:all .15s;
+}
+.modal-btn-g{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+.modal-btn-g:hover{background:white;border-color:var(--muted);color:var(--text)}
+.modal-btn-p{background:linear-gradient(135deg,var(--teal),var(--sky));color:white;box-shadow:0 3px 10px rgba(15,184,160,.3)}
+.modal-btn-p:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(15,184,160,.4)}
+.modal-btn-p:active{transform:translateY(0)}
+.custom-range{
+  display:flex;gap:8px;align-items:center;margin-bottom:16px;
+  padding:11px 12px;border:1.5px dashed var(--bdr);border-radius:9px;
+  background:var(--card2);
+}
+.custom-range.hidden{display:none}
+.custom-range input{
+  flex:1;height:32px;border:1px solid var(--bdr);border-radius:6px;
+  padding:0 10px;font-size:11px;font-family:var(--font);color:var(--text);
+  background:white;outline:none;
+}
+.custom-range input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(15,184,160,.15)}
+
+/* ══ 期間ドロップダウン ══ */
+.period-wrap{position:relative;display:inline-block}
+.tb-btn.tb-ghost.has-dd{padding-right:9px}
+.tb-btn .dd-caret{font-size:8px;opacity:.6;margin-left:2px}
+.period-dd{
+  position:absolute;top:calc(100% + 6px);right:0;
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:11px;box-shadow:0 16px 48px rgba(11,29,53,.18),0 6px 18px rgba(11,29,53,.10);
+  min-width:200px;z-index:50;overflow:hidden;
+  transform:translateY(-4px) scale(.96);opacity:0;
+  pointer-events:none;transform-origin:top right;
+  transition:all .2s cubic-bezier(.2,.9,.3,1.1);
+}
+.period-dd.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.period-dd-hdr{
+  padding:9px 14px;font-size:9px;font-weight:700;
+  color:var(--muted);letter-spacing:.08em;text-transform:uppercase;
+  border-bottom:1px solid var(--bdr2);background:var(--card2);
+}
+.period-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;font-size:11px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:all .12s;user-select:none;
+}
+.period-item:hover{background:rgba(15,184,160,.08);color:var(--teal)}
+.period-item.act{background:rgba(15,184,160,.12);color:var(--teal);font-weight:700}
+.period-item.act::after{content:'✓';font-weight:900}
+.period-item-l{display:flex;align-items:center;gap:8px}
+.period-item-ico{font-size:13px}
+.period-item-sub{font-size:9px;color:var(--muted);font-weight:500;font-family:var(--mono)}
+.period-item.act .period-item-sub{color:var(--teal);opacity:.7}
+.period-dd-foot{
+  border-top:1px solid var(--bdr2);padding:8px 14px;
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;color:var(--muted);background:var(--card2);
+}
+.period-dd-custom{
+  border:none;background:transparent;color:var(--teal);
+  font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font);
+  padding:2px 6px;border-radius:5px;transition:all .15s;
+}
+.period-dd-custom:hover{background:rgba(15,184,160,.12)}
+
+/* ══ 加入申請承認 ══ */
+.appr-tab{
+  padding:5px 13px;border-radius:5px;font-size:10px;color:var(--muted);
+  cursor:pointer;font-weight:600;transition:all .15s;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.appr-tab:hover{background:rgba(15,184,160,.08);color:var(--teal)}
+.appr-tab.act{background:var(--teal);color:#FFFFFF;font-weight:700}
+.appr-tab.act .badge{background:rgba(255,255,255,.25)!important;color:white!important;border-color:rgba(255,255,255,.3)!important}
+
+.appr-list{display:flex;flex-direction:column;gap:12px}
+
+.appr-card{
+  display:flex;gap:14px;justify-content:space-between;
+  background:white;border:1.5px solid var(--bdr);border-radius:12px;
+  padding:16px;transition:all .25s ease;
+}
+.appr-card:hover{border-color:rgba(15,184,160,.35);box-shadow:0 4px 14px rgba(11,29,53,.06);transform:translateY(-1px)}
+.appr-card.approving{background:var(--ok-bg);border-color:#A9DFBF;opacity:.85}
+.appr-card.rejecting{background:var(--danger-bg);border-color:#F9BABA;opacity:.65}
+.appr-card.removing{
+  opacity:0;transform:translateX(20px) scale(.96);
+  margin-top:-12px;max-height:0;padding:0 16px;
+  border-color:transparent;
+}
+.appr-card.appr-done{padding:13px 16px}
+
+.appr-l{display:flex;gap:13px;flex:1;min-width:0}
+.appr-main{flex:1;min-width:0}
+.appr-name{
+  font-size:14px;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:8px;margin-bottom:3px;
+}
+.appr-meta{font-size:10px;color:var(--muted)}
+
+.appr-r{display:flex;flex-direction:column;gap:6px;flex-shrink:0;width:110px;align-items:stretch}
+.appr-btn{
+  height:32px;border:none;border-radius:7px;cursor:pointer;
+  font-size:11px;font-weight:700;font-family:var(--font);
+  transition:all .15s;
+}
+.appr-btn-ok{background:linear-gradient(135deg,var(--ok),#159042);color:white;box-shadow:0 2px 8px rgba(39,174,96,.3)}
+.appr-btn-ok:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(39,174,96,.4)}
+.appr-btn-ng{background:white;color:var(--danger);border:1px solid rgba(229,62,62,.3)}
+.appr-btn-ng:hover{background:var(--danger);color:white;border-color:var(--danger)}
+.appr-btn-g{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+.appr-btn-g:hover{background:var(--card2);color:var(--text)}
+
+.appr-empty{
+  text-align:center;padding:40px 20px;
+  background:var(--card2);border:1.5px dashed var(--bdr);
+  border-radius:12px;
+}
+.appr-empty-ico{font-size:42px;margin-bottom:10px}
+.appr-empty-txt{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.appr-empty-sub{font-size:11px;color:var(--muted)}
+
+/* ══ E-08 チーム作成申請 ══ */
+.reg-wrap{
+  max-width:680px;margin:0 auto;
+  display:flex;flex-direction:column;gap:18px;
+}
+.reg-hero{
+  background:linear-gradient(135deg,#E8FAF0,#EBF3FF);
+  border:1.5px solid rgba(15,184,160,.3);
+  border-radius:14px;padding:22px 24px;
+  display:flex;align-items:center;gap:16px;
+}
+.reg-hero-ico{
+  width:56px;height:56px;border-radius:14px;
+  background:linear-gradient(135deg,var(--teal),var(--sky));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:white;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(15,184,160,.35);
+}
+.reg-hero-ttl{font-size:18px;font-weight:800;color:var(--text);margin-bottom:3px}
+.reg-hero-sub{font-size:12px;color:var(--muted);line-height:1.55}
+
+.reg-form{display:flex;flex-direction:column;gap:14px}
+.reg-row{display:flex;flex-direction:column;gap:6px}
+.reg-row.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.reg-lbl{
+  font-size:11px;font-weight:700;color:var(--text);
+  display:flex;align-items:center;gap:5px;
+}
+.reg-lbl .req{color:var(--danger);font-weight:900}
+.reg-hint{font-size:10px;color:var(--muted);font-weight:400;margin-left:4px}
+.reg-inp, .reg-sel, .reg-area{
+  width:100%;height:44px;border-radius:10px;
+  border:1.5px solid var(--bdr);background:var(--card2);
+  padding:0 14px;font-size:13px;color:var(--text);font-family:var(--font);
+  outline:none;transition:all .15s;
+}
+.reg-area{height:auto;padding:11px 14px;resize:vertical;min-height:90px}
+.reg-inp:focus, .reg-sel:focus, .reg-area:focus{
+  border-color:var(--teal);background:white;
+  box-shadow:0 0 0 3px rgba(15,184,160,.12);
+}
+.reg-sel{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%235A6F84' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+
+.reg-info{
+  display:flex;gap:11px;align-items:flex-start;
+  background:#F4F9FF;border:1px solid rgba(59,143,232,.2);
+  border-radius:10px;padding:11px 13px;
+  font-size:11px;color:#1244A0;line-height:1.55;
+}
+
+.reg-actions{display:flex;gap:10px;align-items:center;margin-top:8px}
+.reg-btn{
+  height:48px;padding:0 22px;border-radius:11px;border:none;
+  font-size:13px;font-weight:700;font-family:var(--font);
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.reg-btn-p{
+  flex:1;
+  background:linear-gradient(135deg,var(--teal),var(--sky));
+  color:white;box-shadow:0 4px 14px rgba(15,184,160,.3);
+}
+.reg-btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(15,184,160,.4)}
+.reg-btn-p:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;transform:none}
+.reg-btn-g{
+  background:transparent;color:var(--muted);border:1px solid var(--bdr);
+}
+
+/* 申請完了・承認待ち画面 */
+.reg-pending{
+  background:white;border:1.5px solid var(--bdr);border-radius:14px;
+  padding:32px 28px;text-align:center;
+}
+.reg-pending-ico{
+  width:80px;height:80px;border-radius:50%;margin:0 auto 16px;
+  background:linear-gradient(135deg,#FFF7E6,#FFE6B3);
+  display:flex;align-items:center;justify-content:center;font-size:36px;
+  border:2px solid #F8C471;
+  animation:pulseTeal 2s ease-out infinite;
+}
+.reg-pending-ttl{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
+.reg-pending-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.reg-pending-card{
+  background:var(--card2);border-radius:11px;padding:16px;
+  text-align:left;max-width:480px;margin:0 auto 18px;
+  display:grid;grid-template-columns:max-content 1fr;gap:9px 16px;font-size:12px;
+}
+.reg-pending-card dt{font-weight:700;color:var(--muted)}
+.reg-pending-card dd{color:var(--text);font-weight:600}
+.reg-pending-status{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(232,160,48,.12);color:#8A4F00;
+  border:1px solid #F8C471;border-radius:99px;
+  padding:5px 13px;font-size:11px;font-weight:700;
+}
+.reg-pending-status .pulse-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--amber);
+  animation:pulse 1.6s ease-out infinite;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ════ サイドバー ════ -->
+<div class="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">
+      <div class="sb-mark">⚡</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="sb-name">ProGrow</div>
+          <span class="live-dot"></span><span class="live-label">LIVE</span>
+        </div>
+        <div class="sb-sub">成長データ管理システム</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-sec">
+      <div class="sb-sec-lbl">メインメニュー</div>
+      <div class="sb-item act" id="nav-dashboard" onclick="go('dashboard','チームダッシュボード',this)">
+        <div class="sb-icon">📊</div><div class="sb-lbl">チームダッシュボード</div>
+      </div>
+      <div class="sb-item" id="nav-players" onclick="go('players','選手一覧',this)">
+        <div class="sb-icon">👥</div><div class="sb-lbl">選手一覧</div>
+      </div>
+      <div class="sb-item" id="nav-detail" onclick="go('detail','選手詳細',this)">
+        <div class="sb-icon">🔍</div><div class="sb-lbl">選手詳細</div>
+      </div>
+      <div class="sb-item" id="nav-alerts" onclick="go('alerts','アラート管理',this)">
+        <div class="sb-icon">⚠️</div><div class="sb-lbl">アラート管理</div>
+        <div class="sb-badge sbb-red pulse">5</div>
+      </div>
+      <div class="sb-item" id="nav-report" onclick="go('report','レポート生成',this)">
+        <div class="sb-icon">📋</div><div class="sb-lbl">レポート生成</div>
+      </div>
+      <div class="sb-item" id="nav-notify" onclick="go('notify','通知設定',this)">
+        <div class="sb-icon">🔔</div><div class="sb-lbl">通知設定</div>
+      </div>
+    </div>
+    <div class="sb-sec" style="margin-top:10px">
+      <div class="sb-sec-lbl">チーム管理</div>
+      <div class="sb-item" id="nav-approvals" onclick="go('approvals','加入申請承認',this)">
+        <div class="sb-icon">✅</div><div class="sb-lbl">加入申請承認</div>
+        <div class="sb-badge sbb-teal pulse">2</div>
+      </div>
+      <div class="sb-item" onclick="toast('チーム設定')">
+        <div class="sb-icon">⚙️</div><div class="sb-lbl">チーム設定</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av">田</div>
+      <div><div class="sb-uname">田中 コーチ</div><div class="sb-urole">東京FC ジュニア ／ 指導者</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ メイン ════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="page-title">チームダッシュボード</div>
+    <div style="font-size:10px;color:var(--muted)">東京FC ジュニア ／ 2026年4月</div>
+    <div class="last-update" id="last-update" title="最終データ同期">3分前 同期</div>
+    <div class="tb-spacer"></div>
+    <div class="tab-row">
+      <div class="tab act" id="tab-dashboard" onclick="go('dashboard','チームダッシュボード',null)">ダッシュボード</div>
+      <div class="tab" id="tab-players" onclick="go('players','選手一覧',null)">選手一覧</div>
+      <div class="tab" id="tab-alerts" onclick="go('alerts','アラート管理',null)">アラート</div>
+      <div class="tab" id="tab-report" onclick="go('report','レポート生成',null)">レポート</div>
+    </div>
+    <div class="period-wrap">
+      <button class="tb-btn tb-ghost has-dd" type="button" id="period-btn" onclick="togglePeriodDD(event)" aria-haspopup="true" aria-expanded="false">
+        <span>📅</span><span id="period-label">今月</span><span class="dd-caret">▼</span>
+      </button>
+      <div class="period-dd" id="period-dd">
+        <div class="period-dd-hdr">表示期間を選択</div>
+        <div class="period-item act" data-period="this-month" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">📆</span>今月</div>
+          <span class="period-item-sub">2026/05</span>
+        </div>
+        <div class="period-item" data-period="last-month" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">⬅️</span>先月</div>
+          <span class="period-item-sub">2026/04</span>
+        </div>
+        <div class="period-item" data-period="3m" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">📊</span>過去3ヶ月</div>
+          <span class="period-item-sub">2026/03 〜</span>
+        </div>
+        <div class="period-item" data-period="6m" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">📈</span>過去6ヶ月</div>
+          <span class="period-item-sub">2025/12 〜</span>
+        </div>
+        <div class="period-item" data-period="ytd" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">📅</span>今年度</div>
+          <span class="period-item-sub">2026/04 〜</span>
+        </div>
+        <div class="period-item" data-period="all" onclick="selectPeriod(this)">
+          <div class="period-item-l"><span class="period-item-ico">📚</span>全期間</div>
+          <span class="period-item-sub">ALL</span>
+        </div>
+        <div class="period-dd-foot">
+          <span>カスタム期間で見る</span>
+          <button class="period-dd-custom" type="button" onclick="openCustomPeriod()">✏️ 編集</button>
+        </div>
+      </div>
+    </div>
+    <button class="tb-btn tb-teal" onclick="openReportModal()" title="期間と形式を選んでレポートを生成">📄 レポート生成</button>
+    <div class="tb-notif">
+      <div style="font-size:20px;line-height:1;cursor:pointer" onclick="toast('通知を確認しました')">🔔</div>
+      <div class="notif-dot"></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- E-01 ダッシュボード -->
+    <div class="screen active" id="s-dashboard">
+      <div class="kpi-row">
+        <div class="kpi kpi-t"><div class="kpi-lbl">チーム平均身長</div><div class="kpi-val">163.2<span class="kpi-unit">cm</span></div><div class="kpi-diff kd-ok">↑ 先月比 +0.8cm</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">測定未入力</div><div class="kpi-val">3<span class="kpi-unit">名</span></div><div class="kpi-diff kd-warn">今月入力率 86%</div></div>
+        <div class="kpi kpi-d"><div class="kpi-lbl">要対応アラート</div><div class="kpi-val" style="color:var(--danger)">5<span class="kpi-unit">件</span></div><div class="kpi-diff kd-bad">↑ 先週比 +2件</div></div>
+        <div class="kpi kpi-o"><div class="kpi-lbl">コンディション良好</div><div class="kpi-val">14<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">全体の 64%</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="c-hdr">
+            <div class="c-title">📈 チーム平均 身長・体重推移</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="display:flex;background:var(--card2);border-radius:5px;padding:2px;border:1px solid var(--bdr)">
+                <div class="period-tab act" data-period="6M">6M</div>
+                <div class="period-tab" data-period="1Y">1Y</div>
+                <div class="period-tab" data-period="ALL">ALL</div>
+              </div>
+              <div class="c-more" onclick="go('players','選手一覧',null)">全選手を見る →</div>
+            </div>
+          </div>
+          <div class="ch"><canvas id="c-team"></canvas></div>
+          <div class="legend">
+            <div class="li"><div class="ld" style="background:#3B8FE8"></div>身長 (cm)</div>
+            <div class="li"><div class="ld" style="background:#E8A030"></div>体重 (kg)</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="c-hdr">
+            <div class="c-title">💪 コンディション分布（22名）</div>
+            <div class="c-more" onclick="go('players','選手一覧',null)">詳細 →</div>
+          </div>
+          <div style="height:26px;border-radius:7px;overflow:hidden;display:flex;margin-bottom:14px">
+            <div style="flex:14;background:rgba(40,199,111,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--ok)">良好 14名</div>
+            <div style="flex:5;background:rgba(232,160,48,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--amber)">注意 5</div>
+            <div style="flex:3;background:rgba(238,75,75,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--danger)">3</div>
+          </div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">学年別ヒートマップ</div>
+          <div class="hm-wrap">
+            <div class="hm hok">中1①</div><div class="hm hok">中1②</div><div class="hm hwn">中1③</div><div class="hm hok">中1④</div>
+            <div class="hm hok">中2①</div><div class="hm hbd" onclick="go('alerts','アラート管理',null)">中2②⚠</div><div class="hm hwn">中2③</div><div class="hm hok">中2④</div>
+            <div class="hm hbd" onclick="go('alerts','アラート管理',null)">中3①⚠</div><div class="hm hok">中3②</div><div class="hm hok">中3③</div><div class="hm hwn">中3④</div>
+          </div>
+          <div class="legend">
+            <div class="li"><div class="ld" style="background:rgba(40,199,111,.4)"></div>良好</div>
+            <div class="li"><div class="ld" style="background:rgba(232,160,48,.4)"></div>注意</div>
+            <div class="li"><div class="ld" style="background:rgba(238,75,75,.4)"></div>要対応</div>
+          </div>
+        </div>
+      </div>
+      <div class="g2b">
+        <div class="card">
+          <div class="c-hdr">
+            <div class="c-title">⚠ 測定未入力（3名）</div>
+            <button class="tb-btn tb-ghost" style="height:26px;font-size:10px" onclick="toast('リマインドを送信しました！')">📤 一括リマインド</button>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>選手</th><th>学年</th><th>最終入力</th><th>超過</th><th style="text-align:right">操作</th></tr></thead>
+            <tbody>
+              <tr><td><div class="pc"><div class="pav av-d">山</div><div><div class="pn">山田 太郎</div><div class="pm">バスケ</div></div></div></td><td style="color:var(--muted);font-size:10px">中学2年</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">3週間前</td><td><span class="badge b-bd">21日超</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('山田 太郎 に通知しました')">通知</button></td></tr>
+              <tr><td><div class="pc"><div class="pav av-a">鈴</div><div><div class="pn">鈴木 健太</div><div class="pm">バスケ</div></div></div></td><td style="color:var(--muted);font-size:10px">中学1年</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">2週間前</td><td><span class="badge b-wn">14日超</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('鈴木 健太 に通知しました')">通知</button></td></tr>
+              <tr><td><div class="pc"><div class="pav av-a">木</div><div><div class="pn">木村 翔</div><div class="pm">バスケ</div></div></div></td><td style="color:var(--muted);font-size:10px">中学3年</td><td style="font-family:var(--mono);font-size:10px;color:var(--muted)">10日前</td><td><span class="badge b-wn">10日超</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('木村 翔 に通知しました')">通知</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="c-hdr">
+            <div class="c-title">🚨 直近アラート</div>
+            <div class="c-more" onclick="go('alerts','アラート管理',null)">全て見る（5件）→</div>
+          </div>
+          <div class="al al-r" style="padding:10px 12px;cursor:default"><div class="al-top"><div class="al-ico">🔴</div><div><div class="al-ttl">練習過負荷<span class="badge b-bd">未対応</span></div><div class="al-meta">山田 太郎（中2）／ 4/10</div></div><button class="ab ab-t" style="margin-left:auto" onclick="toast('対応済みにしました！')">対応済み</button></div></div>
+          <div class="al al-r" style="padding:10px 12px;cursor:default"><div class="al-top"><div class="al-ico">🔴</div><div><div class="al-ttl">成長停滞<span class="badge b-bd">未対応</span></div><div class="al-meta">伊藤 大輝（中2）／ 4/08</div></div><button class="ab ab-t" style="margin-left:auto" onclick="toast('対応済みにしました！')">対応済み</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-02 選手一覧 -->
+    <div class="screen" id="s-players">
+      <div class="card">
+        <div class="c-hdr">
+          <div class="c-title">👥 選手一覧</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;background:var(--card2);border-radius:6px;padding:2px;border:1px solid var(--bdr);gap:2px">
+              <div style="padding:4px 11px;border-radius:4px;font-size:9px;font-weight:700;background:var(--teal);color:#FFFFFF;cursor:pointer">全員（22）</div>
+              <div style="padding:4px 11px;border-radius:4px;font-size:9px;color:var(--muted);cursor:pointer">中1</div>
+              <div style="padding:4px 11px;border-radius:4px;font-size:9px;color:var(--muted);cursor:pointer">中2</div>
+              <div style="padding:4px 11px;border-radius:4px;font-size:9px;color:var(--muted);cursor:pointer">中3</div>
+              <div style="padding:4px 11px;border-radius:4px;font-size:9px;color:var(--danger);cursor:pointer">⚠ 要対応</div>
+            </div>
+            <div class="tbl-search">
+              <span style="font-size:11px">🔍</span>
+              <input type="text" placeholder="選手を検索...">
+            </div>
+            <span style="font-size:10px;color:var(--muted)">列見出しクリックで並び替え</span>
+          </div>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>選手</th><th>学年</th><th>身長</th><th>先月比</th><th>体重</th><th>総合</th><th>睡眠</th><th>栄養</th><th>練習負荷</th><th>最終入力</th><th style="text-align:right">操作</th></tr></thead>
+          <tbody>
+            <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
+              <td><div class="pc"><div class="pav av-d">山</div><div><div class="pn">山田 太郎</div><div class="pm">東京FC</div></div></div></td>
+              <td style="color:var(--muted);font-size:10px">中学2年</td><td style="font-family:var(--mono)">162.4cm</td>
+              <td style="font-size:10px;font-weight:600;color:var(--ok)">↑ +1.2cm</td>
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">52.8kg</td>
+              <td><span class="badge b-bd">要対応</span></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:82%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">82</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:60%;background:var(--amber)"></div></div><div class="cv" style="color:var(--amber)">60</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:41%;background:var(--danger)"></div></div><div class="cv" style="color:var(--danger)">41</div></div></td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">04/10</td>
+              <td style="text-align:right"><button class="ab ab-t">詳細</button></td>
+            </tr>
+            <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
+              <td><div class="pc"><div class="pav av-t">田</div><div><div class="pn">田中 一郎</div><div class="pm">東京FC</div></div></div></td>
+              <td style="color:var(--muted);font-size:10px">中学2年</td><td style="font-family:var(--mono)">165.0cm</td>
+              <td style="font-size:10px;font-weight:600;color:var(--ok)">↑ +0.9cm</td>
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">58.2kg</td>
+              <td><span class="badge b-ok">良好</span></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:88%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">88</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:82%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">82</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:75%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">75</div></div></td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">04/14</td>
+              <td style="text-align:right"><button class="ab ab-t">詳細</button></td>
+            </tr>
+            <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
+              <td><div class="pc"><div class="pav av-a">伊</div><div><div class="pn">伊藤 大輝</div><div class="pm">東京FC</div></div></div></td>
+              <td style="color:var(--muted);font-size:10px">中学2年</td><td style="font-family:var(--mono)">160.8cm</td>
+              <td style="font-size:10px;font-weight:600;color:var(--muted)">± 0.0cm ⚠</td>
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">54.1kg</td>
+              <td><span class="badge b-wn">注意</span></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:70%;background:var(--amber)"></div></div><div class="cv" style="color:var(--amber)">70</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:65%;background:var(--amber)"></div></div><div class="cv" style="color:var(--amber)">65</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:72%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">72</div></div></td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">04/12</td>
+              <td style="text-align:right"><button class="ab ab-t">詳細</button></td>
+            </tr>
+            <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
+              <td><div class="pc"><div class="pav av-o">佐</div><div><div class="pn">佐藤 花子</div><div class="pm">東京FC</div></div></div></td>
+              <td style="color:var(--muted);font-size:10px">中学1年</td><td style="font-family:var(--mono)">156.2cm</td>
+              <td style="font-size:10px;font-weight:600;color:var(--ok)">↑ +1.4cm</td>
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">46.8kg</td>
+              <td><span class="badge b-ok">良好</span></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:90%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">90</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:55%;background:var(--amber)"></div></div><div class="cv" style="color:var(--amber)">55</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:80%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">80</div></div></td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">04/13</td>
+              <td style="text-align:right"><button class="ab ab-t">詳細</button></td>
+            </tr>
+            <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
+              <td><div class="pc"><div class="pav av-s">高</div><div><div class="pn">高橋 勇気</div><div class="pm">東京FC</div></div></div></td>
+              <td style="color:var(--muted);font-size:10px">中学3年</td><td style="font-family:var(--mono)">172.5cm</td>
+              <td style="font-size:10px;font-weight:600;color:var(--ok)">↑ +0.6cm</td>
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">64.0kg</td>
+              <td><span class="badge b-ok">良好</span></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:85%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">85</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:78%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">78</div></div></td>
+              <td><div class="cb"><div class="cb-bg"><div class="cb-fill" style="width:68%;background:var(--ok)"></div></div><div class="cv" style="color:var(--ok)">68</div></div></td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">04/15</td>
+              <td style="text-align:right"><button class="ab ab-t">詳細</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pager">
+          <span>5件表示（全22件）</span>
+          <div class="pager-btns">
+            <button class="ab ab-g">‹ 前へ</button>
+            <button class="ab" style="background:var(--teal);color:#FFFFFF;border:none;padding:3px 9px;border-radius:5px;font-size:9px;font-weight:700">1</button>
+            <button class="ab ab-g">2</button><button class="ab ab-g">3</button>
+            <button class="ab ab-g">次へ ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-03 選手詳細 -->
+    <div class="screen" id="s-detail">
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+              <div style="width:52px;height:52px;border-radius:50%;background:rgba(238,75,75,.12);border:2px solid rgba(238,75,75,.4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--danger)">山</div>
+              <div>
+                <div style="font-size:15px;font-weight:700;color:var(--text)">山田 太郎</div>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px">中学2年 ／ バスケットボール</div>
+                <div style="display:flex;gap:5px;margin-top:6px"><span class="badge b-bd">⚠ 要対応 2件</span><span class="badge b-mu">🔒 参照のみ</span></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <div style="background:var(--card2);border-radius:9px;padding:10px;text-align:center;border:1px solid var(--bdr)"><div style="font-size:9px;color:var(--muted);margin-bottom:3px">身長</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)">162.4</div><div style="font-size:9px;color:var(--ok)">↑+1.2cm</div></div>
+              <div style="background:var(--card2);border-radius:9px;padding:10px;text-align:center;border:1px solid var(--bdr)"><div style="font-size:9px;color:var(--muted);margin-bottom:3px">体重</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text)">52.8</div><div style="font-size:9px;color:var(--muted)">kg</div></div>
+              <div style="background:var(--card2);border-radius:9px;padding:10px;text-align:center;border:1px solid var(--bdr)"><div style="font-size:9px;color:var(--muted);margin-bottom:3px">予想身長</div><div style="font-family:var(--mono);font-size:18px;font-weight:600;color:var(--teal)">175</div><div style="font-size:9px;color:var(--muted)">cm</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="c-hdr" style="margin-bottom:12px"><div class="c-title">💪 コンディション</div></div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">睡眠</span><span style="color:var(--ok);font-weight:700">82点</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:82%;height:100%;background:var(--ok);border-radius:99px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">栄養</span><span style="color:var(--amber);font-weight:700">60点</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:60%;height:100%;background:var(--amber);border-radius:99px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">練習負荷</span><span style="color:var(--danger);font-weight:700">41点 ⚠</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:41%;height:100%;background:var(--danger);border-radius:99px"></div></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="c-hdr" style="margin-bottom:10px"><div class="c-title">📝 指導メモ</div></div>
+            <div style="background:var(--card2);border-radius:8px;padding:10px;border:1px solid var(--bdr);font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:10px">練習過負荷が続いている。週2日の休養日を設けるよう直接指導済み（4/12）。次回測定時に確認する。</div>
+            <button class="ab ab-t" style="padding:5px 12px;font-size:10px;width:100%" onclick="toast('メモを保存しました')">✏️ メモを追加・編集する</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">📈 身長・体重推移</div><div class="c-more">6ヶ月</div></div>
+            <div class="legend" style="margin-top:0;margin-bottom:8px">
+              <div class="li"><div class="ld" style="background:#0FB8A0"></div>身長 (cm)</div>
+              <div class="li"><div class="ld" style="background:#E8A030"></div>体重 (kg)</div>
+              <div class="li"><div class="ld" style="background:rgba(232,160,48,.5);border-radius:0;height:2px"></div>予想身長</div>
+            </div>
+            <div class="ch"><canvas id="c-player"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">🚨 アクティブアラート</div><div class="c-more" onclick="go('alerts','アラート管理',null)">全て見る →</div></div>
+            <div class="al al-r">
+              <div class="al-top"><div class="al-ico">🔴</div><div><div class="al-ttl">ケガリスク — 高 <span class="badge b-bd">未対応</span></div><div class="al-meta">2026/04/10 発生</div></div></div>
+              <div class="al-desc">週7日・1日3.5時間の練習が2週継続。疲労骨折リスクが高い状態です。</div>
+              <div class="al-btns"><button class="al-btn alb-t" onclick="toast('対応済みにしました！')">✅ 対応済みにする</button><button class="al-btn alb-g">改善提案を見る</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-04 アラート管理 -->
+    <div class="screen" id="s-alerts">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:16px">
+        <div class="card">
+          <div class="c-hdr">
+            <div class="c-title">🚨 アラート一覧</div>
+            <div style="display:flex;gap:7px;align-items:center">
+              <div style="display:flex;background:var(--card2);border-radius:5px;padding:2px;border:1px solid var(--bdr);gap:2px">
+                <div style="padding:3px 9px;border-radius:3px;font-size:9px;font-weight:700;background:var(--teal);color:#FFFFFF">全て（8）</div>
+                <div style="padding:3px 9px;font-size:9px;color:var(--muted);cursor:pointer">高リスク（3）</div>
+                <div style="padding:3px 9px;font-size:9px;color:var(--muted);cursor:pointer">注意（2）</div>
+                <div style="padding:3px 9px;font-size:9px;color:var(--muted);cursor:pointer">解消済（3）</div>
+              </div>
+              <span class="badge b-bd">未対応 5件</span>
+            </div>
+          </div>
+          <div class="al al-r">
+            <div class="al-top"><div class="al-ico">🔴</div><div><div class="al-ttl">練習過負荷 — 高リスク <span class="badge b-bd">未対応</span></div><div class="al-meta">山田 太郎（中学2年）／ 発生日：2026/04/10</div></div></div>
+            <div class="al-desc">週7日・1日3.5時間の練習が2週間継続。疲労骨折リスクが高い状態です。</div>
+            <div class="al-btns"><button class="al-btn alb-t" onclick="toast('対応済みにしました！')">✅ 対応済みにする</button><button class="al-btn alb-g" onclick="go('detail','選手詳細',null)">選手詳細を見る</button></div>
+          </div>
+          <div class="al al-r">
+            <div class="al-top"><div class="al-ico">🔴</div><div><div class="al-ttl">成長停滞 — 高リスク <span class="badge b-bd">未対応</span></div><div class="al-meta">伊藤 大輝（中学2年）／ 発生日：2026/04/08</div></div></div>
+            <div class="al-desc">3ヶ月連続で身長変化が±0.0cm。成長板の状態確認を推奨します。</div>
+            <div class="al-btns"><button class="al-btn alb-t" onclick="toast('対応済みにしました！')">✅ 対応済みにする</button><button class="al-btn alb-g">選手詳細を見る</button></div>
+          </div>
+          <div class="al al-o">
+            <div class="al-top"><div class="al-ico">✅</div><div><div class="al-ttl" style="color:var(--ok)">睡眠不足 — 解消済み</div><div class="al-meta">田中 一郎（中学2年）／ 2026/04/05 解消</div></div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="c-hdr" style="margin-bottom:12px"><div class="c-title">💡 改善提案</div><span class="badge b-bd">練習過負荷</span></div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:10px">山田 太郎 への推奨アクション：</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:var(--card2);border-radius:8px;padding:10px;border:1px solid var(--bdr);font-size:11px;color:var(--text);line-height:1.5"><span style="color:var(--teal);font-weight:700">① </span>週2日以上の完全休養日を設ける</div>
+              <div style="background:var(--card2);border-radius:8px;padding:10px;border:1px solid var(--bdr);font-size:11px;color:var(--text);line-height:1.5"><span style="color:var(--teal);font-weight:700">② </span>1日の練習を2時間以内に制限</div>
+              <div style="background:var(--card2);border-radius:8px;padding:10px;border:1px solid var(--bdr);font-size:11px;color:var(--text);line-height:1.5"><span style="color:var(--teal);font-weight:700">③ </span>練習強度をLow〜Medに変更する期間を設ける</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="c-hdr" style="margin-bottom:12px"><div class="c-title">📊 週別アラート推移</div></div>
+            <div class="ch-sm"><canvas id="c-alert"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-05 レポート生成 -->
+    <div class="screen" id="s-report">
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
+        <div class="card">
+          <div class="c-hdr"><div class="c-title">📋 レポート設定</div></div>
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">対象期間</div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <div style="padding:7px 16px;border-radius:8px;background:rgba(15,184,160,.12);border:1.5px solid var(--teal);color:var(--teal);font-size:12px;font-weight:600;cursor:pointer">今月</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">半年</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">1年</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">📅 カスタム</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">対象選手</div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <div style="padding:7px 16px;border-radius:8px;background:rgba(15,184,160,.12);border:1.5px solid var(--teal);color:var(--teal);font-size:12px;font-weight:600;cursor:pointer">✓ 全選手（22名）</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">中学1年</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">中学2年</div>
+                <div style="padding:7px 16px;border-radius:8px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:12px;cursor:pointer">個別選択</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">出力項目</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <div style="padding:5px 12px;border-radius:7px;background:rgba(15,184,160,.12);border:1.5px solid var(--teal);color:var(--teal);font-size:11px;font-weight:600;cursor:pointer">✓ 身長・体重</div>
+                <div style="padding:5px 12px;border-radius:7px;background:rgba(15,184,160,.12);border:1.5px solid var(--teal);color:var(--teal);font-size:11px;font-weight:600;cursor:pointer">✓ コンディション</div>
+                <div style="padding:5px 12px;border-radius:7px;background:rgba(15,184,160,.12);border:1.5px solid var(--teal);color:var(--teal);font-size:11px;font-weight:600;cursor:pointer">✓ アラート履歴</div>
+                <div style="padding:5px 12px;border-radius:7px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:11px;cursor:pointer">プロテイン使用</div>
+                <div style="padding:5px 12px;border-radius:7px;background:var(--card2);border:1px solid var(--bdr);color:var(--muted);font-size:11px;cursor:pointer">学年別比較</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px">出力形式</div>
+              <div style="display:flex;gap:10px">
+                <button style="flex:1;height:44px;border-radius:9px;border:none;background:var(--teal);color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 3px 12px rgba(15,184,160,.3)" onclick="downloadPDF()">📄 PDF出力</button>
+                <button style="flex:1;height:44px;border-radius:9px;border:1px solid var(--bdr);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="downloadCSV()">📊 CSV出力</button>
+                <button style="flex:1;height:44px;border-radius:9px;border:1px solid rgba(59,143,232,.4);background:rgba(59,143,232,.08);color:var(--sky);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)" onclick="openSheets()">🟩 Sheets出力</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">🕐 出力履歴</div></div>
+            <table class="tbl">
+              <thead><tr><th>日時</th><th>内容</th><th>形式</th><th style="text-align:right"></th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026/04/01</td><td style="font-size:10px">全選手 月次レポート</td><td><span class="badge b-bd" style="font-size:8px">PDF</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('ダウンロードしました')">↓ 再DL</button></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026/03/15</td><td style="font-size:10px">中2 個別データ</td><td><span class="badge b-tl" style="font-size:8px">CSV</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('ダウンロードしました')">↓ 再DL</button></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026/03/01</td><td style="font-size:10px">全選手 月次レポート</td><td><span class="badge b-bd" style="font-size:8px">PDF</span></td><td style="text-align:right"><button class="ab ab-t" onclick="toast('ダウンロードしました')">↓ 再DL</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="c-hdr" style="margin-bottom:12px"><div class="c-title">⚙️ 定期自動生成</div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px;background:var(--card2);border-radius:9px;border:1px solid var(--bdr)">
+              <div><div style="font-size:11px;font-weight:500;color:var(--text)">毎月1日 — 全選手月次PDF</div><div style="font-size:9px;color:var(--muted);margin-top:3px">Googleドライブへ自動保存</div></div>
+              <div style="width:36px;height:20px;border-radius:99px;background:var(--teal);position:relative;cursor:pointer" onclick="toast('設定を変更しました')"><div style="position:absolute;width:16px;height:16px;border-radius:50%;background:white;top:2px;left:18px;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-06 通知設定 -->
+    <div class="screen" id="s-notify">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="c-hdr"><div class="c-title">📅 測定リマインド</div></div>
+          <div style="display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:500;color:var(--text)">定期測定リマインド（LINE）</div><div style="font-size:10px;color:var(--muted);margin-top:2px">毎月指定日に全選手へLINE通知</div></div><div style="width:38px;height:21px;border-radius:99px;background:var(--teal);position:relative;cursor:pointer"><div style="position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:2px;left:19px;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div></div></div>
+            <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bdr)"><div style="font-size:11px;color:var(--text)">毎月1日</div><div style="font-size:10px;color:var(--muted)">全選手へ測定リマインド</div><span style="font-size:10px;font-weight:600;color:var(--ok)">✓ 有効</span></div>
+            <div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--bdr)"><div style="font-size:11px;color:var(--text)">毎月15日</div><div style="font-size:10px;color:var(--muted)">未入力者へ再リマインド</div><span style="font-size:10px;font-weight:600;color:var(--ok)">✓ 有効</span></div>
+            <div style="display:flex;justify-content:space-between;padding:11px 0"><div style="font-size:11px;color:var(--text)">21日超過</div><div style="font-size:10px;color:var(--muted)">未入力者に個別通知</div><span style="font-size:10px;font-weight:600;color:var(--warn)">⚠ 要設定</span></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">🚨 アラート通知</div></div>
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:500;color:var(--text)">高リスクアラート（即時）</div><div style="font-size:10px;color:var(--muted);margin-top:2px">発生時に指導者へLINE通知</div></div><div style="width:38px;height:21px;border-radius:99px;background:var(--teal);position:relative;cursor:pointer"><div style="position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:2px;left:19px"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:500;color:var(--text)">注意アラート（日次まとめ）</div><div style="font-size:10px;color:var(--muted);margin-top:2px">毎日18:00に1日分まとめて通知</div></div><div style="width:38px;height:21px;border-radius:99px;background:var(--teal);position:relative;cursor:pointer"><div style="position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:2px;left:19px"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:500;color:var(--text)">保護者へも通知</div><div style="font-size:10px;color:var(--muted);margin-top:2px">高リスクのみ保護者LINEに送信</div></div><div style="width:38px;height:21px;border-radius:99px;background:var(--teal);position:relative;cursor:pointer"><div style="position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:2px;left:19px"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0"><div><div style="font-size:12px;font-weight:500;color:var(--text)">アラート解消通知</div><div style="font-size:10px;color:var(--muted);margin-top:2px">選手のアラートが解消した時</div></div><div style="width:38px;height:21px;border-radius:99px;background:var(--dim);position:relative;cursor:pointer"><div style="position:absolute;width:17px;height:17px;border-radius:50%;background:white;top:2px;left:2px"></div></div></div>
+            </div>
+          </div>
+          <button style="height:44px;border-radius:10px;border:none;background:var(--teal);color:#FFFFFF;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 3px 12px rgba(15,184,160,.3)" onclick="toast('設定を保存しました！')">💾 設定を保存する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-07 加入申請承認 -->
+    <div class="screen" id="s-approvals">
+      <div class="kpi-row">
+        <div class="kpi kpi-a"><div class="kpi-lbl">未対応の申請</div><div class="kpi-val" style="color:var(--amber)">2<span class="kpi-unit">件</span></div><div class="kpi-diff kd-warn">→ 確認が必要</div></div>
+        <div class="kpi kpi-o"><div class="kpi-lbl">今月の承認数</div><div class="kpi-val">5<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">↑ 先月比 +2名</div></div>
+        <div class="kpi kpi-t"><div class="kpi-lbl">所属選手数</div><div class="kpi-val">22<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">承認後の現役メンバー</div></div>
+        <div class="kpi kpi-d"><div class="kpi-lbl">直近の却下</div><div class="kpi-val">1<span class="kpi-unit">件</span></div><div class="kpi-diff kd-bad">先月 / 重複登録</div></div>
+      </div>
+
+      <div class="card">
+        <div class="c-hdr">
+          <div class="c-title">✅ 加入申請一覧</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;background:var(--card2);border-radius:6px;padding:2px;border:1px solid var(--bdr);gap:2px">
+              <div class="appr-tab act" data-tab="pending" onclick="switchApprTab(this)">未対応 <span class="badge b-bd" style="font-size:8px;margin-left:3px">2</span></div>
+              <div class="appr-tab" data-tab="approved" onclick="switchApprTab(this)">承認済み <span class="badge b-ok" style="font-size:8px;margin-left:3px">5</span></div>
+              <div class="appr-tab" data-tab="rejected" onclick="switchApprTab(this)">却下 <span class="badge b-mu" style="font-size:8px;margin-left:3px">1</span></div>
+            </div>
+            <button class="ab ab-t" style="padding:5px 12px;font-size:10px" onclick="toast('全申請を承認しました！')">✓ 全て承認</button>
+          </div>
+        </div>
+
+        <!-- 未対応タブ -->
+        <div class="appr-list" id="appr-pending">
+
+          <div class="appr-card">
+            <div class="appr-l">
+              <div class="pav av-d">大</div>
+              <div class="appr-main">
+                <div class="appr-name">大野 雄太 <span class="badge b-pl">中学1年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 13歳 / 申請日: 2026/05/26</div>
+              </div>
+            </div>
+            <div class="appr-r">
+              <button class="appr-btn appr-btn-ok" type="button" onclick="approveItem(this)">✓ 承認</button>
+              <button class="appr-btn appr-btn-ng" type="button" onclick="rejectItem(this)">✕ 却下</button>
+              <button class="appr-btn appr-btn-g" type="button" onclick="toast('詳細を表示')">詳細</button>
+            </div>
+          </div>
+
+          <div class="appr-card">
+            <div class="appr-l">
+              <div class="pav av-s">林</div>
+              <div class="appr-main">
+                <div class="appr-name">林 健太朗 <span class="badge b-pl">中学2年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 14歳 / 申請日: 2026/05/24</div>
+              </div>
+            </div>
+            <div class="appr-r">
+              <button class="appr-btn appr-btn-ok" type="button" onclick="approveItem(this)">✓ 承認</button>
+              <button class="appr-btn appr-btn-ng" type="button" onclick="rejectItem(this)">✕ 却下</button>
+              <button class="appr-btn appr-btn-g" type="button" onclick="toast('詳細を表示')">詳細</button>
+            </div>
+          </div>
+
+          <div class="appr-empty" id="appr-empty-pending" style="display:none">
+            <div class="appr-empty-ico">🎉</div>
+            <div class="appr-empty-txt">未対応の申請はありません</div>
+            <div class="appr-empty-sub">新規申請があるとここに表示されます</div>
+          </div>
+        </div>
+
+        <!-- 承認済みタブ -->
+        <div class="appr-list" id="appr-approved" style="display:none">
+          <div class="appr-card appr-done">
+            <div class="appr-l">
+              <div class="pav av-o">中</div>
+              <div class="appr-main">
+                <div class="appr-name">中島 さくら <span class="badge b-pl">中学1年</span></div>
+                <div class="appr-meta">サッカー / 女子 / 申請日: 2026/05/18 / 承認日: 2026/05/19</div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-ok">✓ 承認済み</span></div>
+          </div>
+          <div class="appr-card appr-done">
+            <div class="appr-l">
+              <div class="pav av-t">岡</div>
+              <div class="appr-main">
+                <div class="appr-name">岡田 翔太 <span class="badge b-pl">中学2年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 申請日: 2026/05/12 / 承認日: 2026/05/13</div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-ok">✓ 承認済み</span></div>
+          </div>
+          <div class="appr-card appr-done">
+            <div class="appr-l">
+              <div class="pav av-a">藤</div>
+              <div class="appr-main">
+                <div class="appr-name">藤本 大地 <span class="badge b-pl">中学3年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 申請日: 2026/05/08 / 承認日: 2026/05/09</div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-ok">✓ 承認済み</span></div>
+          </div>
+          <div class="appr-card appr-done">
+            <div class="appr-l">
+              <div class="pav av-d">三</div>
+              <div class="appr-main">
+                <div class="appr-name">三浦 蓮 <span class="badge b-pl">中学1年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 申請日: 2026/05/03 / 承認日: 2026/05/04</div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-ok">✓ 承認済み</span></div>
+          </div>
+          <div class="appr-card appr-done">
+            <div class="appr-l">
+              <div class="pav av-s">小</div>
+              <div class="appr-main">
+                <div class="appr-name">小川 美穂 <span class="badge b-pl">中学2年</span></div>
+                <div class="appr-meta">サッカー / 女子 / 申請日: 2026/05/01 / 承認日: 2026/05/02</div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-ok">✓ 承認済み</span></div>
+          </div>
+        </div>
+
+        <!-- 却下タブ -->
+        <div class="appr-list" id="appr-rejected" style="display:none">
+          <div class="appr-card appr-done" style="opacity:.65">
+            <div class="appr-l">
+              <div class="pav av-a">川</div>
+              <div class="appr-main">
+                <div class="appr-name">川口 翔 <span class="badge b-pl">中学1年</span></div>
+                <div class="appr-meta">サッカー / 男子 / 申請日: 2026/04/22 / 却下日: 2026/04/23</div>
+                <div style="display:flex;gap:6px;align-items:flex-start;background:var(--danger-bg);border:1px solid #F9BABA;border-radius:8px;padding:8px 11px;font-size:11px;color:var(--text);line-height:1.5;margin-top:8px"><span style="font-size:10px;font-weight:700;color:var(--danger);white-space:nowrap;flex-shrink:0">却下理由:</span><span>重複登録のため（既に他チームに所属）</span></div>
+              </div>
+            </div>
+            <div class="appr-r"><span class="badge b-bd">✕ 却下</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 説明カード -->
+      <div class="card" style="margin-top:16px;background:var(--card2);border-style:dashed">
+        <div style="display:flex;align-items:flex-start;gap:11px">
+          <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--sky));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:white">💡</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">申請承認のフロー</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.6">選手から加入申請を受けると未対応リストに表示されます。<strong>承認</strong>すると選手がチームに正式登録され、月次測定の対象になります。<strong>却下</strong>の場合は選手に通知されます。詳細データ（身長・体重・保護者連携など）は「詳細」ボタンから確認できます。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- E-08 指導者チーム作成申請 -->
+    <div class="screen" id="s-register">
+      <div class="reg-wrap">
+
+        <!-- 入力フォーム -->
+        <div id="reg-form-view">
+          <div class="reg-hero">
+            <div class="reg-hero-ico">🏅</div>
+            <div>
+              <div class="reg-hero-ttl">チーム作成申請</div>
+              <div class="reg-hero-sub">指導者として ProGrow を使い始めるには、チーム情報を登録して運営の承認を受ける必要があります。</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">📝 チーム情報</div></div>
+            <div class="reg-form">
+
+              <div class="reg-row">
+                <label class="reg-lbl">チーム名 <span class="req">*</span><span class="reg-hint">例：東京FC ジュニア / ○○中学校 ○○部</span></label>
+                <input class="reg-inp" id="reg-team-name" type="text" placeholder="○○○ ジュニア / ○○中学校 ○○部 / U-14 / クラブ名">
+              </div>
+
+              <div class="reg-row two">
+                <div>
+                  <label class="reg-lbl">競技 <span class="req">*</span></label>
+                  <select class="reg-sel" id="reg-sport">
+                    <option value="">選択してください</option>
+                    <option>サッカー</option>
+                    <option>バスケットボール</option>
+                    <option>野球</option>
+                    <option>陸上競技</option>
+                    <option>水泳</option>
+                    <option>テニス</option>
+                    <option>バレーボール</option>
+                    <option>柔道・剣道</option>
+                    <option>その他</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="reg-lbl">対象年代 <span class="req">*</span></label>
+                  <select class="reg-sel" id="reg-age">
+                    <option value="">選択してください</option>
+                    <option>小学生</option>
+                    <option>中学生</option>
+                    <option>高校生</option>
+                    <option>複数年代</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="reg-row two">
+                <div>
+                  <label class="reg-lbl">活動拠点（都道府県） <span class="req">*</span></label>
+                  <select class="reg-sel" id="reg-pref">
+                    <option value="">選択してください</option>
+                    <option>北海道</option><option>東北</option>
+                    <option>東京都</option><option>神奈川県</option>
+                    <option>埼玉県</option><option>千葉県</option>
+                    <option>愛知県</option><option>大阪府</option>
+                    <option>京都府</option><option>兵庫県</option>
+                    <option>福岡県</option><option>その他</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="reg-lbl">所属選手の規模 <span class="req">*</span></label>
+                  <select class="reg-sel" id="reg-size">
+                    <option value="">選択してください</option>
+                    <option>1〜10名</option>
+                    <option>11〜25名</option>
+                    <option>26〜50名</option>
+                    <option>51名以上</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="reg-row">
+                <label class="reg-lbl">指導歴 <span class="reg-hint">任意</span></label>
+                <select class="reg-sel" id="reg-exp">
+                  <option value="">選択してください</option>
+                  <option>1年未満</option>
+                  <option>1〜3年</option>
+                  <option>3〜5年</option>
+                  <option>5〜10年</option>
+                  <option>10年以上</option>
+                </select>
+              </div>
+
+              <div class="reg-row">
+                <label class="reg-lbl">チーム目標 <span class="req">*</span><span class="reg-hint">例：県大会優勝、選手の身体能力向上、ケガ予防 など</span></label>
+                <textarea class="reg-area" id="reg-goal" placeholder="チームとして目指す目標を入力してください（複数記載可）"></textarea>
+              </div>
+
+              <div class="reg-row">
+                <label class="reg-lbl">申請メッセージ <span class="reg-hint">任意 — 利用目的・運営状況など</span></label>
+                <textarea class="reg-area" id="reg-message" placeholder="例：地域の中学生サッカークラブで、選手の成長を可視化したく利用申請します。"></textarea>
+              </div>
+
+              <div class="reg-info">
+                <span>💡</span>
+                <span>申請内容は <strong>運営管理者</strong> が確認します。通常 <strong>1〜3営業日以内</strong> に承認結果をメールでお知らせします。承認後にチームダッシュボードや選手管理機能をご利用いただけます。</span>
+              </div>
+
+              <div class="reg-actions">
+                <button class="reg-btn reg-btn-g" type="button" onclick="window.location.href='../index.html'">← ログアウト</button>
+                <button class="reg-btn reg-btn-p" type="button" id="reg-submit" onclick="submitTeamRegistration()">📤 申請を送信する</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 承認待ち画面（申請後に表示） -->
+        <div id="reg-pending-view" style="display:none">
+          <div class="reg-pending">
+            <div class="reg-pending-ico">⏳</div>
+            <div class="reg-pending-ttl">申請を送信しました</div>
+            <div class="reg-pending-sub">運営管理者による承認をお待ちください。<br>承認結果は登録メールアドレス宛にお送りします。通常 1〜3 営業日以内にご連絡いたします。</div>
+
+            <dl class="reg-pending-card" id="reg-summary-card">
+              <!-- JS で動的に埋め込み -->
+            </dl>
+
+            <div class="reg-pending-status">
+              <span class="pulse-dot"></span>
+              <span>承認待ち</span>
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:10px;justify-content:center">
+              <button class="reg-btn reg-btn-g" type="button" onclick="resetTeamRegistration()" style="flex:none">✎ 申請内容を編集</button>
+              <button class="reg-btn reg-btn-g" type="button" onclick="window.location.href='../index.html'" style="flex:none">← ログアウト</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ レポート生成 クイック設定モーダル ══ -->
+<div class="modal-overlay" id="report-modal" onclick="if(event.target===this)closeReportModal()">
+  <div class="modal" role="dialog" aria-label="レポート生成">
+    <div class="modal-hdr">
+      <div class="modal-title">📄 レポート生成</div>
+      <button class="modal-close" type="button" onclick="closeReportModal()" aria-label="閉じる">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-sec-lbl">期間</div>
+      <div class="opt-grid cols3">
+        <div class="opt-btn sel" data-period="this-month" onclick="selectOpt(this,'period')"><span class="opt-ico">📆</span>今月</div>
+        <div class="opt-btn" data-period="last-month" onclick="selectOpt(this,'period')"><span class="opt-ico">⬅️</span>先月</div>
+        <div class="opt-btn" data-period="q1" onclick="selectOpt(this,'period')"><span class="opt-ico">📊</span>四半期</div>
+        <div class="opt-btn" data-period="ytd" onclick="selectOpt(this,'period')"><span class="opt-ico">📅</span>今年度</div>
+        <div class="opt-btn" data-period="all" onclick="selectOpt(this,'period')"><span class="opt-ico">📚</span>全期間</div>
+        <div class="opt-btn" data-period="custom" onclick="selectOpt(this,'period');toggleCustomRange(true)"><span class="opt-ico">✏️</span>カスタム</div>
+      </div>
+      <div class="custom-range hidden" id="custom-range">
+        <input type="month" id="custom-from" value="2026-01">
+        <span style="color:var(--muted)">〜</span>
+        <input type="month" id="custom-to" value="2026-04">
+      </div>
+
+      <div class="modal-sec-lbl">出力形式</div>
+      <div class="opt-grid cols3">
+        <div class="opt-btn sel" data-format="pdf" onclick="selectOpt(this,'format')"><span class="opt-ico">📄</span>PDF</div>
+        <div class="opt-btn" data-format="csv" onclick="selectOpt(this,'format')"><span class="opt-ico">📊</span>CSV</div>
+        <div class="opt-btn" data-format="sheets" onclick="selectOpt(this,'format')"><span class="opt-ico">🟩</span>Sheets</div>
+      </div>
+
+      <div class="modal-sec-lbl">対象</div>
+      <div class="opt-grid">
+        <div class="opt-btn sel" data-scope="team" onclick="selectOpt(this,'scope')"><span class="opt-ico">🏅</span>チーム全体</div>
+        <div class="opt-btn" data-scope="grade" onclick="selectOpt(this,'scope')"><span class="opt-ico">🎓</span>学年別</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="ft-hint" id="modal-hint">今月のチーム全体レポートをPDFで生成します</span>
+      <button class="modal-btn modal-btn-g" type="button" onclick="closeReportModal()">キャンセル</button>
+      <button class="modal-btn modal-btn-p" type="button" onclick="generateReport()">⚡ 生成する</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const ALL = ['dashboard','players','detail','alerts','report','notify','approvals','register'];
+const TABS = ['dashboard','players','alerts','report'];
+
+function go(id, title, el){
+  // フェードアウト用に現在のactiveから外す
+  ALL.forEach(s=>{
+    const sc=document.getElementById('s-'+s);
+    if(sc) sc.classList.remove('active');
+    const sb=document.getElementById('nav-'+s);
+    if(sb) sb.classList.toggle('act',s===id);
+  });
+  TABS.forEach(t=>{
+    const tb=document.getElementById('tab-'+t);
+    if(tb) tb.classList.toggle('act',t===id);
+  });
+  document.getElementById('page-title').textContent=title;
+  // 次のフレームでactiveを付与→fadeInUpアニメーションが再演出される
+  requestAnimationFrame(() => {
+    const next = document.getElementById('s-'+id);
+    if(next){
+      next.classList.add('active');
+      // カードのフェードインも再演出
+      next.querySelectorAll('.kpi, .card').forEach(c => {
+        c.classList.remove('in-view');
+        // reflow して再アニメ
+        void c.offsetWidth;
+      });
+      setTimeout(() => {
+        next.querySelectorAll('.kpi, .card').forEach(c => c.classList.add('in-view'));
+      }, 50);
+    }
+    setTimeout(initCharts, 120);
+  });
+}
+
+function initCharts(){
+  // ── E-01 チーム平均 身長・体重推移（2軸）──
+  const tc=document.getElementById('c-team');
+  if(tc&&!tc._d){tc._d=1;new Chart(tc,{
+    type:'line',
+    data:{
+      labels:['10月','11月','12月','1月','2月','3月'],
+      datasets:[
+        // 身長（左軸）
+        {
+          label:'身長',
+          data:[160.5,161.2,162.0,162.6,163.0,163.2],
+          borderColor:'#3B8FE8',
+          backgroundColor:'rgba(59,143,232,.10)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#3B8FE8',
+          fill:true,tension:.4,yAxisID:'yH'
+        },
+        // 体重（右軸）
+        {
+          label:'体重',
+          data:[50.8,51.4,52.0,52.6,53.1,53.5],
+          borderColor:'#E8A030',
+          backgroundColor:'rgba(232,160,48,.08)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#E8A030',
+          fill:false,tension:.4,yAxisID:'yW'
+        }
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:function(ctx){
+              var unit = ctx.dataset.yAxisID === 'yW' ? 'kg' : 'cm';
+              return ctx.dataset.label + ': ' + ctx.parsed.y + unit;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(11,29,53,.06)'},ticks:{font:{size:10},color:'#5A7898'}},
+        yH:{position:'left',grid:{color:'rgba(11,29,53,.06)'},ticks:{font:{size:10},color:'#3B8FE8',callback:v=>v+'cm'},min:158,max:166},
+        yW:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'#E8A030',callback:v=>v+'kg'},min:48,max:56}
+      }
+    }
+  });}
+
+  // ── E-03 選手詳細 身長・体重・予想身長（2軸＋破線）──
+  const pc=document.getElementById('c-player');
+  if(pc&&!pc._d){pc._d=1;new Chart(pc,{
+    type:'line',
+    data:{
+      labels:['10月','11月','12月','1月','2月','3月'],
+      datasets:[
+        // 身長（左軸・実線）
+        {
+          label:'身長',
+          data:[156.6,157.4,158.5,159.8,161.2,162.4],
+          borderColor:'#0FB8A0',
+          backgroundColor:'rgba(15,184,160,.08)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#0FB8A0',
+          fill:true,tension:.4,yAxisID:'yH'
+        },
+        // 予想身長（左軸・破線）
+        {
+          label:'予想身長',
+          data:[162,163,164,165,166,167],
+          borderColor:'rgba(232,160,48,.5)',
+          borderWidth:1.5,pointRadius:0,
+          fill:false,tension:.4,borderDash:[4,3],yAxisID:'yH'
+        },
+        // 体重（右軸・実線）
+        {
+          label:'体重',
+          data:[48.5,49.3,50.1,51.0,51.9,52.8],
+          borderColor:'#E8A030',
+          backgroundColor:'rgba(232,160,48,.06)',
+          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#E8A030',
+          fill:false,tension:.4,yAxisID:'yW'
+        }
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label:function(ctx){
+              var unit = ctx.dataset.yAxisID === 'yW' ? 'kg' : 'cm';
+              return ctx.dataset.label + ': ' + ctx.parsed.y + unit;
+            }
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(11,29,53,.06)'},ticks:{font:{size:10},color:'#5A7898'}},
+        yH:{position:'left',grid:{color:'rgba(11,29,53,.06)'},ticks:{font:{size:10},color:'#0FB8A0',callback:v=>v+'cm'},min:154,max:170},
+        yW:{position:'right',grid:{display:false},ticks:{font:{size:10},color:'#E8A030',callback:v=>v+'kg'},min:46,max:56}
+      }
+    }
+  });}
+
+  const ac=document.getElementById('c-alert');
+  if(ac&&!ac._d){ac._d=1;new Chart(ac,{type:'bar',data:{labels:['W1','W2','W3','W4','今週'],datasets:[
+    {data:[2,3,4,4,3],backgroundColor:'rgba(238,75,75,.5)',borderRadius:3,stack:'a'},
+    {data:[1,2,1,2,2],backgroundColor:'rgba(232,160,48,.5)',borderRadius:3,stack:'a'},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    x:{stacked:true,grid:{display:false},ticks:{font:{size:9},color:'#5A7898'}},
+    y:{stacked:true,grid:{color:'rgba(11,29,53,.06)'},ticks:{font:{size:9},color:'#5A7898'}}
+  }}});}
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity='0'},2000);
+}
+
+// ══════════════════════════════════════════════════
+// CSV / Sheets / PDF 実出力機能
+// ══════════════════════════════════════════════════
+function _buildTeamCSV(){
+  const header = ['選手ID','氏名','学年','身長(cm)','先月比(cm)','体重(kg)','総合','睡眠','栄養','練習負荷','最終入力'];
+  const rows = [
+    ['ATH-0001','山田 太郎','中2','162.4','+1.2','52.8','要対応','82','60','41','2026/04/10'],
+    ['ATH-0002','田中 一郎','中2','165.0','+0.9','58.2','良好','88','82','75','2026/04/14'],
+    ['ATH-0003','伊藤 大輝','中2','160.8','±0.0','54.1','注意','70','65','72','2026/04/12'],
+    ['ATH-0004','佐藤 花子','中1','156.2','+1.4','46.8','良好','90','55','80','2026/04/13'],
+    ['ATH-0005','高橋 勇気','中3','172.5','+0.6','64.0','良好','85','78','68','2026/04/15']
+  ];
+  const lines = [header.join(','), ...rows.map(r => r.join(','))];
+  return '﻿' + lines.join('\n');
+}
+
+function downloadCSV(){
+  const csv = _buildTeamCSV();
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `progrow_team_${ts}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✓ CSVファイルをダウンロードしました');
+}
+
+function openSheets(){
+  toast('🟩 Google Sheetsに転送中...');
+  setTimeout(() => {
+    window.open('https://docs.google.com/spreadsheets/create', '_blank');
+    toast('✓ Google Sheetsを開きました');
+  }, 800);
+}
+
+function downloadPDF(){
+  toast('📄 PDFを生成中...');
+  setTimeout(() => {
+    const pdfContent = '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>>>endobj\n4 0 obj<</Length 70>>stream\nBT /F1 24 Tf 100 720 Td (ProGrow Team Report - Sample) Tj ET\nendstream endobj\nxref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000245 00000 n \ntrailer<</Size 5/Root 1 0 R>>\nstartxref\n360\n%%EOF';
+    const blob = new Blob([pdfContent], { type:'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `progrow_team_report_${ts}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('✓ PDFレポートをダウンロードしました');
+  }, 900);
+}
+
+// ══════════════════════════════════════════════════
+// レポート生成 クイック設定モーダル
+// ══════════════════════════════════════════════════
+const REPORT_STATE = { period:'this-month', format:'pdf', scope:'team' };
+
+const PERIOD_LABELS = {
+  'this-month':'今月', 'last-month':'先月', 'q1':'四半期',
+  'ytd':'今年度', 'all':'全期間', 'custom':'カスタム期間'
+};
+const FORMAT_LABELS = {
+  'pdf':'PDF', 'csv':'CSV', 'sheets':'Google Sheets'
+};
+const SCOPE_LABELS = { 'team':'チーム全体', 'grade':'学年別' };
+
+function openReportModal(){
+  document.getElementById('report-modal').classList.add('open');
+  updateHint();
+  document.addEventListener('keydown', _modalKeyHandler);
+}
+
+function closeReportModal(){
+  document.getElementById('report-modal').classList.remove('open');
+  document.removeEventListener('keydown', _modalKeyHandler);
+}
+
+function _modalKeyHandler(e){
+  if(e.key === 'Escape') closeReportModal();
+  if(e.key === 'Enter')  generateReport();
+}
+
+function selectOpt(btn, group){
+  // 同じグループの兄弟ボタンの選択を外す
+  btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  // 状態保存
+  if(group === 'period') REPORT_STATE.period = btn.dataset.period;
+  if(group === 'format') REPORT_STATE.format = btn.dataset.format;
+  if(group === 'scope')  REPORT_STATE.scope  = btn.dataset.scope;
+  // カスタム以外を選んだらカスタム範囲入力を隠す
+  if(group === 'period' && btn.dataset.period !== 'custom') toggleCustomRange(false);
+  updateHint();
+}
+
+function toggleCustomRange(show){
+  const el = document.getElementById('custom-range');
+  if(!el) return;
+  el.classList.toggle('hidden', !show);
+}
+
+function updateHint(){
+  const hint = document.getElementById('modal-hint');
+  if(!hint) return;
+  let periodText = PERIOD_LABELS[REPORT_STATE.period] || '今月';
+  if(REPORT_STATE.period === 'custom'){
+    const f = document.getElementById('custom-from').value;
+    const t = document.getElementById('custom-to').value;
+    periodText = (f || '?') + ' 〜 ' + (t || '?');
+  }
+  const formatText = FORMAT_LABELS[REPORT_STATE.format] || 'PDF';
+  const scopeText  = SCOPE_LABELS[REPORT_STATE.scope] || 'チーム全体';
+  hint.textContent = `${periodText}の${scopeText}レポートを${formatText}で生成します`;
+}
+
+function generateReport(){
+  closeReportModal();
+  // 選んだフォーマットに応じてダウンロード処理を呼び分け
+  const fmt = REPORT_STATE.format;
+  if(fmt === 'csv')         downloadCSV();
+  else if(fmt === 'sheets') openSheets();
+  else                       downloadPDF();
+}
+
+// ══════════════════════════════════════════════════
+// 期間ドロップダウン
+// ══════════════════════════════════════════════════
+let CURRENT_PERIOD = 'this-month';
+
+function togglePeriodDD(e){
+  if(e) e.stopPropagation();
+  const dd = document.getElementById('period-dd');
+  const btn = document.getElementById('period-btn');
+  const open = dd.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function closePeriodDD(){
+  const dd = document.getElementById('period-dd');
+  const btn = document.getElementById('period-btn');
+  if(dd) dd.classList.remove('open');
+  if(btn) btn.setAttribute('aria-expanded','false');
+}
+
+function selectPeriod(el){
+  // 全アイテムから act を外して選択にだけ付ける
+  document.querySelectorAll('#period-dd .period-item').forEach(it => it.classList.remove('act'));
+  el.classList.add('act');
+  CURRENT_PERIOD = el.dataset.period;
+
+  // ボタンラベル更新
+  const lblMap = {
+    'this-month':'今月', 'last-month':'先月',
+    '3m':'過去3ヶ月', '6m':'過去6ヶ月',
+    'ytd':'今年度', 'all':'全期間'
+  };
+  const lbl = lblMap[CURRENT_PERIOD] || '今月';
+  document.getElementById('period-label').textContent = lbl;
+
+  closePeriodDD();
+  toast('🔄 ' + lbl + 'のデータに切替');
+
+  // E-01のチームグラフがある場合、期間タブと連動
+  // updateTeamChart() は initPeriodTabs() で定義済み
+  try{
+    if(CURRENT_PERIOD === '6m' || CURRENT_PERIOD === 'this-month' || CURRENT_PERIOD === 'last-month'){
+      if(typeof updateTeamChart === 'function') updateTeamChart('6M');
+    } else if(CURRENT_PERIOD === 'ytd' || CURRENT_PERIOD === '3m'){
+      if(typeof updateTeamChart === 'function') updateTeamChart('1Y');
+    } else if(CURRENT_PERIOD === 'all'){
+      if(typeof updateTeamChart === 'function') updateTeamChart('ALL');
+    }
+  }catch(e){}
+}
+
+function openCustomPeriod(){
+  closePeriodDD();
+  // レポート生成モーダルを期間カスタムプリセットで開いて再利用
+  openReportModal();
+  // レポートモーダル内で「カスタム」を自動選択
+  const customBtn = document.querySelector('#report-modal .opt-btn[data-period="custom"]');
+  if(customBtn){
+    customBtn.click();
+  }
+}
+
+// 外側クリックで閉じる
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.period-wrap');
+  if(wrap && !wrap.contains(e.target)) closePeriodDD();
+});
+// Escキーで閉じる
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closePeriodDD();
+});
+
+// ══════════════════════════════════════════════════
+// 加入申請承認（E-07）
+// ══════════════════════════════════════════════════
+function switchApprTab(tab){
+  document.querySelectorAll('.appr-tab').forEach(t => t.classList.remove('act'));
+  tab.classList.add('act');
+  const target = tab.dataset.tab;
+  ['pending','approved','rejected'].forEach(k => {
+    const list = document.getElementById('appr-' + k);
+    if(list) list.style.display = (k === target) ? '' : 'none';
+  });
+}
+
+function approveItem(btn){
+  const card = btn.closest('.appr-card');
+  if(!card) return;
+  card.classList.add('approving');
+  const name = (card.querySelector('.appr-name') || {}).textContent || '選手';
+  setTimeout(() => {
+    card.classList.add('removing');
+    setTimeout(() => {
+      card.remove();
+      _refreshApprEmpty();
+    }, 400);
+  }, 250);
+  toast('✓ ' + name.trim().split(' ').slice(0,2).join(' ') + ' を承認しました');
+}
+
+function rejectItem(btn){
+  const card = btn.closest('.appr-card');
+  if(!card) return;
+  if(!confirm('この申請を却下しますか？選手に通知されます。')) return;
+  card.classList.add('rejecting');
+  const name = (card.querySelector('.appr-name') || {}).textContent || '選手';
+  setTimeout(() => {
+    card.classList.add('removing');
+    setTimeout(() => {
+      card.remove();
+      _refreshApprEmpty();
+    }, 400);
+  }, 250);
+  toast('✕ ' + name.trim().split(' ').slice(0,2).join(' ') + ' を却下しました');
+}
+
+function _refreshApprEmpty(){
+  const pending = document.getElementById('appr-pending');
+  if(!pending) return;
+  const remaining = pending.querySelectorAll('.appr-card').length;
+  const empty = document.getElementById('appr-empty-pending');
+  if(empty) empty.style.display = remaining === 0 ? 'block' : 'none';
+  // サイドバーバッジも更新
+  const badge = document.querySelector('#nav-approvals .sb-badge');
+  if(badge) badge.textContent = String(remaining);
+}
+
+// ══════════════════════════════════════════════════
+// E-08 指導者チーム作成申請
+// ══════════════════════════════════════════════════
+function submitTeamRegistration(){
+  const name = (document.getElementById('reg-team-name')||{}).value || '';
+  const sport = (document.getElementById('reg-sport')||{}).value || '';
+  const age = (document.getElementById('reg-age')||{}).value || '';
+  const pref = (document.getElementById('reg-pref')||{}).value || '';
+  const size = (document.getElementById('reg-size')||{}).value || '';
+  const exp = (document.getElementById('reg-exp')||{}).value || '—';
+  const goal = (document.getElementById('reg-goal')||{}).value || '';
+  const msg = (document.getElementById('reg-message')||{}).value || '（未記入）';
+
+  // 必須チェック
+  if(!name.trim() || !sport || !age || !pref || !size || !goal.trim()){
+    toast('⚠ 必須項目を入力してください');
+    return;
+  }
+
+  // サマリーカードに埋め込み
+  const summary = document.getElementById('reg-summary-card');
+  if(summary){
+    summary.innerHTML =
+      '<dt>チーム名</dt><dd>' + escapeHtml(name) + '</dd>' +
+      '<dt>競技</dt><dd>' + escapeHtml(sport) + '</dd>' +
+      '<dt>対象年代</dt><dd>' + escapeHtml(age) + '</dd>' +
+      '<dt>活動拠点</dt><dd>' + escapeHtml(pref) + '</dd>' +
+      '<dt>選手規模</dt><dd>' + escapeHtml(size) + '</dd>' +
+      '<dt>指導歴</dt><dd>' + escapeHtml(exp) + '</dd>' +
+      '<dt>チーム目標</dt><dd style="white-space:pre-wrap">' + escapeHtml(goal) + '</dd>' +
+      '<dt>申請日</dt><dd>' + new Date().toISOString().slice(0,10) + '</dd>';
+  }
+
+  // localStorageに保存（Mockup用）
+  try{
+    localStorage.setItem('progrow_team_application', JSON.stringify({
+      name, sport, age, pref, size, exp, goal, msg,
+      appliedAt: new Date().toISOString(),
+      status: 'pending'
+    }));
+  }catch(e){}
+
+  // ビュー切替
+  document.getElementById('reg-form-view').style.display = 'none';
+  document.getElementById('reg-pending-view').style.display = 'block';
+  toast('✓ チーム作成申請を送信しました');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function resetTeamRegistration(){
+  document.getElementById('reg-form-view').style.display = '';
+  document.getElementById('reg-pending-view').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+}
+
+// URLクエリパラメータ ?register=new で起動された場合、E-08を初期表示＋他ナビ非表示
+function _checkRegisterMode(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('register') === 'new'){
+    // 強制的にE-08を表示
+    document.querySelectorAll('.screen').forEach(sc => sc.classList.remove('active'));
+    const reg = document.getElementById('s-register');
+    if(reg) reg.classList.add('active');
+    // ページタイトル更新
+    const pt = document.getElementById('page-title');
+    if(pt) pt.textContent = 'チーム作成申請';
+    // サイドバー全体・トップバータブを非表示にして新規登録に集中させる
+    const sb = document.querySelector('.sidebar');
+    if(sb) sb.style.display = 'none';
+    const tabRow = document.querySelector('.tab-row');
+    if(tabRow) tabRow.style.display = 'none';
+    // トップバーのアクションボタン群も隠す
+    const periodWrap = document.querySelector('.period-wrap');
+    if(periodWrap) periodWrap.style.display = 'none';
+    const reportBtn = document.querySelector('.tb-btn.tb-teal');
+    if(reportBtn) reportBtn.style.display = 'none';
+    const tbNotif = document.querySelector('.tb-notif');
+    if(tbNotif) tbNotif.style.display = 'none';
+  }
+
+  // 既に申請済みなら承認待ち画面を初期表示
+  try{
+    const app = JSON.parse(localStorage.getItem('progrow_team_application') || 'null');
+    if(app && app.status === 'pending'){
+      const params2 = new URLSearchParams(window.location.search);
+      if(params2.get('register') === 'new'){
+        // フォームを既存値で復元してから承認待ちビュー表示
+        if(document.getElementById('reg-team-name')) document.getElementById('reg-team-name').value = app.name || '';
+        if(document.getElementById('reg-sport')) document.getElementById('reg-sport').value = app.sport || '';
+        if(document.getElementById('reg-age')) document.getElementById('reg-age').value = app.age || '';
+        if(document.getElementById('reg-pref')) document.getElementById('reg-pref').value = app.pref || '';
+        if(document.getElementById('reg-size')) document.getElementById('reg-size').value = app.size || '';
+        if(document.getElementById('reg-exp')) document.getElementById('reg-exp').value = app.exp || '';
+        if(document.getElementById('reg-goal')) document.getElementById('reg-goal').value = app.goal || '';
+        if(document.getElementById('reg-message')) document.getElementById('reg-message').value = app.msg || '';
+
+        const summary = document.getElementById('reg-summary-card');
+        if(summary){
+          summary.innerHTML =
+            '<dt>チーム名</dt><dd>' + escapeHtml(app.name) + '</dd>' +
+            '<dt>競技</dt><dd>' + escapeHtml(app.sport) + '</dd>' +
+            '<dt>対象年代</dt><dd>' + escapeHtml(app.age) + '</dd>' +
+            '<dt>活動拠点</dt><dd>' + escapeHtml(app.pref) + '</dd>' +
+            '<dt>選手規模</dt><dd>' + escapeHtml(app.size) + '</dd>' +
+            '<dt>指導歴</dt><dd>' + escapeHtml(app.exp || '—') + '</dd>' +
+            '<dt>チーム目標</dt><dd style="white-space:pre-wrap">' + escapeHtml(app.goal || '') + '</dd>' +
+            '<dt>申請日</dt><dd>' + (app.appliedAt || '').slice(0,10) + '</dd>';
+        }
+        document.getElementById('reg-form-view').style.display = 'none';
+        document.getElementById('reg-pending-view').style.display = 'block';
+      }
+    }
+  }catch(e){}
+}
+window.addEventListener('load', _checkRegisterMode);
+
+// ══════════════════════════════════════════════════
+// アニメーション & インタラクション拡張
+// ══════════════════════════════════════════════════
+
+// ── IntersectionObserver でカードをフェードイン ──
+function observeCards(){
+  if(!('IntersectionObserver' in window)){
+    document.querySelectorAll('.kpi, .card').forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.kpi, .card').forEach(el => io.observe(el));
+}
+
+// ── KPI数値のカウントアップ ──
+function animateKpis(){
+  document.querySelectorAll('.kpi-val').forEach(el => {
+    if(el._counted) return;
+    const text = el.textContent.trim();
+    const m = text.match(/^([\d.]+)/);
+    if(!m) return;
+    const target = parseFloat(m[1]);
+    if(isNaN(target)) return;
+    el._counted = true;
+    const decimals = (m[1].split('.')[1] || '').length;
+    const unitSpan = el.querySelector('.kpi-unit');
+    const unitHtml = unitSpan ? unitSpan.outerHTML : '';
+    const duration = 900;
+    const start = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      const val = (target * eased).toFixed(decimals);
+      el.innerHTML = val + unitHtml;
+      if(t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// ── 「最終更新」時刻の自動更新 ──
+function startLastUpdateTicker(){
+  const el = document.getElementById('last-update');
+  if(!el) return;
+  let minutes = 3;
+  setInterval(() => {
+    minutes++;
+    el.textContent = minutes + '分前 同期';
+  }, 60000);
+}
+
+// ── テーブル：列ソート ──
+function initTableSorting(){
+  const tables = document.querySelectorAll('.tbl');
+  tables.forEach(table => {
+    const thead = table.querySelector('thead');
+    if(!thead) return;
+    const ths = thead.querySelectorAll('th');
+    // 操作列以外をソート可能に
+    ths.forEach((th, idx) => {
+      const label = th.textContent.trim();
+      if(/操作|action/i.test(label)) return;
+      th.classList.add('sortable');
+      th.addEventListener('click', () => sortTableBy(table, idx, th));
+    });
+  });
+}
+
+function sortTableBy(table, colIdx, th){
+  const tbody = table.querySelector('tbody');
+  if(!tbody) return;
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const asc = !th.classList.contains('asc');
+  // 他のヘッダのソート状態をクリア
+  table.querySelectorAll('th').forEach(t => t.classList.remove('asc','desc'));
+  th.classList.add(asc ? 'asc' : 'desc');
+
+  rows.sort((a, b) => {
+    const av = (a.children[colIdx]||{}).textContent || '';
+    const bv = (b.children[colIdx]||{}).textContent || '';
+    const an = parseFloat(av.replace(/[^\d.\-]/g,''));
+    const bn = parseFloat(bv.replace(/[^\d.\-]/g,''));
+    if(!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+    return asc ? av.localeCompare(bv, 'ja') : bv.localeCompare(av, 'ja');
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+  // 行のフェードインを再演出
+  rows.forEach((r,i) => {
+    r.style.animation = 'none';
+    r.offsetHeight; // reflow
+    r.style.animation = `fadeInUp .3s ease ${i*0.04}s forwards`;
+    r.style.opacity = '0';
+  });
+}
+
+// ── テーブル：検索フィルター ──
+function initTableSearch(){
+  document.querySelectorAll('.tbl-search input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const q = inp.value.toLowerCase();
+      const table = inp.closest('.card') ? inp.closest('.card').querySelector('.tbl') : null;
+      if(!table) return;
+      table.querySelectorAll('tbody tr').forEach(tr => {
+        const txt = tr.textContent.toLowerCase();
+        tr.style.display = txt.includes(q) ? '' : 'none';
+      });
+    });
+  });
+}
+
+// ── 期間タブ（6M/1Y/ALL）でデータ切替 ──
+const PERIOD_DATA = {
+  '6M': {
+    labels:['10月','11月','12月','1月','2月','3月'],
+    height:[160.5,161.2,162.0,162.6,163.0,163.2],
+    weight:[50.8,51.4,52.0,52.6,53.1,53.5]
+  },
+  '1Y': {
+    labels:['4月','6月','8月','10月','12月','2月'],
+    height:[158.0,159.2,159.8,161.0,162.0,163.0],
+    weight:[49.2,50.0,50.6,51.4,52.6,53.4]
+  },
+  'ALL': {
+    labels:['2024','2025前','2025後','2026前'],
+    height:[155.0,158.0,161.0,163.2],
+    weight:[47.0,49.5,51.5,53.5]
+  }
+};
+
+function initPeriodTabs(){
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const wrapper = tab.parentElement;
+      wrapper.querySelectorAll('.period-tab').forEach(t => t.classList.remove('act'));
+      tab.classList.add('act');
+      const period = tab.dataset.period || '6M';
+      updateTeamChart(period);
+    });
+  });
+}
+
+function updateTeamChart(period){
+  const data = PERIOD_DATA[period] || PERIOD_DATA['6M'];
+  const tc = document.getElementById('c-team');
+  if(!tc || !tc._d) return;
+  const chart = Chart.getChart(tc);
+  if(!chart) return;
+  chart.data.labels = data.labels;
+  chart.data.datasets[0].data = data.height;
+  chart.data.datasets[1].data = data.weight;
+  chart.update();
+}
+
+// ── アラートカードの「対応済み」アニメーション ──
+function initAlertResolveAnimation(){
+  document.querySelectorAll('.al .alb-t, .al .ab-t').forEach(btn => {
+    btn.addEventListener('click', function(e){
+      const al = this.closest('.al');
+      if(!al) return;
+      e.stopPropagation();
+      al.style.transition = 'all .5s ease';
+      al.style.opacity = '0.4';
+      al.style.transform = 'translateX(8px) scale(.96)';
+      al.style.filter = 'grayscale(.8)';
+      setTimeout(() => {
+        const ttl = al.querySelector('.al-ttl');
+        if(ttl) ttl.style.textDecoration = 'line-through';
+      }, 250);
+    }, { capture: true });
+  });
+}
+
+// ── 新着アラートの強調表示（最初の al-r に shake & flash）──
+function spotlightFreshAlerts(){
+  const first = document.querySelector('#s-dashboard .al.al-r, #s-alerts .al.al-r');
+  if(first){
+    setTimeout(() => first.classList.add('shake','fresh'), 600);
+  }
+}
+
+// ── 初期化 ──
+function _initE(){
+  initCharts();
+  observeCards();
+  animateKpis();
+  initTableSorting();
+  initTableSearch();
+  initPeriodTabs();
+  initAlertResolveAnimation();
+  spotlightFreshAlerts();
+  startLastUpdateTicker();
+}
+
+window.addEventListener('load', _initE);
+</script>
+</body>
+</html>

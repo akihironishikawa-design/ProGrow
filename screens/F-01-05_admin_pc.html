@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProGrow — 管理コンソール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F0F7FB;
+  --bg-grad:linear-gradient(135deg,#EBF5FB 0%,#EAF7F0 100%);
+  --surf:#FFFFFF;--card:#FFFFFF;--card2:#F7FAFC;
+  --bdr:#D8E5EF;--bdr2:#E8EEF4;
+  --teal:#0FB8A0;--amber:#E8A030;--sky:#3B8FE8;--purple:#7C4DFF;
+  --ok:#27AE60;--danger:#E53E3E;--warn:#E8A030;
+  --text:#0F2137;--muted:#5A6F84;--dim:#8FA3B8;
+  --font:'Instrument Sans','Noto Sans JP',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);background-image:var(--bg-grad);color:var(--text)}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ─ サイドバー ─ */
+.sidebar{width:230px;flex-shrink:0;background:var(--surf);border-right:1px solid var(--bdr);display:flex;flex-direction:column;overflow:hidden;box-shadow:2px 0 8px rgba(11,29,53,.04)}
+.sb-head{padding:16px 18px 14px;border-bottom:1px solid var(--bdr)}
+.sb-logo{display:flex;align-items:center;gap:9px}
+.sb-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;box-shadow:0 3px 10px rgba(124,77,255,.3);color:white}
+.sb-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.sb-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.admin-tag{
+  display:inline-block;font-size:8px;font-weight:800;padding:1px 6px;border-radius:99px;
+  background:linear-gradient(135deg,var(--purple),var(--sky));color:white;
+  letter-spacing:.05em;margin-left:6px;vertical-align:middle;
+}
+.sb-scroll{flex:1;overflow-y:auto;padding:10px 0}
+.sb-scroll::-webkit-scrollbar{width:2px}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
+.sb-sec{padding:5px 14px 2px}
+.sb-sec-lbl{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:7px;margin:1px 5px;cursor:pointer;transition:all .15s}
+.sb-item:hover{background:rgba(124,77,255,.06);transform:translateX(2px)}
+.sb-item.act{background:rgba(124,77,255,.10);border:1px solid rgba(124,77,255,.25)}
+.sb-item.act .sb-icon{opacity:1}
+.sb-item.act .sb-lbl{color:var(--purple);font-weight:600}
+.sb-icon{font-size:14px;opacity:.45;width:18px;text-align:center;flex-shrink:0;transition:transform .2s}
+.sb-item:hover .sb-icon{transform:scale(1.15)}
+.sb-lbl{font-size:11px;color:var(--muted);font-weight:500;flex:1}
+.sb-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.sbb-purple{background:rgba(124,77,255,.12);color:var(--purple);border:1px solid rgba(124,77,255,.25)}
+.sbb-red{background:rgba(229,62,62,.12);color:var(--danger);border:1px solid rgba(229,62,62,.25)}
+.sb-badge.pulse{animation:pulse 2s ease-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,.5)}50%{box-shadow:0 0 0 6px rgba(229,62,62,0)}}
+.sb-foot{padding:12px 18px;border-top:1px solid var(--bdr)}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-logout{
+  width:30px;height:30px;border-radius:8px;
+  background:transparent;border:1px solid var(--bdr);
+  color:var(--muted);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.sb-logout:hover{
+  background:rgba(229,62,62,.10);
+  border-color:rgba(229,62,62,.35);
+  color:var(--danger);
+}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(124,77,255,.25),rgba(59,143,232,.25));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--purple);border:1.5px solid rgba(124,77,255,.3);flex-shrink:0}
+.sb-uname{font-size:11px;font-weight:600;color:var(--text)}
+.sb-urole{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* LIVE インジケータ */
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#27AE60;margin-right:5px;vertical-align:middle;animation:pulseTeal 1.8s ease-out infinite;box-shadow:0 0 0 0 rgba(39,174,96,.55)}
+.live-label{font-size:9px;font-weight:700;color:var(--ok);letter-spacing:.1em;text-transform:uppercase}
+
+/* ─ メイン ─ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:46px;background:var(--surf);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0;box-shadow:0 1px 4px rgba(11,29,53,.04)}
+.tb-title{font-size:14px;font-weight:700;color:var(--text)}
+.tb-spacer{flex:1}
+.tb-btn{height:28px;padding:0 13px;border-radius:7px;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;gap:5px}
+.tb-ghost{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+.tb-ghost:hover{border-color:var(--purple);color:var(--purple)}
+.tb-purple{background:linear-gradient(135deg,var(--purple),var(--sky));color:#FFFFFF;box-shadow:0 3px 10px rgba(124,77,255,.3)}
+.last-update{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.last-update::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulseTeal 2s ease-out infinite}
+
+.content{flex:1;overflow-y:auto;padding:22px;background:transparent}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:99px}
+
+/* ─ KPI ─ */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.kpi{background:var(--card);border-radius:13px;padding:16px 18px;border:1px solid var(--bdr);position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(11,29,53,.05);transition:all .25s ease;opacity:0;transform:translateY(14px)}
+.kpi.in-view{opacity:1;transform:translateY(0)}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(11,29,53,.10);border-color:rgba(124,77,255,.35)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0}
+.kpi-u::before{background:linear-gradient(90deg,var(--purple),var(--sky))}
+.kpi-o::before{background:linear-gradient(90deg,var(--ok),#159042)}
+.kpi-a::before{background:linear-gradient(90deg,var(--amber),#E86010)}
+.kpi-lbl{font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.kpi-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--text);line-height:1;margin-bottom:4px}
+.kpi-unit{font-size:13px;font-weight:400;color:var(--muted);margin-left:2px}
+.kpi-diff{font-size:10px;font-weight:600}
+.kd-ok{color:var(--ok)}.kd-warn{color:var(--warn)}.kd-bad{color:var(--danger)}
+
+/* ─ グリッド ─ */
+.g2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ─ カード ─ */
+.card{background:var(--card);border-radius:13px;padding:18px;border:1px solid var(--bdr);box-shadow:0 2px 10px rgba(11,29,53,.05);transition:all .25s ease;opacity:0;transform:translateY(14px)}
+.card.in-view{opacity:1;transform:translateY(0)}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(11,29,53,.10);border-color:rgba(124,77,255,.35)}
+.c-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:8px;flex-wrap:wrap}
+.c-title{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+
+/* ─ テーブル ─ */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--bdr);text-align:left;background:var(--card2);white-space:nowrap;cursor:pointer;user-select:none;transition:all .15s}
+.tbl th:hover{color:var(--purple);background:rgba(124,77,255,.06)}
+.tbl th.sortable::after{content:' ⇅';opacity:.35;font-size:9px}
+.tbl th.asc::after{content:' ↑';opacity:1;color:var(--purple)}
+.tbl th.desc::after{content:' ↓';opacity:1;color:var(--purple)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--bdr2);font-size:11px;vertical-align:middle;color:var(--text)}
+.tbl tr:hover td{background:rgba(124,77,255,.05)}
+.tbl tr:last-child td{border:none}
+.pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:10px;color:var(--muted)}
+
+/* ─ アバター ─ */
+.pc{display:flex;align-items:center;gap:9px}
+.pav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1.5px solid}
+.av-t{background:rgba(15,184,160,.12);border-color:rgba(15,184,160,.35);color:var(--teal)}
+.av-a{background:rgba(232,160,48,.12);border-color:rgba(232,160,48,.35);color:var(--amber)}
+.av-d{background:rgba(229,62,62,.12);border-color:rgba(229,62,62,.35);color:var(--danger)}
+.av-o{background:rgba(39,174,96,.12);border-color:rgba(39,174,96,.35);color:var(--ok)}
+.av-s{background:rgba(59,143,232,.12);border-color:rgba(59,143,232,.35);color:var(--sky)}
+.av-p{background:rgba(124,77,255,.12);border-color:rgba(124,77,255,.35);color:var(--purple)}
+.pn{font-size:11px;font-weight:600;color:var(--text)}
+.pm{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ─ バッジ ─ */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:9px;font-weight:700;white-space:nowrap}
+.b-ok{background:rgba(39,174,96,.12);color:var(--ok);border:1px solid rgba(39,174,96,.2)}
+.b-wn{background:rgba(232,160,48,.12);color:var(--amber);border:1px solid rgba(232,160,48,.2)}
+.b-bd{background:rgba(229,62,62,.12);color:var(--danger);border:1px solid rgba(229,62,62,.2)}
+.b-tl{background:rgba(15,184,160,.12);color:var(--teal);border:1px solid rgba(15,184,160,.2)}
+.b-pl{background:rgba(124,77,255,.12);color:var(--purple);border:1px solid rgba(124,77,255,.2)}
+.b-mu{background:var(--card2);color:var(--muted);border:1px solid var(--bdr)}
+
+/* ─ ロールチップ ─ */
+.role-chip{
+  display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;
+  background:var(--card2);color:var(--muted);border:1px solid var(--bdr);
+}
+.role-athlete{background:rgba(15,184,160,.10);color:var(--teal);border-color:rgba(15,184,160,.25)}
+.role-parent{background:rgba(232,160,48,.10);color:var(--amber);border-color:rgba(232,160,48,.25)}
+.role-coach{background:rgba(59,143,232,.10);color:var(--sky);border-color:rgba(59,143,232,.25)}
+.role-admin{background:rgba(124,77,255,.10);color:var(--purple);border-color:rgba(124,77,255,.25)}
+
+/* ロールフィルタタブ */
+.role-tab{padding:4px 11px;border-radius:4px;font-size:9px;color:var(--muted);cursor:pointer;font-weight:600;transition:all .15s;user-select:none}
+.role-tab:hover{background:rgba(124,77,255,.06);color:var(--purple)}
+.role-tab.act{background:var(--purple);color:#FFFFFF;font-weight:700}
+
+/* ─ アクションボタン ─ */
+.ab{padding:3px 10px;border-radius:5px;border:none;font-size:9px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s}
+.ab-p{background:rgba(124,77,255,.15);color:var(--purple);border:1px solid rgba(124,77,255,.25)}
+.ab-p:hover{background:var(--purple);color:white}
+.ab-g{background:transparent;color:var(--muted);border:1px solid var(--bdr)}
+.ab-g:hover{border-color:var(--muted);color:var(--text)}
+.ab-d{background:rgba(229,62,62,.12);color:var(--danger);border:1px solid rgba(229,62,62,.25)}
+.ab-d:hover{background:var(--danger);color:white}
+
+/* ─ エクスポートカード ─ */
+.export-card{
+  background:var(--card);border-radius:12px;padding:18px;border:1.5px solid var(--bdr);
+  cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:10px;
+}
+.export-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 4px 16px rgba(124,77,255,.15)}
+.export-ico{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.export-ico-csv{background:linear-gradient(135deg,#27AE60,#159042);color:white;box-shadow:0 4px 14px rgba(39,174,96,.35)}
+.export-ico-sheets{background:linear-gradient(135deg,#34A853,#137333);color:white;box-shadow:0 4px 14px rgba(52,168,83,.35)}
+.export-title{font-size:13px;font-weight:700;color:var(--text)}
+.export-desc{font-size:11px;color:var(--muted);line-height:1.55;flex:1}
+.export-btn{
+  height:36px;border-radius:8px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--purple),var(--sky));color:white;
+  font-size:11px;font-weight:700;font-family:var(--font);
+  box-shadow:0 2px 8px rgba(124,77,255,.3);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:all .15s;
+}
+.export-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(124,77,255,.4)}
+.export-btn:active{transform:translateY(0)}
+
+/* ─ チェックリスト ─ */
+.chk-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.chk-row{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 11px;border-radius:8px;
+  border:1.5px solid var(--bdr);background:var(--card2);
+  cursor:pointer;transition:all .15s;user-select:none;
+}
+.chk-row:hover{background:white;border-color:#BFCFDE}
+.chk-row.sel{background:rgba(124,77,255,.08);border-color:var(--purple)}
+.chk-mark{
+  width:18px;height:18px;border-radius:5px;
+  border:1.5px solid var(--bdr);background:white;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:white;
+  transition:all .15s;flex-shrink:0;
+}
+.chk-row.sel .chk-mark{background:var(--purple);border-color:var(--purple)}
+.chk-row.sel .chk-mark::after{content:'✓'}
+.chk-lbl{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.chk-cnt{font-size:10px;color:var(--muted);font-family:var(--mono)}
+
+/* ─ ログテーブル ─ */
+.log-row{
+  display:grid;grid-template-columns:120px 80px 1fr;gap:12px;
+  padding:8px 12px;border-bottom:1px solid var(--bdr2);font-size:10px;
+}
+.log-row:hover{background:var(--card2)}
+.log-time{font-family:var(--mono);color:var(--muted)}
+.log-type{font-size:9px;font-weight:700;text-align:center;padding:1px 6px;border-radius:4px}
+.log-info{background:rgba(59,143,232,.12);color:var(--sky)}
+.log-warn{background:rgba(232,160,48,.12);color:var(--amber)}
+.log-err{background:rgba(229,62,62,.12);color:var(--danger)}
+.log-ok{background:rgba(39,174,96,.12);color:var(--ok)}
+.log-msg{color:var(--text)}
+
+/* ─ チーム作成申請カード ─ */
+.appl-card{
+  display:flex;gap:14px;justify-content:space-between;
+  background:white;border:1.5px solid var(--bdr);border-radius:11px;
+  padding:14px;transition:all .25s ease;
+}
+.appl-card:hover{border-color:rgba(124,77,255,.35);box-shadow:0 4px 14px rgba(11,29,53,.06)}
+.appl-card.approving{background:var(--ok-bg,#EAFAF1);border-color:#A9DFBF;opacity:.85}
+.appl-card.rejecting{background:rgba(229,62,62,.08);border-color:#F9BABA;opacity:.65}
+.appl-card.removing{opacity:0;transform:translateX(20px) scale(.96);margin-top:-10px;max-height:0;padding:0 14px;border-color:transparent}
+.appl-l{display:flex;gap:12px;flex:1;min-width:0}
+.appl-main{flex:1;min-width:0}
+.appl-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.appl-meta{font-size:10px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+.appl-msg{
+  background:#F4F9FF;border:1px solid rgba(59,143,232,.2);
+  border-radius:7px;padding:7px 10px;
+  font-size:11px;color:var(--text);line-height:1.5;
+}
+.appl-goal{
+  background:#FFFCEB;border:1px solid rgba(232,160,48,.2);
+  border-radius:7px;padding:7px 10px;margin-top:6px;
+  font-size:11px;color:var(--text);line-height:1.5;
+}
+.appl-r{display:flex;flex-direction:column;gap:6px;flex-shrink:0;width:90px}
+.appl-btn{
+  height:30px;border:none;border-radius:6px;cursor:pointer;
+  font-size:11px;font-weight:700;font-family:var(--font);transition:all .15s;
+}
+.appl-btn-ok{background:linear-gradient(135deg,var(--ok),#159042);color:white;box-shadow:0 2px 8px rgba(39,174,96,.3)}
+.appl-btn-ok:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(39,174,96,.4)}
+.appl-btn-ng{background:white;color:var(--danger);border:1px solid rgba(229,62,62,.3)}
+.appl-btn-ng:hover{background:var(--danger);color:white;border-color:var(--danger)}
+
+/* ─ スクリーン ─ */
+.screen{display:none;animation:fadeInUp .35s ease}
+.screen.active{display:block}
+
+/* ─ トースト ─ */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0F2137;color:#FFFFFF;font-size:11px;font-weight:700;padding:9px 20px;border-radius:99px;pointer-events:none;opacity:0;transition:opacity .3s;z-index:9999;white-space:nowrap;box-shadow:0 6px 20px rgba(11,29,53,.25)}
+#toast.show{opacity:1}
+
+/* ─ アニメーション ─ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseTeal{0%,100%{box-shadow:0 0 0 0 rgba(39,174,96,.55)}50%{box-shadow:0 0 0 5px rgba(39,174,96,0)}}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after { animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ════ サイドバー ════ -->
+<div class="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">
+      <div class="sb-mark">🛡</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div class="sb-name">ProGrow</div>
+          <span class="admin-tag">ADMIN</span>
+        </div>
+        <div class="sb-sub"><span class="live-dot"></span><span class="live-label">LIVE</span> &nbsp;管理コンソール</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-sec">
+      <div class="sb-sec-lbl">運用管理</div>
+      <div class="sb-item act" id="nav-dashboard" onclick="go('dashboard','監視ダッシュボード',this)">
+        <div class="sb-icon">📊</div><div class="sb-lbl">監視ダッシュボード</div>
+      </div>
+      <div class="sb-item" id="nav-teams" onclick="go('teams','チーム管理',this)">
+        <div class="sb-icon">🏅</div><div class="sb-lbl">チーム管理</div>
+        <div class="sb-badge sbb-purple">214</div>
+      </div>
+      <div class="sb-item" id="nav-approvals" onclick="go('approvals','チーム作成承認',this)">
+        <div class="sb-icon">✅</div><div class="sb-lbl">チーム作成承認</div>
+        <div class="sb-badge sbb-red pulse">3</div>
+      </div>
+      <div class="sb-item" id="nav-export" onclick="go('export','データエクスポート',this)">
+        <div class="sb-icon">⬇️</div><div class="sb-lbl">データエクスポート</div>
+      </div>
+    </div>
+    <div class="sb-sec" style="margin-top:10px">
+      <div class="sb-sec-lbl">監視・ログ</div>
+      <div class="sb-item" onclick="toast('準備中：システムログ')">
+        <div class="sb-icon">📜</div><div class="sb-lbl">システムログ</div>
+      </div>
+      <div class="sb-item" onclick="toast('準備中：バックアップ')">
+        <div class="sb-icon">💾</div><div class="sb-lbl">バックアップ</div>
+      </div>
+    </div>
+  </div>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av">運</div>
+      <div style="flex:1;min-width:0">
+        <div class="sb-uname">運営管理者</div>
+        <div class="sb-urole">admin@progrow.app</div>
+      </div>
+      <button class="sb-logout" type="button" title="ログアウト" onclick="logoutAdmin()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ メイン ════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-title" id="page-title">監視ダッシュボード</div>
+    <div style="font-size:10px;color:var(--muted)">運営本部 ／ 全体管理</div>
+    <div class="last-update" id="last-update" title="最終データ同期">2分前 同期</div>
+    <div class="tb-spacer"></div>
+    <button class="tb-btn tb-purple" onclick="go('export','データエクスポート',null)">⬇️ エクスポート</button>
+  </div>
+
+  <div class="content">
+
+    <!-- F-01 監視ダッシュボード（運用監視＋KPI） -->
+    <div class="screen active" id="s-dashboard">
+      <div class="kpi-row">
+        <div class="kpi kpi-u"><div class="kpi-lbl">登録ユーザー総数</div><div class="kpi-val">5,184<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">↑ 今月 +127名</div></div>
+        <div class="kpi kpi-o"><div class="kpi-lbl">月次測定 完了率</div><div class="kpi-val">87.2<span class="kpi-unit">%</span></div><div class="kpi-diff kd-ok">↑ 先月比 +3.5pt</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">プロテイン使用者</div><div class="kpi-val">1,842<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">全体の 35.5%</div></div>
+      </div>
+
+      <div class="g2b">
+        <div class="card">
+          <div class="c-hdr"><div class="c-title">🛡 システムステータス</div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">API稼働率</div><span class="badge b-ok">✓ 99.98%</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">DB応答時間</div><span class="badge b-ok">✓ 24ms</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">LINE API</div><span class="badge b-ok">✓ 正常</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">Google API</div><span class="badge b-wn">⚠ 遅延あり</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">ストレージ使用率</div><span class="badge b-ok">✓ 42%</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0"><div style="font-size:11px;color:var(--text)">最終バックアップ</div><span class="badge b-ok">✓ 2時間前</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="c-hdr"><div class="c-title">📜 最新ログ（直近の操作）</div></div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div class="log-row"><span class="log-time">14:32:18</span><span class="log-type log-ok">SUCCESS</span><span class="log-msg">バックアップ完了 (5,184件)</span></div>
+            <div class="log-row"><span class="log-time">14:28:05</span><span class="log-type log-info">INFO</span><span class="log-msg">CSVエクスポート (admin@progrow.app)</span></div>
+            <div class="log-row"><span class="log-time">14:15:42</span><span class="log-type log-warn">WARN</span><span class="log-msg">Google API レート制限警告</span></div>
+            <div class="log-row"><span class="log-time">13:50:11</span><span class="log-type log-info">INFO</span><span class="log-msg">ユーザー権限変更: sasaki@progrow.app</span></div>
+            <div class="log-row"><span class="log-time">12:45:33</span><span class="log-type log-info">INFO</span><span class="log-msg">Sheets出力 (admin@progrow.app)</span></div>
+            <div class="log-row"><span class="log-time">11:20:08</span><span class="log-type log-ok">SUCCESS</span><span class="log-msg">月次バッチ処理完了</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- F-02 チーム管理 -->
+    <div class="screen" id="s-teams">
+      <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi kpi-u"><div class="kpi-lbl">承認済みチーム</div><div class="kpi-val">214<span class="kpi-unit">チーム</span></div><div class="kpi-diff kd-ok">↑ 今月 +8</div></div>
+        <div class="kpi kpi-o"><div class="kpi-lbl">稼働中チーム</div><div class="kpi-val">198<span class="kpi-unit">/214</span></div><div class="kpi-diff kd-ok">稼働率 92.5%</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">休眠チーム</div><div class="kpi-val" style="color:var(--warn)">12<span class="kpi-unit">チーム</span></div><div class="kpi-diff kd-warn">3ヶ月以上未活動</div></div>
+        <div class="kpi kpi-u"><div class="kpi-lbl">平均選手数</div><div class="kpi-val">24.2<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">↑ 先月比 +1.1</div></div>
+      </div>
+
+      <div class="card">
+        <div class="c-hdr">
+          <div class="c-title">🏅 チーム一覧（全 214チーム）</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;background:var(--card2);border-radius:6px;padding:2px;border:1px solid var(--bdr);gap:2px" id="team-filter">
+              <div class="role-tab act" data-status="all" onclick="filterByStatus(this)">全て</div>
+              <div class="role-tab" data-status="active" onclick="filterByStatus(this)">稼働中</div>
+              <div class="role-tab" data-status="dormant" onclick="filterByStatus(this)">休眠</div>
+              <div class="role-tab" data-status="suspended" onclick="filterByStatus(this)">停止</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--bdr);border-radius:7px;padding:5px 10px">
+              <span style="font-size:11px">🔍</span>
+              <input id="team-search" type="text" placeholder="チーム名・指導者..." style="border:none;outline:none;background:transparent;font-size:11px;font-family:var(--font);color:var(--text);width:160px">
+            </div>
+          </div>
+        </div>
+        <table class="tbl" id="team-table">
+          <thead><tr><th class="sortable">チーム名</th><th class="sortable">競技</th><th class="sortable">指導者</th><th class="sortable">所在地</th><th class="sortable">選手数</th><th class="sortable">最終測定</th><th class="sortable">状態</th><th style="text-align:right">操作</th></tr></thead>
+          <tbody>
+            <tr data-status="active">
+              <td><div class="pc"><div class="pav av-t">東</div><div><div class="pn">東京FC ジュニア</div><div class="pm">2024-09-01 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">サッカー</td>
+              <td style="font-size:10px">田中 一郎</td>
+              <td style="font-size:10px;color:var(--muted)">東京都</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">22</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-15</td>
+              <td><span class="badge b-ok">✓ 稼働中</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button></td>
+            </tr>
+            <tr data-status="active">
+              <td><div class="pc"><div class="pav av-s">横</div><div><div class="pn">横浜SP U-14</div><div class="pm">2024-08-15 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">サッカー</td>
+              <td style="font-size:10px">鈴木 健太</td>
+              <td style="font-size:10px;color:var(--muted)">神奈川県</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">28</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-12</td>
+              <td><span class="badge b-ok">✓ 稼働中</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button></td>
+            </tr>
+            <tr data-status="active">
+              <td><div class="pc"><div class="pav av-a">大</div><div><div class="pn">大阪BC ユース</div><div class="pm">2024-10-12 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">バスケットボール</td>
+              <td style="font-size:10px">中村 大輔</td>
+              <td style="font-size:10px;color:var(--muted)">大阪府</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">19</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-10</td>
+              <td><span class="badge b-ok">✓ 稼働中</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button></td>
+            </tr>
+            <tr data-status="active">
+              <td><div class="pc"><div class="pav av-o">名</div><div><div class="pn">名古屋陸上クラブ</div><div class="pm">2025-01-10 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">陸上競技</td>
+              <td style="font-size:10px">高橋 雅子</td>
+              <td style="font-size:10px;color:var(--muted)">愛知県</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">31</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-08</td>
+              <td><span class="badge b-ok">✓ 稼働中</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button></td>
+            </tr>
+            <tr data-status="dormant">
+              <td><div class="pc"><div class="pav av-d">仙</div><div><div class="pn">仙台アスリート</div><div class="pm">2025-03-20 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">陸上競技</td>
+              <td style="font-size:10px">渡辺 真理</td>
+              <td style="font-size:10px;color:var(--muted)">宮城県</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">15</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--warn)">2026-02-18</td>
+              <td><span class="badge b-wn">💤 休眠</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-d" onclick="if(confirm('チームを削除しますか？\nこの操作は取り消せません。'))toast('チームを削除しました')">削除</button></td>
+            </tr>
+            <tr data-status="dormant">
+              <td><div class="pc"><div class="pav av-d">福</div><div><div class="pn">福岡ジュニアSC</div><div class="pm">2024-11-08 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">サッカー</td>
+              <td style="font-size:10px">小野 武</td>
+              <td style="font-size:10px;color:var(--muted)">福岡県</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">17</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--warn)">2026-01-25</td>
+              <td><span class="badge b-wn">💤 休眠</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="toast('チーム詳細を表示')">詳細</button> <button class="ab ab-d" onclick="if(confirm('チームを削除しますか？\nこの操作は取り消せません。'))toast('チームを削除しました')">削除</button></td>
+            </tr>
+            <tr data-status="suspended">
+              <td><div class="pc"><div class="pav av-d">広</div><div><div class="pn">広島水泳クラブ</div><div class="pm">2025-02-14 登録</div></div></div></td>
+              <td style="font-size:10px;color:var(--muted)">水泳</td>
+              <td style="font-size:10px">藤田 健一</td>
+              <td style="font-size:10px;color:var(--muted)">広島県</td>
+              <td style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text)">8</td>
+              <td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2025-12-20</td>
+              <td><span class="badge b-bd">✕ 停止中</span></td>
+              <td style="text-align:right"><button class="ab ab-p" onclick="resumeTeam(this)">再開</button> <button class="ab ab-d" onclick="if(confirm('チームを削除しますか？\nこの操作は取り消せません。'))toast('チームを削除しました')">削除</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pager">
+          <div>1 - 7 / 214チーム</div>
+          <div style="display:flex;gap:4px"><button class="ab ab-g">‹ 前</button><button class="ab ab-p">1</button><button class="ab ab-g">2</button><button class="ab ab-g">3</button><button class="ab ab-g">…</button><button class="ab ab-g">次 ›</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- F-03 チーム作成承認 -->
+    <div class="screen" id="s-approvals">
+      <div class="card" style="border-left:4px solid var(--amber)">
+        <div class="c-hdr">
+          <div class="c-title">⏳ 指導者からのチーム作成申請 <span class="badge b-wn" style="margin-left:6px">3件 承認待ち</span></div>
+          <button class="ab ab-p" style="padding:5px 12px;font-size:10px" onclick="toast('全申請を承認しました')">✓ 全て承認</button>
+        </div>
+
+        <div style="font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:14px">
+          指導者が ProGrow を新規利用する際に提出されたチーム作成申請の一覧です。<strong>承認</strong>するとチームと指導者アカウントがアクティブ化され、選手管理機能が利用可能になります。
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <!-- 申請1: 新潟ライオンズ -->
+          <div class="appl-card">
+            <div class="appl-l">
+              <div class="pav av-s">新</div>
+              <div class="appl-main">
+                <div class="appl-name">新潟ライオンズ <span class="badge b-pl">サッカー</span> <span class="badge b-mu">中学生</span></div>
+                <div class="appl-meta">申請者: 小林 健（kobayashi@niigata-lions.jp） / 新潟県 / 選手規模: 11〜25名 / 申請: 2026/05/28 13:50</div>
+                <div class="appl-msg">💬 地元のサッカークラブで中学生18名を指導しています。データに基づいた成長管理を導入したく申請しました。</div>
+                <div class="appl-goal">🎯 <strong>チーム目標:</strong> 県大会ベスト4以上 / 選手の身体能力向上 / ケガ予防</div>
+              </div>
+            </div>
+            <div class="appl-r">
+              <button class="appl-btn appl-btn-ok" type="button" onclick="approveApplication(this)">✓ 承認</button>
+              <button class="appl-btn appl-btn-ng" type="button" onclick="rejectApplication(this)">✕ 却下</button>
+            </div>
+          </div>
+
+          <!-- 申請2: 福岡ユナイテッド U-15 -->
+          <div class="appl-card">
+            <div class="appl-l">
+              <div class="pav av-a">福</div>
+              <div class="appl-main">
+                <div class="appl-name">福岡ユナイテッド U-15 <span class="badge b-pl">サッカー</span> <span class="badge b-mu">中学生</span></div>
+                <div class="appl-meta">申請者: 松本 大輝（matsumoto@fukuoka-utd.jp） / 福岡県 / 選手規模: 26〜50名 / 申請: 2026/05/28 11:23</div>
+                <div class="appl-msg">💬 既存クラブから移行で、選手32名を一括登録予定。指導歴 10年以上です。</div>
+                <div class="appl-goal">🎯 <strong>チーム目標:</strong> 全国大会出場 / 個人成長の可視化</div>
+              </div>
+            </div>
+            <div class="appl-r">
+              <button class="appl-btn appl-btn-ok" type="button" onclick="approveApplication(this)">✓ 承認</button>
+              <button class="appl-btn appl-btn-ng" type="button" onclick="rejectApplication(this)">✕ 却下</button>
+            </div>
+          </div>
+
+          <!-- 申請3: 京都スプリンターズ -->
+          <div class="appl-card">
+            <div class="appl-l">
+              <div class="pav av-o">京</div>
+              <div class="appl-main">
+                <div class="appl-name">京都スプリンターズ <span class="badge b-pl">陸上競技</span> <span class="badge b-mu">小学生</span></div>
+                <div class="appl-meta">申請者: 川村 文子（kawamura@kyoto-sprinters.jp） / 京都府 / 選手規模: 1〜10名 / 申請: 2026/05/27 18:42</div>
+                <div class="appl-msg">💬 小学生向け陸上クラブ。骨端線測定を取り入れた個別指導を実現したいです。</div>
+                <div class="appl-goal">🎯 <strong>チーム目標:</strong> 全選手の身体能力向上 / 中学進学後の活躍につながる基礎づくり</div>
+              </div>
+            </div>
+            <div class="appl-r">
+              <button class="appl-btn appl-btn-ok" type="button" onclick="approveApplication(this)">✓ 承認</button>
+              <button class="appl-btn appl-btn-ng" type="button" onclick="rejectApplication(this)">✕ 却下</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 過去の承認/却下履歴 -->
+      <div class="card" style="margin-top:16px">
+        <div class="c-hdr"><div class="c-title">📋 過去の承認・却下履歴</div></div>
+        <table class="tbl">
+          <thead><tr><th>処理日時</th><th>チーム名</th><th>申請者</th><th>競技</th><th>処理</th><th>処理者</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-24 10:14</td><td style="font-size:11px;font-weight:600">大阪BC ユース</td><td style="font-size:10px">中村 大輔</td><td style="font-size:10px;color:var(--muted)">バスケットボール</td><td><span class="badge b-ok">✓ 承認</span></td><td style="font-size:10px">運営管理者</td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-18 16:32</td><td style="font-size:11px;font-weight:600">仙台アスリート</td><td style="font-size:10px">渡辺 真理</td><td style="font-size:10px;color:var(--muted)">陸上競技</td><td><span class="badge b-ok">✓ 承認</span></td><td style="font-size:10px">運営管理者</td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-12 11:08</td><td style="font-size:11px;font-weight:600">名古屋陸上クラブ</td><td style="font-size:10px">高橋 雅子</td><td style="font-size:10px;color:var(--muted)">陸上競技</td><td><span class="badge b-ok">✓ 承認</span></td><td style="font-size:10px">運営管理者</td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-05-08 09:45</td><td style="font-size:11px;font-weight:600">札幌スポーツ少年団</td><td style="font-size:10px">伊藤 雄一</td><td style="font-size:10px;color:var(--muted)">サッカー</td><td><span class="badge b-bd">✕ 却下</span></td><td style="font-size:10px">運営管理者</td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-22 14:30</td><td style="font-size:11px;font-weight:600">横浜SP U-14</td><td style="font-size:10px">鈴木 健太</td><td style="font-size:10px;color:var(--muted)">サッカー</td><td><span class="badge b-ok">✓ 承認</span></td><td style="font-size:10px">運営管理者</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- F-04 データエクスポート（CSV/Sheetsのみ） -->
+    <div class="screen" id="s-export">
+      <div class="card">
+        <div class="c-hdr"><div class="c-title">⬇️ データエクスポート設定</div></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">出力するデータと形式を選択してください</div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">対象データ（複数選択可）</div>
+        <div class="chk-list">
+          <div class="chk-row sel" onclick="toggleExportItem(this,'athletes')"><div class="chk-mark"></div><div class="chk-lbl">選手データ一覧</div><div class="chk-cnt">5,184件</div></div>
+          <div class="chk-row sel" onclick="toggleExportItem(this,'measurements')"><div class="chk-mark"></div><div class="chk-lbl">身体測定データ（身長・体重・骨端線幅）</div><div class="chk-cnt">62,208件</div></div>
+          <div class="chk-row" onclick="toggleExportItem(this,'lifestyle')"><div class="chk-mark"></div><div class="chk-lbl">生活習慣データ（睡眠・食事・練習）</div><div class="chk-cnt">58,440件</div></div>
+          <div class="chk-row" onclick="toggleExportItem(this,'proteins')"><div class="chk-mark"></div><div class="chk-lbl">プロテイン使用データ</div><div class="chk-cnt">22,104件</div></div>
+          <div class="chk-row" onclick="toggleExportItem(this,'alerts')"><div class="chk-mark"></div><div class="chk-lbl">アラート発生履歴</div><div class="chk-cnt">8,820件</div></div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">出力形式</div>
+        <div class="g2b" style="margin-bottom:14px">
+          <div class="export-card" onclick="exportData('csv')">
+            <div class="export-ico export-ico-csv">📊</div>
+            <div class="export-title">CSV ファイル</div>
+            <div class="export-desc">汎用的なCSV形式。Excel等で開けます</div>
+            <button class="export-btn" type="button">⬇️ ダウンロード</button>
+          </div>
+          <div class="export-card" onclick="exportData('sheets')">
+            <div class="export-ico export-ico-sheets">🟩</div>
+            <div class="export-title">Google Sheets</div>
+            <div class="export-desc">Sheets APIで直接スプレッドシートに出力</div>
+            <button class="export-btn" type="button">🔗 Sheets出力</button>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;margin-top:6px">期間指定</div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+          <input type="month" value="2025-11" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--card2);padding:0 12px;font-size:12px;color:var(--text);font-family:var(--font)">
+          <span style="color:var(--muted)">〜</span>
+          <input type="month" value="2026-04" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--card2);padding:0 12px;font-size:12px;color:var(--text);font-family:var(--font)">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="c-hdr"><div class="c-title">📦 過去のエクスポート履歴</div></div>
+        <table class="tbl">
+          <thead><tr><th>実行日時</th><th>対象データ</th><th>形式</th><th>サイズ</th><th>実行者</th><th style="text-align:right">操作</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-15 14:28</td><td style="font-size:10px">選手+測定 (2026年4月)</td><td><span class="badge b-ok">CSV</span></td><td style="font-family:var(--mono);font-size:10px">2.4 MB</td><td style="font-size:10px">運営管理者</td><td style="text-align:right"><button class="ab ab-p" onclick="exportData('csv')">↓ 再DL</button></td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-12 10:05</td><td style="font-size:10px">プロテイン使用 (全期間)</td><td><span class="badge b-tl">Sheets</span></td><td style="font-family:var(--mono);font-size:10px">—</td><td style="font-size:10px">運営管理者</td><td style="text-align:right"><button class="ab ab-p" onclick="toast('Sheetsを開きました')">🔗 開く</button></td></tr>
+            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-01 09:00</td><td style="font-size:10px">月次バックアップ（自動）</td><td><span class="badge b-ok">CSV</span></td><td style="font-family:var(--mono);font-size:10px">12.8 MB</td><td style="font-size:10px">自動バッチ</td><td style="text-align:right"><button class="ab ab-p" onclick="exportData('csv')">↓ 再DL</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+const ALL = ['dashboard','teams','approvals','export'];
+
+function go(id, title, el){
+  ALL.forEach(s=>{
+    const sc=document.getElementById('s-'+s);
+    if(sc) sc.classList.remove('active');
+    const sb=document.getElementById('nav-'+s);
+    if(sb) sb.classList.toggle('act',s===id);
+  });
+  document.getElementById('page-title').textContent=title;
+  requestAnimationFrame(() => {
+    const next = document.getElementById('s-'+id);
+    if(next){
+      next.classList.add('active');
+      next.querySelectorAll('.kpi, .card').forEach(c => c.classList.remove('in-view'));
+      setTimeout(() => {
+        next.querySelectorAll('.kpi, .card').forEach(c => c.classList.add('in-view'));
+      }, 50);
+    }
+  });
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity='0'},2000);
+}
+
+// ── ログアウト ──
+function logoutAdmin(){
+  if(confirm('管理コンソールからログアウトしますか？')){
+    window.location.href = '../admin/index.html';
+  }
+}
+
+// ── F-03 チーム作成申請の承認/却下 ──
+function approveApplication(btn){
+  const card = btn.closest('.appl-card');
+  if(!card) return;
+  card.classList.add('approving');
+  const name = (card.querySelector('.appl-name') || {}).textContent || 'チーム';
+  setTimeout(() => {
+    card.classList.add('removing');
+    setTimeout(() => {
+      card.remove();
+      _refreshApprovalBadge();
+    }, 400);
+  }, 250);
+  toast('✓ ' + name.trim().split(' ')[0] + ' を承認しました');
+}
+
+function rejectApplication(btn){
+  const card = btn.closest('.appl-card');
+  if(!card) return;
+  if(!confirm('このチーム作成申請を却下しますか？\n指導者にメールで却下通知が送られます。')) return;
+  card.classList.add('rejecting');
+  const name = (card.querySelector('.appl-name') || {}).textContent || 'チーム';
+  setTimeout(() => {
+    card.classList.add('removing');
+    setTimeout(() => {
+      card.remove();
+      _refreshApprovalBadge();
+    }, 400);
+  }, 250);
+  toast('✕ ' + name.trim().split(' ')[0] + ' を却下しました');
+}
+
+function _refreshApprovalBadge(){
+  const remaining = document.querySelectorAll('#s-approvals .appl-card').length;
+  const badge = document.querySelector('#nav-approvals .sb-badge');
+  if(badge){
+    badge.textContent = String(remaining);
+    if(remaining === 0) badge.style.display = 'none';
+  }
+  // ヘッダーの件数バッジも更新
+  const headBadge = document.querySelector('#s-approvals .badge.b-wn');
+  if(headBadge) headBadge.textContent = remaining + '件 承認待ち';
+}
+
+// ── F-02 チーム状態フィルタ ──
+function filterByStatus(tab){
+  document.querySelectorAll('#team-filter .role-tab').forEach(t => t.classList.remove('act'));
+  tab.classList.add('act');
+  const status = tab.dataset.status;
+  document.querySelectorAll('#team-table tbody tr').forEach(tr => {
+    if(status === 'all') tr.style.display = '';
+    else tr.style.display = tr.dataset.status === status ? '' : 'none';
+  });
+}
+
+// ── チーム停止/再開 ──
+function suspendTeam(btn){
+  const tr = btn.closest('tr');
+  if(!tr) return;
+  const teamName = (tr.querySelector('.pn') || {}).textContent || 'チーム';
+  if(!confirm(teamName + ' を停止しますか？\n停止中のチームは選手・指導者がログインできなくなります。')) return;
+  tr.dataset.status = 'suspended';
+  const statusTd = tr.children[6];
+  if(statusTd) statusTd.innerHTML = '<span class="badge b-bd">✕ 停止中</span>';
+  // 操作列のボタンを「再開」に
+  const actionTd = tr.children[7];
+  if(actionTd){
+    actionTd.innerHTML = '<button class="ab ab-p" onclick="resumeTeam(this)">再開</button> <button class="ab ab-d" onclick="if(confirm(\'チームを削除しますか？\\nこの操作は取り消せません。\'))toast(\'チームを削除しました\')">削除</button>';
+  }
+  toast('⚠ ' + teamName + ' を停止しました');
+}
+
+function resumeTeam(btn){
+  const tr = btn.closest('tr');
+  if(!tr) return;
+  const teamName = (tr.querySelector('.pn') || {}).textContent || 'チーム';
+  tr.dataset.status = 'active';
+  const statusTd = tr.children[6];
+  if(statusTd) statusTd.innerHTML = '<span class="badge b-ok">✓ 稼働中</span>';
+  // 操作列のボタンを「停止」に
+  const actionTd = tr.children[7];
+  if(actionTd){
+    actionTd.innerHTML = '<button class="ab ab-p" onclick="toast(\'チーム詳細を表示\')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button>';
+  }
+  toast('✓ ' + teamName + ' を再開しました');
+}
+
+// ── F-04 エクスポート対象選択 ──
+const selectedExports = new Set(['athletes','measurements']);
+function toggleExportItem(el, key){
+  el.classList.toggle('sel');
+  if(el.classList.contains('sel')) selectedExports.add(key);
+  else selectedExports.delete(key);
+}
+
+// ── CSV / Sheets 出力（実機能） ──
+function exportData(format){
+  if(selectedExports.size === 0){
+    toast('⚠ 対象データを1つ以上選択してください');
+    return;
+  }
+  if(format === 'csv'){ downloadCSV(); }
+  else if(format === 'sheets'){ openSheets(); }
+}
+
+function buildSampleAthletesCSV(){
+  const header = ['選手ID','氏名','性別','学年','競技','チーム','身長(cm)','体重(kg)','骨端線幅(mm)','最終測定日'];
+  const rows = [
+    ['ATH-0001','山田 太郎','男','中2','サッカー','東京FC ジュニア','162.4','52.8','3.2','2026-04-15'],
+    ['ATH-0002','田中 一郎','男','中2','サッカー','東京FC ジュニア','165.0','58.2','2.8','2026-04-14'],
+    ['ATH-0003','伊藤 大輝','男','中2','サッカー','東京FC ジュニア','160.8','54.1','2.5','2026-04-12'],
+    ['ATH-0004','佐藤 花子','女','中1','サッカー','横浜SP U-14','156.2','46.8','3.5','2026-04-13'],
+    ['ATH-0005','高橋 勇気','男','中3','サッカー','東京FC ジュニア','172.5','64.0','2.1','2026-04-15']
+  ];
+  const lines = [header.join(','), ...rows.map(r => r.join(','))];
+  return '﻿' + lines.join('\n');
+}
+
+function downloadCSV(){
+  const csv = buildSampleAthletesCSV();
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `progrow_export_${ts}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('✓ CSVファイルをダウンロードしました');
+}
+
+function openSheets(){
+  toast('🟩 Google Sheetsに転送中...');
+  setTimeout(() => {
+    window.open('https://docs.google.com/spreadsheets/create', '_blank');
+    toast('✓ Google Sheetsを開きました');
+  }, 800);
+}
+
+// ── テーブルソート ──
+function initTableSorting(){
+  document.querySelectorAll('.tbl th.sortable').forEach((th) => {
+    th.addEventListener('click', () => {
+      const table = th.closest('.tbl');
+      const tbody = table.querySelector('tbody');
+      const colIdx = Array.from(th.parentElement.children).indexOf(th);
+      const asc = !th.classList.contains('asc');
+      table.querySelectorAll('th').forEach(t => t.classList.remove('asc','desc'));
+      th.classList.add(asc ? 'asc' : 'desc');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const av = (a.children[colIdx]||{}).textContent || '';
+        const bv = (b.children[colIdx]||{}).textContent || '';
+        const an = parseFloat(av.replace(/[^\d.\-]/g,''));
+        const bn = parseFloat(bv.replace(/[^\d.\-]/g,''));
+        if(!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+        return asc ? av.localeCompare(bv, 'ja') : bv.localeCompare(av, 'ja');
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    });
+  });
+}
+
+// ── テーブル検索 ──
+function initTableSearch(){
+  const inp = document.getElementById('team-search');
+  if(!inp) return;
+  inp.addEventListener('input', () => {
+    const q = inp.value.toLowerCase();
+    const table = inp.closest('.card').querySelector('.tbl');
+    if(!table) return;
+    table.querySelectorAll('tbody tr').forEach(tr => {
+      const txt = tr.textContent.toLowerCase();
+      tr.style.display = txt.includes(q) ? '' : 'none';
+    });
+  });
+}
+
+// ── カードのフェードイン ──
+function observeCards(){
+  if(!('IntersectionObserver' in window)){
+    document.querySelectorAll('.kpi, .card').forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.classList.add('in-view');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.kpi, .card').forEach(el => io.observe(el));
+}
+
+// ── 最終更新タイマー ──
+function startLastUpdateTicker(){
+  const el = document.getElementById('last-update');
+  if(!el) return;
+  let minutes = 2;
+  setInterval(() => {
+    minutes++;
+    el.textContent = minutes + '分前 同期';
+  }, 60000);
+}
+
+function _init(){
+  observeCards();
+  initTableSorting();
+  initTableSearch();
+  startLastUpdateTicker();
+}
+
+window.addEventListener('load', _init);
+</script>
+</body>
+</html>
