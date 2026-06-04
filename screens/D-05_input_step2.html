@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Nobita — D-05 入力 STEP2 生活習慣</title>
+<title>ProGrow — D-05 入力 STEP2 食事（タンパク質）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -25,55 +24,19 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#141F30;border-radius:0 0 22px 22px;z-index:20}
 .sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;padding-top:6px;font-size:10px;color:rgba(255,255,255,.6);font-family:var(--mono);flex-shrink:0}
 .sb-light{background:var(--navy)}
-.sb-white{background:var(--white);color:var(--sub)}
 .screen{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
 
-/* Header gradients */
-.hdr{background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);padding:16px 20px 52px;position:relative;overflow:hidden;flex-shrink:0}
-.hdr::after{content:'';position:absolute;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-90px;right:-60px}
-.hdr-purple{background:linear-gradient(160deg,#2C1B47 0%,#6C3483 100%)}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.back{display:flex;align-items:center;gap:10px}
-.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;cursor:pointer;border:1px solid rgba(255,255,255,.15)}
-.hdr-title{font-size:16px;font-weight:700;color:white;letter-spacing:-.01em}
-.hdr-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
-
-/* Stat boxes */
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat-box{background:rgba(255,255,255,.1);border-radius:11px;padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)}
-.stat-u{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px}
-.stat-v{font-family:var(--mono);font-size:18px;font-weight:600;color:white;line-height:1}
-.stat-l{font-size:9px;color:rgba(255,255,255,.4);margin-top:2px}
-
-/* Scroll */
-.scroll{flex:1;overflow-y:auto;padding:0 16px 24px;margin-top:-34px}
-.scroll::-webkit-scrollbar{display:none}
-.scroll-flat{flex:1;overflow-y:auto;padding:16px;background:var(--bg)}
-.scroll-flat::-webkit-scrollbar{display:none}
-.scroll-white{flex:1;overflow-y:auto;padding:20px 18px 24px;background:var(--white)}
+.scroll-white{flex:1;overflow-y:auto;padding:18px 18px 24px;background:var(--white)}
 .scroll-white::-webkit-scrollbar{display:none}
 
-/* Cards */
-.card{background:var(--white);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(11,29,53,.07);border:1px solid rgba(216,229,239,.5)}
-.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
-.card-title{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px}
-.more-link{font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;padding:3px 9px;border-radius:6px;background:var(--pale);border:1px solid rgba(30,111,217,.15)}
-
-/* Form */
 .field{margin-bottom:13px}
 .f-lbl{display:block;font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px}
-.f-inp{width:100%;height:46px;border-radius:11px;border:1.5px solid var(--border);background:#FAFCFE;padding:0 14px;font-size:14px;font-family:var(--font);color:var(--text);outline:none;-webkit-appearance:none}
-.f-inp:focus{border-color:var(--blue);background:white;box-shadow:0 0 0 3px rgba(30,111,217,.1)}
-.f-inp.filled{border-color:#AED6F1;background:#F8FCFF}
-.f-select{appearance:none}
 .f-req{color:var(--danger)}
 
-/* Step bar */
 .step-wrap{padding:14px 18px 18px;flex-shrink:0;background:linear-gradient(160deg,var(--navy) 0%,#1A4F8A 100%);position:relative;overflow:hidden}
 .step-wrap::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-80px;right:-50px}
 .step-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:8px}
 .step-title{font-size:14px;font-weight:700;color:white}
-.step-meta{font-size:10px;color:rgba(255,255,255,.5)}
 .prog{height:3px;background:rgba(255,255,255,.15);border-radius:99px;margin-bottom:12px}
 .prog-fill{height:100%;border-radius:99px;background:#06C755;transition:width .4s}
 .steps{display:flex;align-items:center;position:relative;z-index:1}
@@ -86,292 +49,110 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .s-line-done{background:#06C755}
 .s-line-todo{background:rgba(255,255,255,.15)}
 
-/* Buttons */
 .btn{width:100%;height:50px;border-radius:var(--r);border:none;font-size:15px;font-weight:700;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;transition:all .18s;letter-spacing:-.01em}
 .btn-blue{background:linear-gradient(135deg,#1E6FD9,#0B4DB5);color:white;box-shadow:0 4px 16px rgba(30,111,217,.3)}
-.btn-line{background:#06C755;color:white;box-shadow:0 4px 16px rgba(6,199,85,.3)}
 .btn-ghost{background:white;color:var(--blue);border:1.5px solid var(--border)}
-.btn-ok{background:linear-gradient(135deg,#27AE60,#1A7A40);color:white;box-shadow:0 4px 14px rgba(39,174,96,.3)}
-.btn-warn{background:linear-gradient(135deg,#E8A030,#C47010);color:white;box-shadow:0 4px 14px rgba(232,160,48,.3)}
-.btn-ghost-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)}
 
-/* Number input */
-.num-wrap{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;height:50px;background:#FAFCFE;margin-bottom:10px}
-.nm-btn{width:50px;background:var(--pale);border:none;font-size:22px;font-weight:300;color:var(--blue);cursor:pointer}
+/* タンパク質サマリーカード */
+.protein-need-card{
+  background:linear-gradient(135deg,#FFFDF5,#FFF7E6);
+  border:1.5px solid rgba(232,160,48,.3);
+  border-radius:var(--r);padding:14px;margin-bottom:14px;
+}
+.pn-row{display:flex;align-items:center;gap:13px}
+.pn-ico{
+  width:48px;height:48px;border-radius:13px;
+  background:linear-gradient(135deg,#E8A030,#C47010);color:white;
+  display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;
+  box-shadow:0 4px 14px rgba(232,160,48,.35);
+}
+.pn-body{flex:1;min-width:0}
+.pn-lbl{font-size:10px;color:var(--sub);font-weight:600;margin-bottom:3px}
+.pn-val{display:flex;align-items:baseline;gap:5px}
+.pn-val .v{font-family:var(--mono);font-size:24px;font-weight:800;color:#8A4F00;line-height:1}
+.pn-val .u{font-size:12px;color:#8A4F00;font-weight:700}
+.pn-formula{font-size:10px;color:var(--sub);margin-top:3px}
+
+/* プロテインカード */
+.prot-card{
+  background:linear-gradient(135deg,#EBF3FF,#E8FAF0);
+  border:1.5px solid rgba(30,111,217,.2);
+  border-radius:var(--r);padding:14px;margin-bottom:14px;
+}
+.prot-hdr{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.prot-ico{
+  width:40px;height:40px;border-radius:11px;
+  background:linear-gradient(135deg,#1E6FD9,#06C755);color:white;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.prot-ttl{font-size:13px;font-weight:700;color:var(--navy)}
+.prot-sub{font-size:10px;color:var(--sub);margin-top:1px}
+
+.num-wrap{display:flex;align-items:stretch;border:1.5px solid var(--border);border-radius:11px;overflow:hidden;height:46px;background:#FAFCFE;margin-bottom:10px}
+.nm-btn{width:46px;background:var(--pale);border:none;font-size:20px;font-weight:300;color:var(--blue);cursor:pointer;padding:0;font-family:var(--font);user-select:none}
+.nm-btn:hover{background:#D8E8F8}
+.nm-btn:active{background:#C5D9EA}
 .nm-c{flex:1;display:flex;align-items:center;justify-content:center;gap:5px}
-.nm-v{text-align:center;font-family:var(--mono);font-size:22px;font-weight:600;color:var(--navy);border:none;background:transparent;outline:none;width:64px}
+.nm-v{text-align:center;font-family:var(--mono);font-size:20px;font-weight:600;color:var(--navy);border:none;background:transparent;outline:none;width:64px}
 .nm-u{font-size:12px;color:var(--sub)}
 
-/* Badges */
-.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
-.b-ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(39,174,96,.2)}
-.b-warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(232,160,48,.2)}
-.b-bad{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(229,62,62,.2)}
-.b-blue{background:var(--pale);color:var(--blue);border:1px solid rgba(30,111,217,.2)}
-.b-mu{background:#F2F4F6;color:var(--sub);border:1px solid var(--border)}
-.b-purple{background:#F5EEF8;color:var(--purple);border:1px solid rgba(108,52,131,.2)}
-.b-line{background:#E8FAF0;color:#059E44;border:1px solid rgba(6,199,85,.2)}
-
-/* Alert cards */
-.al{border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid}
-.al-r{background:var(--danger-bg);border-color:#F9BABA}
-.al-y{background:var(--warn-bg);border-color:#F8C471}
-.al-g{background:var(--ok-bg);border-color:#A9DFBF;opacity:.7}
-.al-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:6px}
-.al-ico{font-size:20px;flex-shrink:0}
-.al-ttl{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.al-meta{font-size:10px;color:var(--sub);margin-top:2px}
-.al-desc{font-size:11px;color:var(--sub);line-height:1.55;margin-bottom:10px}
-.al-proposal{background:white;border-radius:9px;padding:11px;border:1px solid #F9BABA;margin-bottom:10px}
-.al-prop-ttl{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:7px}
-.al-prop-item{font-size:11px;color:var(--text);display:flex;gap:8px;margin-bottom:5px;line-height:1.45}
-
-/* Condition rings */
-.cond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.cond-box{background:#FAFCFE;border-radius:13px;padding:11px 6px;text-align:center;border:1px solid var(--border)}
-.ring{width:58px;height:58px;margin:0 auto 7px;position:relative}
-.ring svg{transform:rotate(-90deg)}
-.ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:15px;font-weight:700;color:var(--navy)}
-.cond-name{font-size:10px;color:var(--sub);font-weight:500}
-.cond-bdg{font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin-top:4px;display:inline-block}
-
-/* Toggle */
-.tg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F0F4F8}
-.tg-row:last-child{border:none}
-.tg-info{flex:1}
-.tg-title{font-size:13px;font-weight:500;color:var(--text)}
-.tg-sub{font-size:10px;color:var(--sub);margin-top:2px}
-.tgl{width:44px;height:24px;border-radius:99px;position:relative;cursor:pointer;flex-shrink:0;transition:background .2s}
-.tgl-on{background:var(--blue)}
-.tgl-off{background:#CBD5DF}
-.tgl::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:white;top:2px;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s}
-.tgl-on::after{left:22px}
-.tgl-off::after{left:2px}
-
-/* Bottom nav */
-.bnav{background:white;border-top:1px solid var(--border);display:flex;padding:9px 0 22px;flex-shrink:0;box-shadow:0 -4px 16px rgba(11,29,53,.05)}
-.nv{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:3px 0;transition:opacity .15s}
-.nv-ico{font-size:20px;opacity:.3}
-.nv-lbl{font-size:9px;color:var(--sub);font-weight:500}
-.nv.act .nv-ico{opacity:1}
-.nv.act .nv-lbl{color:var(--blue);font-weight:700}
-.nv-dot{width:4px;height:4px;border-radius:50%;background:var(--blue);margin:0 auto}
-
-/* Separator */
-.sep{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);margin:14px 0}
-.sep::before,.sep::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* Info banners */
-.banner{border-radius:11px;padding:11px 13px;margin-bottom:13px;display:flex;gap:9px;align-items:flex-start;font-size:11px;line-height:1.55}
-.bn-ok{background:var(--ok-bg);border:1px solid #A9DFBF;color:#1A6B3A}
-.bn-blue{background:var(--pale);border:1px solid rgba(30,111,217,.2);color:#1244A0}
-.bn-warn{background:var(--warn-bg);border:1px solid #F8C471;color:#8A4F00}
-.bn-bad{background:var(--danger-bg);border:1px solid #F9BABA;color:#9B1A1A}
-
-/* Protein card */
-.prot-card{background:linear-gradient(135deg,#EBF3FF,#E8FAF0);border:1.5px solid rgba(30,111,217,.2);border-radius:var(--r);padding:15px;margin-bottom:13px}
-
-/* Week calendar */
-.wk-cal{display:flex;gap:5px;justify-content:space-between}
-.wk-day{flex:1;text-align:center}
-.wk-lbl{font-size:9px;color:var(--sub);margin-bottom:5px}
-.wk-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto}
-.wk-ok{background:var(--ok)}
-.wk-ng{background:#EEF2F7;color:var(--sub)}
-.wk-td{background:linear-gradient(135deg,var(--blue),#0B4DB5);color:white;font-size:10px;font-weight:700;box-shadow:0 3px 10px rgba(30,111,217,.4)}
-
-/* Summary rows */
-.sum-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #F0F4F8}
-.sum-row:last-child{border:none}
-.sum-lbl{font-size:11px;color:var(--sub)}
-.sum-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--navy)}
-.sum-ok{font-size:10px;color:var(--ok);font-weight:600;margin-left:5px}
-.sum-bad{font-size:10px;color:var(--danger);font-weight:600;margin-left:5px}
-
-/* Nut bars */
-.nb-wrap{margin-bottom:9px}
-.nb-hdr{display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px}
-.nb-bg{height:7px;background:#EEF2F7;border-radius:99px;overflow:hidden}
-.nb-fill{height:100%;border-radius:99px}
-
-/* Done icon */
-.done-ico{width:78px;height:78px;border-radius:50%;background:linear-gradient(135deg,#A8E6CF,#27AE60);display:flex;align-items:center;justify-content:center;font-size:34px;margin:16px auto 14px;box-shadow:0 8px 28px rgba(39,174,96,.35)}
-
-/* Profile */
-.prof-av{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--mint));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:white;margin:0 auto 14px;border:3px solid rgba(255,255,255,.5);box-shadow:0 6px 20px rgba(6,199,85,.3)}
-
-/* Sleep blocks */
-.sl-row{display:flex;gap:4px;margin-bottom:5px}
-.sl-blk{flex:1;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer}
-.slk-r{background:var(--danger-bg);color:var(--danger)}
-.slk-y{background:var(--warn-bg);color:var(--warn)}
-.slk-b{background:var(--pale);border:2px solid var(--blue);color:var(--blue)}
-.slk-g{background:var(--ok-bg);color:var(--ok)}
-
-/* Emoji row */
-.emo-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
-.emo{text-align:center;cursor:pointer;opacity:.3;transition:all .15s}
-.emo.sel{opacity:1;transform:scale(1.18)}
-.emo .e{font-size:28px}
-.emo .l{font-size:9px;color:var(--sub);margin-top:3px}
-.emo.sel .l{color:var(--blue);font-weight:700}
-
-/* ── 食事 3食記録 ── */
-.meal-row{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:8px;margin-bottom:10px;
-}
-.meal-card{
-  background:#FAFCFE;border:1.5px solid var(--border);border-radius:12px;
-  padding:11px 8px 10px;cursor:pointer;text-align:center;
-  transition:all .15s;user-select:none;position:relative;
-}
-.meal-card:hover{background:white;border-color:#BFCFDE}
-.meal-card.on{
-  background:var(--ok-bg);border-color:#A9DFBF;
-  box-shadow:0 2px 8px rgba(39,174,96,.12);
-}
-.meal-ico{font-size:26px;line-height:1;margin-bottom:5px;filter:grayscale(.6);opacity:.55;transition:all .15s}
-.meal-card.on .meal-ico{filter:none;opacity:1}
-.meal-lbl{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.02em}
-.meal-card.on .meal-lbl{color:var(--ok)}
-.meal-time{font-size:9px;color:var(--muted);margin-top:1px}
-.meal-card.on .meal-time{color:#1A6B3A}
-.meal-check{
-  position:absolute;top:6px;right:6px;
-  width:18px;height:18px;border-radius:50%;
-  background:white;border:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:900;color:white;
-  transition:all .15s;
-}
-.meal-card.on .meal-check{background:var(--ok);border-color:var(--ok)}
-
-/* サマリー帯 */
-.meal-summary{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 13px;border-radius:11px;border:1.5px solid;
-  font-size:12px;font-weight:600;
-}
-.meal-sum-ico{font-size:18px;line-height:1;flex-shrink:0}
-.meal-sum-txt{flex:1;line-height:1.4}
-.meal-sum-cnt{
-  font-family:var(--mono);font-size:11px;font-weight:700;
-  padding:3px 8px;border-radius:99px;background:white;flex-shrink:0;
-}
-.meal-sum-ok  {background:var(--ok-bg);border-color:#A9DFBF;color:#1A6B3A}
-.meal-sum-warn{background:var(--warn-bg);border-color:#F8C471;color:#8A4F00}
-.meal-sum-bad {background:var(--danger-bg);border-color:#F9BABA;color:#9B1A1A}
-
-/* ── 食事の質 5段階評価 ── */
-.quality-row{
-  display:grid;grid-template-columns:repeat(5,1fr);
-  gap:6px;margin-bottom:10px;
-}
-.quality-btn{
-  background:#FAFCFE;border:1.5px solid var(--border);
-  border-radius:11px;padding:9px 4px 8px;
-  cursor:pointer;transition:all .15s;user-select:none;
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  font-family:var(--font);
-}
-.quality-btn:hover{background:white;border-color:#BFCFDE}
-.quality-btn.sel{
-  background:var(--pale);border-color:var(--blue);
-  box-shadow:0 3px 10px rgba(30,111,217,.18);
-  transform:translateY(-1px);
-}
-.quality-emo{font-size:22px;line-height:1;filter:grayscale(.6);opacity:.55;transition:all .15s}
-.quality-btn.sel .quality-emo{filter:none;opacity:1;transform:scale(1.1)}
-.quality-lbl{font-size:9px;font-weight:600;color:var(--sub);text-align:center;line-height:1.2}
-.quality-btn.sel .quality-lbl{color:var(--blue);font-weight:700}
-
-.quality-hint{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;border-radius:9px;
-  font-size:11px;font-weight:600;line-height:1.45;
-  border:1px solid;
-}
-.quality-h-ok  {background:var(--ok-bg);border-color:#A9DFBF;color:#1A6B3A}
-.quality-h-mid {background:#F4F9FF;border-color:#BFCFDE;color:var(--sub)}
-.quality-h-warn{background:var(--warn-bg);border-color:#F8C471;color:#8A4F00}
-.quality-h-bad {background:var(--danger-bg);border-color:#F9BABA;color:#9B1A1A}
-
-
-/* Growth bar */
-.grow-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.grow-item{background:#FAFCFE;border-radius:11px;padding:10px 12px;border:1px solid var(--border)}
-.gi-lbl{font-size:10px;color:var(--sub);margin-bottom:2px}
-.gi-val{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy);line-height:1}
-.gi-sub{font-size:10px;margin-top:3px}
-
-/* Hist items */
-.hist-item{display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F0F4F8;cursor:pointer}
-.hist-item:last-child{border:none}
-.hist-date{text-align:center;width:46px;flex-shrink:0}
-.hist-month{font-size:10px;color:var(--sub)}
-.hist-day{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--navy);line-height:1}
-.hist-vals{flex:1}
-.hist-ht{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--navy)}
-.hist-sub{font-size:10px;color:var(--sub);margin-top:2px}
-
-/* Chart */
-.ch{position:relative;height:150px}
-.ch-sm{position:relative;height:75px}
-
-/* Chip row */
-.chip-row{display:flex;gap:7px;margin-bottom:12px}
-.chip{flex:1;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid}
+/* チップ */
+.chip-row{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.chip{flex:1;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid;min-width:0;padding:0 6px}
 .chip-sel{background:var(--pale);border-color:var(--blue);color:var(--blue)}
 .chip-idle{background:#FAFCFE;border-color:var(--border);color:var(--sub)}
 
-/* 怪我チップ（複数選択・3列グリッド） */
-.injury-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
-.injury-chip{
-  height:38px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;gap:4px;
-  font-size:11px;font-weight:600;cursor:pointer;
-  border:1.5px solid var(--border);background:#FAFCFE;color:var(--sub);
-  transition:all .15s;user-select:none;text-align:center;line-height:1.15;padding:0 4px;
+/* 食事3食 */
+.meal-section{margin-top:6px}
+.meal-row{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.meal-card{
+  border-radius:11px;border:1.5px solid var(--border);
+  background:#FAFCFE;padding:11px 12px;
+  display:flex;align-items:center;gap:11px;
 }
-.injury-chip:hover{background:white;border-color:#BFCFDE}
-.injury-chip.sel{
-  background:var(--danger-bg);border-color:var(--danger);color:var(--danger);
-  box-shadow:0 2px 8px rgba(229,62,62,.15);font-weight:700;
+.meal-ico{
+  width:36px;height:36px;border-radius:10px;
+  background:#F2F4F6;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
 }
-.injury-chip.sel::after{content:'✓';font-size:10px;font-weight:900}
+.meal-info{flex:1;min-width:0}
+.meal-name{font-size:12px;font-weight:700;color:var(--text)}
+.meal-time-lbl{font-size:9px;color:var(--muted);margin-top:1px}
+.meal-choices{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:170px;
+}
+.meal-choice{
+  height:28px;border-radius:6px;border:1px solid var(--border);
+  background:white;font-size:9px;font-weight:600;cursor:pointer;
+  color:var(--sub);transition:all .15s;font-family:var(--font);
+  display:flex;align-items:center;justify-content:center;line-height:1;padding:0 2px;
+  white-space:nowrap;
+}
+.meal-choice:hover{border-color:#BFCFDE}
+.meal-choice.sel-short{background:var(--danger-bg);border-color:var(--danger);color:var(--danger);font-weight:700}
+.meal-choice.sel-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:700}
+.meal-choice.sel-over{background:var(--warn-bg);border-color:var(--warn);color:var(--warn);font-weight:700}
 
-/* 「怪我なし」専用スタイル */
-.injury-none{
-  grid-column:1 / -1;height:42px;border-radius:11px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-size:12px;font-weight:700;cursor:pointer;
-  border:1.5px solid var(--border);background:#FAFCFE;color:var(--sub);
-  transition:all .15s;user-select:none;margin-bottom:8px;
+/* タンパク質摂取量サマリー */
+.intake-summary{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 13px;border-radius:11px;border:1.5px solid;
+  font-size:12px;font-weight:600;margin-bottom:14px;
 }
-.injury-none:hover{background:white;border-color:#A9DFBF}
-.injury-none.sel{
-  background:var(--ok-bg);border-color:var(--ok);color:var(--ok);
-  box-shadow:0 2px 8px rgba(39,174,96,.15);
+.is-ico{font-size:18px;line-height:1;flex-shrink:0}
+.is-txt{flex:1;line-height:1.4}
+.is-cnt{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:99px;background:white;flex-shrink:0;
 }
-.injury-none.sel::before{content:'✓';font-size:13px;font-weight:900}
+.is-ok{background:var(--ok-bg);border-color:#A9DFBF;color:#1A6B3A}
+.is-warn{background:var(--warn-bg);border-color:#F8C471;color:#8A4F00}
+.is-bad{background:var(--danger-bg);border-color:#F9BABA;color:#9B1A1A}
 
-.injury-summary{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 12px;border-radius:9px;
-  font-size:11px;font-weight:600;margin-bottom:14px;
-  border:1px solid;
-}
-.injury-sum-ok{background:var(--ok-bg);border-color:#A9DFBF;color:#1A6B3A}
-.injury-sum-warn{background:var(--warn-bg);border-color:#F8C471;color:#8A4F00}
-.injury-sum-bad{background:var(--danger-bg);border-color:#F9BABA;color:#9B1A1A}
+/* セクション見出し */
+.sec-lbl{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.sec-lbl-dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
 
-/* Period tabs */
-.per-tabs{display:flex;background:#F0F4F8;border-radius:9px;padding:3px;gap:2px;margin-bottom:13px}
-.per-tab{flex:1;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:500;color:var(--sub);cursor:pointer}
-.per-tab.act{background:white;color:var(--blue);font-weight:700;box-shadow:0 1px 4px rgba(11,29,53,.1)}
-
-/* toast */
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:white;font-size:12px;font-weight:600;padding:11px 20px;border-radius:99px;opacity:0;transition:all .3s;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(11,29,53,.25);pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -390,412 +171,347 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 <div class="phone">
   <div class="notch"></div>
   <div class="screen">
-    <div class="sb sb-light"><span>9:43</span><span>● ● 100%</span></div>
+    <div class="sb sb-light"><span>9:42</span><span>● ● 100%</span></div>
     <div class="step-wrap">
-      <div class="step-top"><div class="step-title">生活習慣を記録</div><div style="background:rgba(255,255,255,.1);border-radius:99px;padding:3px 11px;font-size:10px;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)">📅 月1回 / 3分</div></div>
+      <div class="step-top"><div class="step-title">食事（タンパク質）</div><div style="background:rgba(255,255,255,.1);border-radius:99px;padding:3px 11px;font-size:10px;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15)">📅 毎日 / 約2分</div></div>
       <div class="prog"><div class="prog-fill" style="width:50%"></div></div>
       <div class="steps">
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">身体測定</div></div>
         <div class="s-line s-line-done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">2</div><div class="s-lbl">生活習慣</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">2</div><div class="s-lbl">食事</div></div>
         <div class="s-line s-line-todo"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-todo">3</div><div class="s-lbl">プロテイン</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-todo">3</div><div class="s-lbl">生活習慣</div></div>
         <div class="s-line s-line-todo"></div>
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-todo">4</div><div class="s-lbl">確認</div></div>
       </div>
     </div>
     <div class="scroll-white">
-      <div class="field">
-        <label class="f-lbl">😴 普段の睡眠時間 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">この1ヶ月の平均</span></label>
-        <div class="num-wrap" style="margin-bottom:9px"><button class="nm-btn" onclick="adj('slp',-0.5)">−</button><div class="nm-c"><input class="nm-v" id="slp" value="7.5"><span class="nm-u">時間</span></div><button class="nm-btn" onclick="adj('slp',0.5)">＋</button></div>
-        <div class="sl-row"><div class="sl-blk slk-r">〜5h</div><div class="sl-blk slk-y">6h</div><div class="sl-blk slk-b">7.5h ✓</div><div class="sl-blk slk-g">8h</div><div class="sl-blk slk-g">9h〜</div></div>
-        <div style="font-size:10px;color:var(--ok);text-align:center;margin-top:5px;font-weight:600">✓ 推奨範囲（7〜9時間）</div>
+
+      <!-- あなたの必要なタンパク質摂取量 -->
+      <div class="protein-need-card">
+        <div class="pn-row">
+          <div class="pn-ico">🥩</div>
+          <div class="pn-body">
+            <div class="pn-lbl">あなたの必要なタンパク質摂取量（1日）</div>
+            <div class="pn-val">
+              <span class="v" id="need-protein-val">104.6</span>
+              <span class="u">g / 日</span>
+            </div>
+            <div class="pn-formula">体重 <span id="weight-display">52.3</span>kg × 2 = 必要量</div>
+          </div>
+        </div>
       </div>
-      <div style="height:1px;background:var(--border);margin:14px 0"></div>
-      <div class="field">
-        <label class="f-lbl">🥗 食事状況 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">この1ヶ月でよく摂れた食事</span></label>
+
+      <!-- プロテイン入力 -->
+      <div class="sec-lbl"><div class="sec-lbl-dot"></div>プロテインの入力</div>
+
+      <div class="prot-card">
+        <div class="prot-hdr">
+          <div class="prot-ico">💊</div>
+          <div style="flex:1">
+            <div class="prot-ttl">今日のプロテイン</div>
+            <div class="prot-sub">使用量・タイミング・頻度を記録</div>
+          </div>
+        </div>
+
+        <label class="f-lbl">今日プロテインで摂取したタンパク質量 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">前回値が初期入力されます</span></label>
+        <div class="num-wrap">
+          <button type="button" class="nm-btn" onclick="adj('pg',-1)">−</button>
+          <div class="nm-c"><input class="nm-v" id="pg" value="20"><span class="nm-u">g</span></div>
+          <button type="button" class="nm-btn" onclick="adj('pg',1)">＋</button>
+        </div>
+
+        <label class="f-lbl" style="margin-bottom:7px">服用タイミング</label>
+        <div class="chip-row">
+          <div class="chip chip-sel"  id="chip-pre-post" onclick="toggleChip('pre-post')">練習前後</div>
+          <div class="chip chip-idle" id="chip-before"   onclick="toggleChip('before')">就寝前</div>
+          <div class="chip chip-idle" id="chip-morning"  onclick="toggleChip('morning')">朝食時</div>
+        </div>
+
+        <label class="f-lbl" style="margin-bottom:7px;margin-top:6px">服用頻度</label>
+        <div class="chip-row">
+          <div class="chip chip-sel"  id="freq-daily" onclick="setFreq('daily')">毎日</div>
+          <div class="chip chip-idle" id="freq-half"  onclick="setFreq('half')">週2〜3日</div>
+          <div class="chip chip-idle" id="freq-rare"  onclick="setFreq('rare')">週1日以下</div>
+          <div class="chip chip-idle" id="freq-none"  onclick="setFreq('none')">使ってない</div>
+        </div>
+      </div>
+
+      <!-- 食事入力 -->
+      <div class="sec-lbl"><div class="sec-lbl-dot"></div>食事入力</div>
+
+      <div style="font-size:11px;color:var(--sub);margin-bottom:10px;line-height:1.55">
+        各食事で<strong>必要なタンパク質（約15g目安）</strong>を摂取できたかを選択してください
+      </div>
+
+      <div class="meal-section">
         <div class="meal-row">
-          <div class="meal-card on" id="meal-breakfast" onclick="toggleMeal('breakfast')">
-            <div class="meal-check">✓</div>
+          <!-- 朝食 -->
+          <div class="meal-card" data-meal="breakfast">
             <div class="meal-ico">🍞</div>
-            <div class="meal-lbl">朝食</div>
-            <div class="meal-time">〜10時</div>
+            <div class="meal-info">
+              <div class="meal-name">朝食</div>
+              <div class="meal-time-lbl">〜10時</div>
+            </div>
+            <div class="meal-choices">
+              <button type="button" class="meal-choice sel-short" data-val="short" onclick="setMealChoice(this,'breakfast','short')">足りない</button>
+              <button type="button" class="meal-choice" data-val="ok" onclick="setMealChoice(this,'breakfast','ok')">足りた</button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'breakfast','over')">必要以上</button>
+            </div>
           </div>
-          <div class="meal-card on" id="meal-lunch" onclick="toggleMeal('lunch')">
-            <div class="meal-check">✓</div>
+
+          <!-- 昼食 -->
+          <div class="meal-card" data-meal="lunch">
             <div class="meal-ico">🍱</div>
-            <div class="meal-lbl">昼食</div>
-            <div class="meal-time">11〜15時</div>
+            <div class="meal-info">
+              <div class="meal-name">昼食</div>
+              <div class="meal-time-lbl">11〜15時</div>
+            </div>
+            <div class="meal-choices">
+              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'lunch','short')">足りない</button>
+              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'lunch','ok')">足りた</button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'lunch','over')">必要以上</button>
+            </div>
           </div>
-          <div class="meal-card on" id="meal-dinner" onclick="toggleMeal('dinner')">
-            <div class="meal-check">✓</div>
+
+          <!-- 夕食 -->
+          <div class="meal-card" data-meal="dinner">
             <div class="meal-ico">🍛</div>
-            <div class="meal-lbl">夕食</div>
-            <div class="meal-time">17時〜</div>
-          </div>
-        </div>
-        <div id="meal-summary" class="meal-summary meal-sum-ok" style="margin-bottom:14px">
-          <div class="meal-sum-ico">🌟</div>
-          <div class="meal-sum-txt" id="meal-summary-txt">三食しっかり摂れている良好な傾向です</div>
-          <div class="meal-sum-cnt" id="meal-summary-cnt">3 / 3食</div>
-        </div>
-
-        <!-- 食事の質（5段階） -->
-        <label class="f-lbl" style="margin-top:4px">⚖️ 食事の質（栄養バランス）<span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">5段階で評価</span></label>
-        <div class="quality-row">
-          <button type="button" class="quality-btn" data-quality="1" onclick="setQuality(1)">
-            <div class="quality-emo">😞</div>
-            <div class="quality-lbl">とても偏り</div>
-          </button>
-          <button type="button" class="quality-btn" data-quality="2" onclick="setQuality(2)">
-            <div class="quality-emo">😕</div>
-            <div class="quality-lbl">やや偏り</div>
-          </button>
-          <button type="button" class="quality-btn" data-quality="3" onclick="setQuality(3)">
-            <div class="quality-emo">😐</div>
-            <div class="quality-lbl">ふつう</div>
-          </button>
-          <button type="button" class="quality-btn sel" data-quality="4" onclick="setQuality(4)">
-            <div class="quality-emo">🙂</div>
-            <div class="quality-lbl">バランス良</div>
-          </button>
-          <button type="button" class="quality-btn" data-quality="5" onclick="setQuality(5)">
-            <div class="quality-emo">🤩</div>
-            <div class="quality-lbl">とても良</div>
-          </button>
-        </div>
-        <div id="quality-hint" class="quality-hint quality-h-ok" style="margin-bottom:14px">
-          <span id="quality-hint-ico">👍</span>
-          <span id="quality-hint-txt">主食・主菜・副菜が揃っている良好なバランスです</span>
-        </div>
-      </div>
-      <div style="height:1px;background:var(--border);margin:2px 0 14px"></div>
-      <label class="f-lbl">⚡ 練習状況 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">この1ヶ月の平均</span></label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div>
-          <label class="f-lbl" style="font-weight:400;color:var(--sub);font-size:10px">1日の練習時間</label>
-          <div class="num-wrap" style="height:44px">
-            <button type="button" class="nm-btn" style="width:40px" onclick="adj('pt',-0.5)">−</button>
-            <div class="nm-c"><input class="nm-v" id="pt" style="font-size:18px" value="3.5"><span class="nm-u">h</span></div>
-            <button type="button" class="nm-btn" style="width:40px" onclick="adj('pt',0.5)">＋</button>
-          </div>
-        </div>
-        <div>
-          <label class="f-lbl" style="font-weight:400;color:var(--sub);font-size:10px">週活動日数</label>
-          <div class="num-wrap" style="height:44px">
-            <button type="button" class="nm-btn" style="width:40px" onclick="adj('days',-1)">−</button>
-            <div class="nm-c"><input class="nm-v" id="days" style="font-size:18px" value="7"><span class="nm-u">日</span></div>
-            <button type="button" class="nm-btn" style="width:40px" onclick="adj('days',1)">＋</button>
+            <div class="meal-info">
+              <div class="meal-name">夕食</div>
+              <div class="meal-time-lbl">17時〜</div>
+            </div>
+            <div class="meal-choices">
+              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'dinner','short')">足りない</button>
+              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'dinner','ok')">足りた</button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'dinner','over')">必要以上</button>
+            </div>
           </div>
         </div>
       </div>
-      <div id="pt-warn-banner" class="banner bn-bad" style="margin-bottom:14px;display:none">
-        <span>⚠️</span>
-        <span>練習時間・活動日数が推奨値を超えています</span>
+
+      <!-- タンパク質摂取サマリー -->
+      <div id="intake-summary" class="intake-summary is-warn">
+        <span class="is-ico" id="is-ico">⚠</span>
+        <span class="is-txt" id="is-txt">朝食のタンパク質が不足しています</span>
+        <span class="is-cnt" id="is-cnt">推定 約50g</span>
       </div>
 
-      <div style="height:1px;background:var(--border);margin:2px 0 14px"></div>
-      <label class="f-lbl">🩹 半年間の怪我の有無 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">該当するものをすべて選択</span></label>
-      <div class="injury-none" id="inj-none" onclick="toggleInjury('none')">怪我なし</div>
-      <div class="injury-grid">
-        <div class="injury-chip" data-inj="joint"    onclick="toggleInjury('joint')">関節</div>
-        <div class="injury-chip" data-inj="ligament" onclick="toggleInjury('ligament')">靭帯</div>
-        <div class="injury-chip" data-inj="muscle"   onclick="toggleInjury('muscle')">肉離れ</div>
-        <div class="injury-chip" data-inj="sprain"   onclick="toggleInjury('sprain')">捻挫</div>
-        <div class="injury-chip" data-inj="osgood"   onclick="toggleInjury('osgood')">オスグット</div>
-        <div class="injury-chip" data-inj="stress"   onclick="toggleInjury('stress')">疲労骨折</div>
-        <div class="injury-chip" data-inj="fracture" onclick="toggleInjury('fracture')">骨折</div>
-        <div class="injury-chip" data-inj="spondylo" onclick="toggleInjury('spondylo')">腰椎分離症</div>
-        <div class="injury-chip" data-inj="other"    onclick="toggleInjury('other')">その他</div>
-      </div>
-      <div id="inj-summary" class="injury-summary injury-sum-warn" style="display:none">
-        <span id="inj-summary-ico">⚠</span>
-        <span id="inj-summary-txt">怪我の有無を選択してください</span>
-      </div>
-
-      <button class="btn btn-blue" onclick="saveCurrent();window.location.href='D-06_input_step3.html'">次へ → プロテイン記録</button>
+      <button class="btn btn-blue" onclick="saveCurrent();window.location.href='D-06_input_step3.html'">次へ → 生活習慣の入力</button>
       <button class="btn btn-ghost" onclick="location.href='D-04_input_step1.html'">← 戻る</button>
       <div style="text-align:center;font-size:11px;color:var(--danger);cursor:pointer;margin-top:4px" onclick="cancelInput()">✕ 入力を中止する</div>
+
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
-<script>
 
-window._numCfg = {
-  slp:  { step:0.5, min:0,  max:24, dec:1 },
-  pt:   { step:0.5, min:0,  max:12, dec:1 },
-  days: { step:1,   min:0,  max:7,  dec:0 },
+<script>
+// ══════════════════════════════════════════════════
+// 必要タンパク質量の計算（体重 × 2）
+// ══════════════════════════════════════════════════
+function recalcProteinNeed(){
+  var w = 52.3;
+  try{
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    if(s.wt !== undefined) w = parseFloat(s.wt);
+  }catch(e){}
+  var need = Math.round(w * 2 * 10) / 10;
+  var nv = document.getElementById('need-protein-val');
+  var wd = document.getElementById('weight-display');
+  if(nv) nv.textContent = need.toFixed(1);
+  if(wd) wd.textContent = w.toFixed(1);
+  return need;
+}
+
+// ══════════════════════════════════════════════════
+// 数値入力（+/-）
+// ══════════════════════════════════════════════════
+var _numCfg = {
+  pg: { step:1, min:0, max:200, dec:0 }
 };
 function adj(id, delta){
-  const inp = document.getElementById(id);
+  var inp = document.getElementById(id);
   if(!inp) return;
-  const c = window._numCfg[id];
-  let v = Math.round((parseFloat(inp.value)+delta)*(1/c.step))/(1/c.step);
-  v = Math.max(c.min, Math.min(c.max, v));
-  inp.value = c.dec===0 ? Math.round(v).toString() : v.toFixed(c.dec);
-  if(id === 'pt' || id === 'days') _renderPracticeWarn();
+  var c = _numCfg[id];
+  var v = parseInt(inp.value, 10);
+  if(isNaN(v)) v = 0;
+  v = Math.max(c.min, Math.min(c.max, v + delta));
+  inp.value = String(v);
+  _renderIntakeSummary();
 }
 
-// 練習状況の警告表示
-function _renderPracticeWarn(){
-  var pt = parseFloat((document.getElementById('pt') || {}).value || '0');
-  var days = parseFloat((document.getElementById('days') || {}).value || '0');
-  // 推奨：1日2h以内 / 週6日以内 を超えたら警告
-  var over = pt > 2 || days >= 7;
-  var banner = document.getElementById('pt-warn-banner');
-  if(banner) banner.style.display = over ? 'flex' : 'none';
-}
-
-// ══════════════════════════════════════════════════════════════
-// 半年間の怪我の有無（複数選択 + 「怪我なし」排他）
-// ══════════════════════════════════════════════════════════════
-var INJURY_LABELS = {
-  joint:    '関節',
-  ligament: '靭帯',
-  muscle:   '肉離れ',
-  sprain:   '捻挫',
-  osgood:   'オスグット',
-  stress:   '疲労骨折',
-  fracture: '骨折',
-  spondylo: '腰椎分離症',
-  other:    'その他'
-};
-
-function _loadInjuries(){
-  try{
-    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
-    var arr = s.injuries || [];
-    return Array.isArray(arr) ? arr : [];
-  }catch(e){ return []; }
-}
-
-function _saveInjuries(arr){
-  try{
-    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
-    s.injuries = arr;
-    localStorage.setItem('nobita_input', JSON.stringify(s));
-  }catch(e){}
-}
-
-function toggleInjury(id){
-  var current = _loadInjuries();
-
-  if(id === 'none'){
-    // 「怪我なし」選択 → 他を全解除して 'none' のみに
-    if(current.indexOf('none') !== -1){
-      current = []; // 未選択に戻す
-    } else {
-      current = ['none'];
-    }
+// ══════════════════════════════════════════════════
+// プロテイン服用タイミング（複数選択）
+// ══════════════════════════════════════════════════
+var _CHIPS = { 'pre-post':'練習前後', 'before':'就寝前', 'morning':'朝食時' };
+var _selectedChips = new Set(['pre-post']);
+function toggleChip(key){
+  var el = document.getElementById('chip-' + key);
+  if(!el) return;
+  if(_selectedChips.has(key)){
+    _selectedChips.delete(key);
+    el.classList.remove('chip-sel'); el.classList.add('chip-idle');
+    el.textContent = _CHIPS[key];
   } else {
-    // 怪我タイプ選択 → 'none' を解除
-    current = current.filter(function(k){ return k !== 'none'; });
-    var idx = current.indexOf(id);
-    if(idx === -1) current.push(id);
-    else           current.splice(idx, 1);
+    _selectedChips.add(key);
+    el.classList.add('chip-sel'); el.classList.remove('chip-idle');
+    el.textContent = _CHIPS[key] + ' ✓';
   }
-
-  _saveInjuries(current);
-  _renderInjuries();
 }
 
-function _renderInjuries(){
-  var current = _loadInjuries();
-  var hasNone = current.indexOf('none') !== -1;
-  var injuries = current.filter(function(k){ return k !== 'none'; });
-
-  // 「怪我なし」チップ
-  var noneEl = document.getElementById('inj-none');
-  if(noneEl) noneEl.classList.toggle('sel', hasNone);
-
-  // 各怪我チップ
-  document.querySelectorAll('.injury-chip').forEach(function(el){
-    var key = el.dataset.inj;
-    el.classList.toggle('sel', injuries.indexOf(key) !== -1);
+// ══════════════════════════════════════════════════
+// プロテイン服用頻度（単一選択）
+// ══════════════════════════════════════════════════
+var _freq = 'daily';
+function setFreq(key){
+  ['daily','half','rare','none'].forEach(function(k){
+    var el = document.getElementById('freq-' + k);
+    if(!el) return;
+    if(k === key){ el.classList.add('chip-sel'); el.classList.remove('chip-idle'); }
+    else { el.classList.remove('chip-sel'); el.classList.add('chip-idle'); }
   });
+  _freq = key;
+}
 
-  // サマリー
-  var box = document.getElementById('inj-summary');
-  var txt = document.getElementById('inj-summary-txt');
-  var ico = document.getElementById('inj-summary-ico');
-  if(!box || !txt || !ico) return;
+// ══════════════════════════════════════════════════
+// 食事3択（足りない/足りた/必要以上）
+// ══════════════════════════════════════════════════
+var _mealChoices = { breakfast:'short', lunch:'ok', dinner:'ok' };
+function setMealChoice(btn, meal, val){
+  var card = btn.closest('.meal-card');
+  if(!card) return;
+  card.querySelectorAll('.meal-choice').forEach(function(b){
+    b.classList.remove('sel-short','sel-ok','sel-over');
+  });
+  btn.classList.add('sel-' + val);
+  _mealChoices[meal] = val;
+  _renderIntakeSummary();
+}
 
-  box.classList.remove('injury-sum-ok','injury-sum-warn','injury-sum-bad');
+// ══════════════════════════════════════════════════
+// タンパク質摂取量サマリー
+// ══════════════════════════════════════════════════
+function _renderIntakeSummary(){
+  var need = recalcProteinNeed();
+  // 各食事の推定タンパク質量
+  // short=8g, ok=15g, over=22g
+  var perMeal = { short:8, ok:15, over:22 };
+  var fromMeals = (perMeal[_mealChoices.breakfast] || 0)
+                + (perMeal[_mealChoices.lunch] || 0)
+                + (perMeal[_mealChoices.dinner] || 0);
+  var fromProtein = parseFloat((document.getElementById('pg') || {}).value || '0');
+  var total = fromMeals + fromProtein;
 
-  if(hasNone){
-    box.style.display = 'flex';
-    box.classList.add('injury-sum-ok');
-    ico.textContent = '✨';
-    txt.textContent = '半年間 怪我なし — 良好な状態です';
-  } else if(injuries.length === 0){
-    box.style.display = 'none';
-  } else {
-    box.style.display = 'flex';
-    var names = injuries.map(function(k){ return INJURY_LABELS[k]; }).join('・');
-    if(injuries.length >= 3){
-      box.classList.add('injury-sum-bad');
-      ico.textContent = '⚠';
-      txt.textContent = names + ' — 複数の怪我あり。練習負荷と休息の見直しを推奨';
+  var box = document.getElementById('intake-summary');
+  var ico = document.getElementById('is-ico');
+  var txt = document.getElementById('is-txt');
+  var cnt = document.getElementById('is-cnt');
+  if(!box || !ico || !txt || !cnt) return;
+
+  box.classList.remove('is-ok','is-warn','is-bad');
+  cnt.textContent = '推定 約' + Math.round(total) + 'g / ' + Math.round(need) + 'g';
+
+  var ratio = need > 0 ? total / need : 0;
+  if(ratio >= 1){
+    box.classList.add('is-ok');
+    ico.textContent = '🌟';
+    txt.textContent = '必要量を達成しています！';
+  } else if(ratio >= 0.7){
+    box.classList.add('is-warn');
+    ico.textContent = '⚠';
+    var missingMeals = [];
+    if(_mealChoices.breakfast === 'short') missingMeals.push('朝食');
+    if(_mealChoices.lunch === 'short') missingMeals.push('昼食');
+    if(_mealChoices.dinner === 'short') missingMeals.push('夕食');
+    if(missingMeals.length){
+      txt.textContent = missingMeals.join('・') + 'のタンパク質が不足しています';
     } else {
-      box.classList.add('injury-sum-warn');
-      ico.textContent = '🩹';
-      txt.textContent = names + ' — 該当の怪我あり';
+      txt.textContent = 'もう少し摂取しましょう';
     }
+  } else {
+    box.classList.add('is-bad');
+    ico.textContent = '⚠';
+    txt.textContent = 'タンパク質が大きく不足しています';
   }
 }
 
-function cancelInput(){
-  if(confirm('入力を中止してホーム画面に戻りますか？\n入力中のデータは保存されません。')){
-    window.location.href='D-01_dashboard.html';
-  }
-}
-
-// ── 前回値の保存・復元 ──
-const _KEYS    = ['slp', 'pt', 'days'];
-const _DEFAULT = {'slp': '7.5', 'pt': '3.5', 'days': '7'};
-const _STORE   = 'nobita_input';
-
+// ══════════════════════════════════════════════════
+// 保存・復元
+// ══════════════════════════════════════════════════
+var _STORE = 'nobita_input';
 function loadPrev(){
   try{
-    const saved = JSON.parse(localStorage.getItem(_STORE) || '{}');
-    _KEYS.forEach(k => {
-      const inp = document.getElementById(k);
-      if(!inp) return;
-      inp.value = (saved[k] !== undefined) ? saved[k] : _DEFAULT[k];
-    });
-    // 食事状況の復元（保存値が無い場合は3食ONをデフォルト）
-    const meals = saved.meals || { breakfast:true, lunch:true, dinner:true };
-    ['breakfast','lunch','dinner'].forEach(function(m){
-      const card = document.getElementById('meal-' + m);
-      if(!card) return;
-      if(meals[m]) card.classList.add('on');
-      else card.classList.remove('on');
-    });
-    _renderMealSummary();
-    // 食事の質（保存値があれば反映）
-    const q = saved.meal_quality !== undefined ? parseInt(saved.meal_quality, 10) : 4;
-    setQuality(isNaN(q) ? 4 : q);
-    _renderPracticeWarn();
-    _renderInjuries();
-  } catch(e) {}
+    var saved = JSON.parse(localStorage.getItem(_STORE) || '{}');
+    // pg（プロテイン量）の前回値復元
+    if(saved.pg !== undefined){
+      var pg = document.getElementById('pg');
+      if(pg) pg.value = saved.pg;
+    }
+    // 服用タイミング
+    if(saved.timing){
+      var chips = saved.timing.split(',').filter(Boolean);
+      _selectedChips = new Set();
+      ['pre-post','before','morning'].forEach(function(k){
+        var el = document.getElementById('chip-' + k);
+        if(!el) return;
+        el.classList.remove('chip-sel'); el.classList.add('chip-idle');
+        el.textContent = _CHIPS[k];
+      });
+      chips.forEach(function(k){
+        if(_CHIPS[k]) toggleChip(k);
+      });
+    }
+    // 服用頻度
+    if(saved.freq) setFreq(saved.freq);
+    // 食事の前回値
+    if(saved.meal_choices){
+      try{
+        var mc = JSON.parse(saved.meal_choices);
+        ['breakfast','lunch','dinner'].forEach(function(meal){
+          if(mc[meal]){
+            _mealChoices[meal] = mc[meal];
+            document.querySelectorAll('.meal-card[data-meal="' + meal + '"] .meal-choice').forEach(function(b){
+              b.classList.remove('sel-short','sel-ok','sel-over');
+              if(b.dataset.val === mc[meal]) b.classList.add('sel-' + mc[meal]);
+            });
+          }
+        });
+      }catch(e){}
+    }
+  }catch(e){}
+  _renderIntakeSummary();
 }
 
 function saveCurrent(){
   try{
-    const existing = JSON.parse(localStorage.getItem(_STORE) || '{}');
-    _KEYS.forEach(k => {
-      const inp = document.getElementById(k);
-      if(inp) existing[k] = inp.value;
-    });
-    // 食事状況の保存
-    existing.meals = _getMealState();
-    existing.meal_count = Object.values(existing.meals).filter(Boolean).length;
-    // 食事の質も保存
-    if(window._mealQuality !== undefined) existing.meal_quality = window._mealQuality;
+    var existing = JSON.parse(localStorage.getItem(_STORE) || '{}');
+    var pg = document.getElementById('pg');
+    if(pg) existing.pg = pg.value;
+    existing.timing = Array.from(_selectedChips).join(',');
+    existing.freq = _freq;
+    existing.meal_choices = JSON.stringify(_mealChoices);
     localStorage.setItem(_STORE, JSON.stringify(existing));
-  } catch(e) {}
+  }catch(e){}
 }
 
-// ══════════════════════════════════════════════════════════════
-// 食事状況（朝・昼・夜）
-// ══════════════════════════════════════════════════════════════
-function toggleMeal(meal){
-  const card = document.getElementById('meal-' + meal);
-  if(!card) return;
-  card.classList.toggle('on');
-  _renderMealSummary();
-}
-
-function _getMealState(){
-  return {
-    breakfast: document.getElementById('meal-breakfast').classList.contains('on'),
-    lunch:     document.getElementById('meal-lunch').classList.contains('on'),
-    dinner:    document.getElementById('meal-dinner').classList.contains('on')
-  };
-}
-
-// ══════════════════════════════════════════════════════════════
-// 食事の質（5段階：1=とても偏り 〜 5=とても良い）
-// ══════════════════════════════════════════════════════════════
-window._mealQuality = 4;
-
-var QUALITY_HINTS = {
-  1: { cls:'quality-h-bad',  ico:'⚠',  msg:'栄養が大きく偏っています。主食・主菜・副菜の見直しを推奨します' },
-  2: { cls:'quality-h-warn', ico:'🍔', msg:'やや偏りがあります。野菜やタンパク質を意識的に追加しましょう' },
-  3: { cls:'quality-h-mid',  ico:'💭', msg:'平均的なバランス。あと一品加えるとさらに良くなります' },
-  4: { cls:'quality-h-ok',   ico:'👍', msg:'主食・主菜・副菜が揃っている良好なバランスです' },
-  5: { cls:'quality-h-ok',   ico:'🌟', msg:'理想的な栄養バランス。この食生活を維持しましょう' }
-};
-
-function setQuality(level){
-  if(level < 1) level = 1;
-  if(level > 5) level = 5;
-  window._mealQuality = level;
-
-  // ボタンの選択状態
-  document.querySelectorAll('.quality-btn').forEach(function(btn){
-    var v = parseInt(btn.dataset.quality, 10);
-    btn.classList.toggle('sel', v === level);
-  });
-
-  // ヒントメッセージ
-  var hint = QUALITY_HINTS[level];
-  var box = document.getElementById('quality-hint');
-  var ico = document.getElementById('quality-hint-ico');
-  var txt = document.getElementById('quality-hint-txt');
-  if(box && hint){
-    box.classList.remove('quality-h-ok','quality-h-mid','quality-h-warn','quality-h-bad');
-    box.classList.add(hint.cls);
+function cancelInput(){
+  if(confirm('入力を中止してホーム画面に戻りますか？\n入力中のデータは保存されません。')){
+    window.location.href = 'D-01_dashboard.html';
   }
-  if(ico && hint) ico.textContent = hint.ico;
-  if(txt && hint) txt.textContent = hint.msg;
 }
 
-function _renderMealSummary(){
-  const m = _getMealState();
-  const taken = [];
-  if(m.breakfast) taken.push('朝');
-  if(m.lunch)     taken.push('昼');
-  if(m.dinner)    taken.push('夜');
-  const cnt = taken.length;
-
-  const box = document.getElementById('meal-summary');
-  const txt = document.getElementById('meal-summary-txt');
-  const cntEl = document.getElementById('meal-summary-cnt');
-  const ico = box ? box.querySelector('.meal-sum-ico') : null;
-  if(!box || !txt || !cntEl) return;
-
-  box.classList.remove('meal-sum-ok','meal-sum-warn','meal-sum-bad');
-  cntEl.textContent = cnt + ' / 3食';
-
-  if(cnt === 3){
-    box.classList.add('meal-sum-ok');
-    if(ico) ico.textContent = '🌟';
-    txt.textContent = '三食しっかり摂れている良好な傾向です';
-  } else if(cnt === 2){
-    box.classList.add('meal-sum-warn');
-    if(ico) ico.textContent = '👍';
-    txt.textContent = taken.join('・') + 'が中心 — もう1食の習慣化を目指しましょう';
-  } else if(cnt === 1){
-    box.classList.add('meal-sum-bad');
-    if(ico) ico.textContent = '⚠';
-    txt.textContent = taken[0] + 'のみの傾向 — 食事回数が不足しています';
-  } else {
-    box.classList.add('meal-sum-bad');
-    if(ico) ico.textContent = '⚠';
-    txt.textContent = '食事傾向を選択してください';
-  }
+function toast(msg){
+  var t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2600);
 }
 
 window.addEventListener('load', loadPrev);
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);
-}
-
 </script>
 </body>
 </html>

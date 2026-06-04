@@ -144,6 +144,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .b-ok{background:rgba(39,174,96,.12);color:var(--ok);border:1px solid rgba(39,174,96,.2)}
 .b-wn{background:rgba(232,160,48,.12);color:var(--amber);border:1px solid rgba(232,160,48,.2)}
 .b-bd{background:rgba(229,62,62,.12);color:var(--danger);border:1px solid rgba(229,62,62,.2)}
+.b-pu{background:rgba(124,77,255,.12);color:var(--purple);border:1px solid rgba(124,77,255,.25)}
 .b-tl{background:rgba(15,184,160,.12);color:var(--teal);border:1px solid rgba(15,184,160,.2)}
 .b-pl{background:rgba(124,77,255,.12);color:var(--purple);border:1px solid rgba(124,77,255,.2)}
 .b-mu{background:var(--card2);color:var(--muted);border:1px solid var(--bdr)}
@@ -309,6 +310,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div class="sb-item" id="nav-teams" onclick="go('teams','チーム管理',this)">
         <div class="sb-icon">🏅</div><div class="sb-lbl">チーム管理</div>
         <div class="sb-badge sbb-purple">214</div>
+      </div>
+      <div class="sb-item" id="nav-players" onclick="go('players','選手管理',this)">
+        <div class="sb-icon">👥</div><div class="sb-lbl">選手管理</div>
+        <div class="sb-badge sbb-purple">3,842</div>
       </div>
       <div class="sb-item" id="nav-approvals" onclick="go('approvals','チーム作成承認',this)">
         <div class="sb-icon">✅</div><div class="sb-lbl">チーム作成承認</div>
@@ -500,6 +505,153 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       </div>
     </div>
 
+    <!-- F-05 選手管理（運営側） -->
+    <div class="screen" id="s-players">
+      <div class="card">
+        <div class="c-hdr">
+          <div class="c-title">👥 全選手の管理 <span class="badge b-pu" style="margin-left:6px">3,842名</span></div>
+          <div style="display:flex;gap:6px">
+            <button class="ab ab-g" onclick="toast('CSV出力を準備しています')">📥 CSV出力</button>
+            <button class="ab ab-p" onclick="openAddPlayerModal()">➕ 選手を追加</button>
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:12px">
+          チームに所属する全選手を運営側で管理します。データ修正・所属チーム変更・退会処理が可能です。
+        </div>
+
+        <!-- フィルター -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <input type="text" id="player-search" placeholder="🔍 選手名・チーム名で検索..." style="flex:1;min-width:240px;height:34px;padding:0 11px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;outline:none" oninput="filterPlayers()">
+          <select id="player-filter-team" style="height:34px;padding:0 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;outline:none" onchange="filterPlayers()">
+            <option value="">全チーム</option>
+            <option value="東京FC">東京FC ジュニア</option>
+            <option value="横浜">横浜マリンスターズ</option>
+            <option value="大阪">大阪ストライカーズU-15</option>
+            <option value="名古屋">名古屋小学校サッカー部</option>
+          </select>
+          <select id="player-filter-status" style="height:34px;padding:0 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;outline:none" onchange="filterPlayers()">
+            <option value="">全ステータス</option>
+            <option value="active">アクティブ</option>
+            <option value="inactive">休止中</option>
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>選手名</th><th>所属チーム</th><th>学年</th><th>登録日</th><th>最終入力</th><th>状態</th><th style="text-align:right">操作</th>
+            </tr>
+          </thead>
+          <tbody id="player-tbody">
+            <tr data-team="東京FC" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00001</td>
+              <td><strong>田中 太郎</strong></td>
+              <td>東京FC ジュニア</td>
+              <td>中学2年</td>
+              <td>2025/04/01</td>
+              <td><span style="color:var(--ok);font-weight:700">本日</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+            <tr data-team="横浜" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00002</td>
+              <td><strong>佐藤 健</strong></td>
+              <td>横浜マリンスターズ</td>
+              <td>中学1年</td>
+              <td>2025/04/15</td>
+              <td><span style="color:var(--ok);font-weight:700">2日前</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+            <tr data-team="大阪" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00003</td>
+              <td><strong>山田 翔太</strong></td>
+              <td>大阪ストライカーズU-15</td>
+              <td>中学3年</td>
+              <td>2024/12/10</td>
+              <td><span style="color:var(--warn);font-weight:700">5日前</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+            <tr data-team="名古屋" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00004</td>
+              <td><strong>鈴木 大輔</strong></td>
+              <td>名古屋小学校サッカー部</td>
+              <td>小学5年</td>
+              <td>2025/05/02</td>
+              <td><span style="color:var(--ok);font-weight:700">本日</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+            <tr data-team="東京FC" data-status="inactive">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00005</td>
+              <td><strong>高橋 美咲</strong></td>
+              <td>東京FC ジュニア</td>
+              <td>中学2年</td>
+              <td>2025/04/01</td>
+              <td><span style="color:var(--danger);font-weight:700">45日前</span></td>
+              <td><span class="badge b-bd">休止中</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-p" onclick="toast('アクティベートしました')">再開</button>
+              </td>
+            </tr>
+            <tr data-team="横浜" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00006</td>
+              <td><strong>伊藤 健一</strong></td>
+              <td>横浜マリンスターズ</td>
+              <td>中学2年</td>
+              <td>2025/03/20</td>
+              <td><span style="color:var(--ok);font-weight:700">1日前</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+            <tr data-team="大阪" data-status="active">
+              <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">PL-00007</td>
+              <td><strong>渡辺 翼</strong></td>
+              <td>大阪ストライカーズU-15</td>
+              <td>中学1年</td>
+              <td>2025/04/05</td>
+              <td><span style="color:var(--ok);font-weight:700">本日</span></td>
+              <td><span class="badge b-ok">アクティブ</span></td>
+              <td style="text-align:right">
+                <button class="ab ab-g" onclick="toast('詳細画面へ')">詳細</button>
+                <button class="ab ab-d" onclick="if(confirm('この選手を退会させますか？'))toast('退会処理を実行しました')">退会</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pager">
+          <div id="player-count">1 - 7 / 3,842名</div>
+          <div style="display:flex;gap:4px">
+            <button class="ab ab-g">‹ 前</button>
+            <button class="ab ab-p">1</button>
+            <button class="ab ab-g">2</button>
+            <button class="ab ab-g">3</button>
+            <button class="ab ab-g">…</button>
+            <button class="ab ab-g">549</button>
+            <button class="ab ab-g">次 ›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- F-03 チーム作成承認 -->
     <div class="screen" id="s-approvals">
       <div class="card" style="border-left:4px solid var(--amber)">
@@ -642,7 +794,33 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div id="toast"></div>
 
 <script>
-const ALL = ['dashboard','teams','approvals','export'];
+const ALL = ['dashboard','teams','players','approvals','export'];
+
+function filterPlayers(){
+  var q = ((document.getElementById('player-search')||{}).value || '').toLowerCase();
+  var team = (document.getElementById('player-filter-team')||{}).value || '';
+  var st = (document.getElementById('player-filter-status')||{}).value || '';
+  var rows = document.querySelectorAll('#player-tbody tr');
+  var visible = 0;
+  rows.forEach(function(r){
+    var name = (r.querySelector('td:nth-child(2)') || {}).textContent || '';
+    var teamNm = (r.querySelector('td:nth-child(3)') || {}).textContent || '';
+    var rt = r.dataset.team || '';
+    var rs = r.dataset.status || '';
+    var matchQ = !q || name.toLowerCase().indexOf(q) !== -1 || teamNm.toLowerCase().indexOf(q) !== -1;
+    var matchT = !team || rt === team;
+    var matchS = !st || rs === st;
+    var ok = matchQ && matchT && matchS;
+    r.style.display = ok ? '' : 'none';
+    if(ok) visible++;
+  });
+  var counter = document.getElementById('player-count');
+  if(counter) counter.textContent = '1 - ' + visible + ' / 3,842名（絞り込み中）';
+}
+
+function openAddPlayerModal(){
+  toast('選手追加モーダル（実装ロードマップ）');
+}
 
 function go(id, title, el){
   ALL.forEach(s=>{

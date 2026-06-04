@@ -39,7 +39,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .hdr-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
 
 /* Stat boxes */
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
 .stat-box{background:rgba(255,255,255,.1);border-radius:11px;padding:9px 8px;text-align:center;border:1px solid rgba(255,255,255,.08)}
 .stat-u{font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px}
 .stat-v{font-family:var(--mono);font-size:18px;font-weight:600;color:white;line-height:1}
@@ -471,8 +471,9 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         </div>
       </div>
       <div class="stat-row">
-        <div class="stat-box"><div class="stat-u">現在身長</div><div class="stat-v">162.4</div><div class="stat-l">cm</div></div>
+        <div class="stat-box"><div class="stat-u">現在身長</div><div class="stat-v" id="stat-height">162.4</div><div class="stat-l">cm</div></div>
         <div class="stat-box"><div class="stat-u">先月比</div><div class="stat-v" style="color:#A8E6CF">+1.2</div><div class="stat-l">cm</div></div>
+        <div class="stat-box" title="最後に入力した骨端線幅"><div class="stat-u">骨端線幅</div><div class="stat-v" id="stat-epiphysis" style="color:#FFD580">3.2</div><div class="stat-l">mm</div></div>
         <div class="stat-box"><div class="stat-u">成長余地</div><div class="stat-v">12.6</div><div class="stat-l">cm</div></div>
       </div>
     </div>
@@ -610,6 +611,18 @@ function renderMaxPotential(){
 
 window.addEventListener('load', renderMaxPotential);
 
+// ── ヘッダー統計値を localStorage の最新入力値で更新 ──
+function renderHeaderStats(){
+  try {
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    var htEl = document.getElementById('stat-height');
+    var epEl = document.getElementById('stat-epiphysis');
+    if(htEl && s.ht !== undefined){ htEl.textContent = parseFloat(s.ht).toFixed(1); }
+    if(epEl && s.ep !== undefined){ epEl.textContent = parseFloat(s.ep).toFixed(1); }
+  } catch(e){}
+}
+window.addEventListener('load', renderHeaderStats);
+
 // ══════════════════════════════════════════════════════════════
 // 通知ドロップダウン
 // ══════════════════════════════════════════════════════════════
@@ -617,8 +630,8 @@ window.addEventListener('load', renderMaxPotential);
 var _NOTIFICATIONS = [
   {
     id:'n1', icoCls:'notif-ico-b', ico:'📅',
-    title:'今月の月次測定がまだです',
-    desc:'5月の測定入力がまだ完了していません。月1回、約3分の入力で月次レポートが更新されます。',
+    title:'今日の記録がまだです',
+    desc:'今日のデータ入力がまだ完了していません。約2分の入力で成長グラフが更新されます。',
     time:'本日',
     tagCls:'notif-tag-b', tagText:'リマインド',
     href:'D-04_input_step1.html'
@@ -632,25 +645,25 @@ var _NOTIFICATIONS = [
     href:'D-03_alerts.html'
   },
   {
-    id:'n3', icoCls:'notif-ico-y', ico:'🥗',
-    title:'栄養スコアが低下傾向',
-    desc:'今月の栄養スコアが60点。三食しっかり摂ることでスコア改善が見込めます。',
-    time:'先月',
+    id:'n3', icoCls:'notif-ico-y', ico:'🍱',
+    title:'タンパク質摂取が不足気味',
+    desc:'昨日のタンパク質摂取が必要量を下回っています。プロテインや高タンパク食材を意識しましょう。',
+    time:'昨日',
     tagCls:'notif-tag-y', tagText:'要注意',
     href:'D-02_condition.html'
   },
   {
     id:'n4', icoCls:'notif-ico-y', ico:'📉',
     title:'成長停滞の兆候',
-    desc:'過去3ヶ月の身長の伸びが月平均を下回っています。睡眠と栄養を見直しましょう。',
-    time:'先月',
+    desc:'過去30日の身長の伸びが平均を下回っています。睡眠とタンパク質摂取を見直しましょう。',
+    time:'昨日',
     tagCls:'notif-tag-y', tagText:'要注意',
     href:'D-02_condition.html'
   },
   {
     id:'n5', icoCls:'notif-ico-g', ico:'💬',
     title:'指導者からコメント',
-    desc:'田中コーチ：「先月の入力ありがとう。練習後のプロテイン摂取を続けてください。」',
+    desc:'田中コーチ：「毎日の入力ありがとう。練習前後のプロテイン摂取を続けてください。」',
     time:'1週間前',
     tagCls:'notif-tag-g', tagText:'コメント',
     href:'D-02_condition.html'

@@ -274,9 +274,9 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="steps">
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">身体測定</div></div>
         <div class="s-line s-line-done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">生活習慣</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">食事</div></div>
         <div class="s-line s-line-done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">プロテイン</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">生活習慣</div></div>
         <div class="s-line s-line-done"></div>
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">4</div><div class="s-lbl">確認</div></div>
       </div>
@@ -292,12 +292,22 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="sum-row"><div class="sum-lbl">予想到達身長（自動）</div><span class="sum-val">175.0 cm</span></div>
       </div>
       <div class="card" style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">食事（タンパク質）</div>
+        <div class="sum-row"><div class="sum-lbl">必要タンパク質量</div><span class="sum-val" id="sum-need-protein">104.6 g / 日</span></div>
+        <div class="sum-row"><div class="sum-lbl">朝食</div><span class="sum-val" id="sum-meal-bf">足りない</span></div>
+        <div class="sum-row"><div class="sum-lbl">昼食</div><span class="sum-val" id="sum-meal-lc">足りた</span></div>
+        <div class="sum-row"><div class="sum-lbl">夕食</div><span class="sum-val" id="sum-meal-dn">足りた</span></div>
+        <div class="sum-row"><div class="sum-lbl">プロテイン摂取量</div><span class="sum-val" id="sum-pg">20 g</span></div>
+      </div>
+      <div class="card" style="margin-bottom:10px">
         <div style="font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px">生活習慣</div>
         <div class="sum-row"><div class="sum-lbl">睡眠</div><div><span class="sum-val" id="sum-slp">7.5h</span><span class="sum-ok">✓ 推奨内</span></div></div>
-        <div class="sum-row"><div class="sum-lbl">練習時間</div><div><span class="sum-val" id="sum-pt">3.5h</span><span class="sum-bad">⚠ 過負荷</span></div></div>
-        <div class="sum-row"><div class="sum-lbl">週活動日数</div><div><span class="sum-val" id="sum-days">7日</span><span class="sum-bad">⚠ 休養なし</span></div></div>
+        <div class="sum-row"><div class="sum-lbl">体調</div><span class="sum-val" id="sum-mood">😊 普通</span></div>
+        <div class="sum-row"><div class="sum-lbl">練習時間</div><div><span class="sum-val" id="sum-pt">2.0h</span></div></div>
+        <div class="sum-row"><div class="sum-lbl">週活動日数</div><div><span class="sum-val" id="sum-days">5日</span></div></div>
+        <div class="sum-row"><div class="sum-lbl">怪我</div><span class="sum-val" id="sum-injury">なし</span></div>
       </div>
-      <div class="banner bn-warn" style="margin-bottom:18px"><span>⚠</span><span>送信後に<strong>練習過負荷アラート</strong>が生成され、指導者に自動通知されます。</span></div>
+      <div class="banner bn-warn" style="margin-bottom:18px"><span>⚠</span><span>朝食のタンパク質が不足しています。改善のヒントが送信後に表示されます。</span></div>
       <button class="btn btn-ok" onclick="submitData()">📤 データを送信する</button>
       <button class="btn btn-ghost" onclick="location.href='D-06_input_step3.html'">← 修正する</button>
       <div style="text-align:center;font-size:11px;color:var(--danger);cursor:pointer;margin-top:4px" onclick="cancelInput()">✕ 入力を中止する</div>
@@ -318,16 +328,46 @@ function cancelInput(){
 window.addEventListener('load', function(){
   try{
     const saved = JSON.parse(localStorage.getItem('nobita_input') || '{}');
-    const map = {
-      ht:'身長', wt:'体重', ep:'骨端線幅',
-      slp:'睡眠', pt:'練習時間', days:'週活動日数', pg:'プロテイン'
-    };
-    if(saved.ht)  document.getElementById('sum-ht')  && (document.getElementById('sum-ht').textContent  = saved.ht  + ' cm');
-    if(saved.wt)  document.getElementById('sum-wt')  && (document.getElementById('sum-wt').textContent  = saved.wt  + ' kg');
-    if(saved.slp) document.getElementById('sum-slp') && (document.getElementById('sum-slp').textContent = saved.slp + 'h');
-    if(saved.pt)  document.getElementById('sum-pt')  && (document.getElementById('sum-pt').textContent  = saved.pt  + 'h');
-    if(saved.days)document.getElementById('sum-days')&& (document.getElementById('sum-days').textContent= saved.days + '日');
-    if(saved.pg)  document.getElementById('sum-pg')  && (document.getElementById('sum-pg').textContent  = saved.pg  + 'g（練習後）');
+    const _set = function(id, val){ var el = document.getElementById(id); if(el && val !== undefined) el.textContent = val; };
+
+    if(saved.ht)  _set('sum-ht', saved.ht + ' cm');
+    if(saved.wt)  _set('sum-wt', saved.wt + ' kg');
+    if(saved.wt){
+      var need = (parseFloat(saved.wt) * 2).toFixed(1);
+      _set('sum-need-protein', need + ' g / 日');
+    }
+
+    // 食事3択
+    var mealLbl = { short:'❌ 足りない', ok:'✓ 足りた', over:'⚠ 必要以上' };
+    if(saved.meal_choices){
+      try{
+        var mc = JSON.parse(saved.meal_choices);
+        if(mc.breakfast) _set('sum-meal-bf', mealLbl[mc.breakfast] || mc.breakfast);
+        if(mc.lunch)     _set('sum-meal-lc', mealLbl[mc.lunch]     || mc.lunch);
+        if(mc.dinner)    _set('sum-meal-dn', mealLbl[mc.dinner]    || mc.dinner);
+      }catch(e){}
+    }
+    if(saved.pg)  _set('sum-pg', saved.pg + ' g');
+
+    // 生活習慣
+    if(saved.sleep) _set('sum-slp', saved.sleep + 'h');
+    if(saved.ptime) _set('sum-pt', saved.ptime + 'h');
+    if(saved.pdays) _set('sum-days', saved.pdays + '日');
+    if(saved.slp)   _set('sum-slp', saved.slp + 'h');
+    if(saved.pt)    _set('sum-pt', saved.pt + 'h');
+    if(saved.days)  _set('sum-days', saved.days + '日');
+
+    // 体調
+    var moodLbl = {1:'😞 不調', 2:'😕 いまいち', 3:'😊 普通', 4:'😄 好調', 5:'🤩 絶好調'};
+    if(saved.mood) _set('sum-mood', moodLbl[saved.mood] || '😊 普通');
+
+    // 怪我
+    if(saved.injuries){
+      try{
+        var arr = JSON.parse(saved.injuries);
+        _set('sum-injury', arr && arr.length ? arr.join(', ') : 'なし');
+      }catch(e){}
+    }
   } catch(e){}
 });
 
