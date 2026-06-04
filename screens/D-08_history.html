@@ -158,6 +158,12 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 
     <div class="scroll-flat">
 
+      <!-- 期間表示バナー -->
+      <div id="period-banner" style="background:linear-gradient(135deg,#1E6FD9,#06C755);color:white;border-radius:11px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:600;box-shadow:0 3px 10px rgba(30,111,217,.2)">
+        <span>📅 表示期間: <span id="period-label" style="font-weight:800;font-size:13px">1ヶ月</span></span>
+        <span id="period-date-range" style="font-size:10px;opacity:.9">— 〜 —</span>
+      </div>
+
       <!-- 入力率ストリーク -->
       <div class="streak-card">
         <div class="streak-ico">🔥</div>
@@ -340,6 +346,17 @@ function renderStreak(){
   document.getElementById('streak-done').textContent = done;
   document.getElementById('streak-total').textContent = total;
   document.getElementById('streak-streak').textContent = streak;
+
+  // 期間バナー更新
+  var lbl = document.getElementById('period-label');
+  var dr = document.getElementById('period-date-range');
+  if(lbl) lbl.textContent = _rangeLabel(_range);
+  if(dr && _cached.length > 0){
+    var oldest = _cached[_cached.length - 1].d;
+    var newest = _cached[0].d;
+    var fmt = function(d){ return d.getFullYear() + '/' + (d.getMonth()+1) + '/' + d.getDate(); };
+    dr.textContent = fmt(oldest) + ' 〜 ' + fmt(newest);
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -411,9 +428,17 @@ function setRange(days, el){
   document.querySelectorAll('.range-tab').forEach(function(t){ t.classList.remove('act'); });
   if(el) el.classList.add('act');
 
+  // クリック直後にスクロール位置をトップに戻す（画面が更新されたことを明示）
+  var scrollEl = document.querySelector('.scroll-flat');
+  if(scrollEl) scrollEl.scrollTo({ top: 0, behavior: 'smooth' });
+
   // 描画前にローディング表示（即座に視覚的フィードバック）
   var listEl = document.getElementById('hist-list');
-  if(listEl) listEl.innerHTML = '<div style="padding:30px 0;text-align:center;color:var(--sub);font-size:11px">読み込み中…</div>';
+  if(listEl) listEl.innerHTML = '<div style="padding:30px 0;text-align:center;color:var(--sub);font-size:11px">📊 ' + _rangeLabel(days) + 'のデータを読み込み中…</div>';
+
+  // ストリークカードに簡易ローディング
+  var streakVal = document.getElementById('streak-rate');
+  if(streakVal) streakVal.textContent = '…';
 
   // 重い処理は次フレームに回してUIブロックを避ける
   setTimeout(function(){
@@ -421,7 +446,23 @@ function setRange(days, el){
     renderStreak();
     renderList();
     renderChart();
+    // 画面トップで小さなフラッシュ通知
+    showRangeToast(days);
   }, 30);
+}
+
+function _rangeLabel(days){
+  if(days <= 7) return '1週間';
+  if(days <= 30) return '1ヶ月';
+  if(days <= 90) return '3ヶ月';
+  if(days <= 180) return '6ヶ月';
+  if(days <= 365) return '1年';
+  if(days <= 730) return '2年';
+  return '5年';
+}
+
+function showRangeToast(days){
+  toast('📅 ' + _rangeLabel(days) + 'の履歴を表示しています');
 }
 
 // ══════════════════════════════════════════════════
