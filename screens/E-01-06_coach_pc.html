@@ -547,14 +547,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .appr-empty-txt{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
 .appr-empty-sub{font-size:11px;color:var(--muted)}
 
-/* ══ E-09 スタッフ招待 ══ */
-.role-chip{
-  flex:1;height:38px;border-radius:9px;border:1.5px solid var(--border);
-  background:#FAFCFE;font-size:11px;font-weight:600;color:var(--muted);
-  cursor:pointer;font-family:inherit;transition:all .15s;
-}
-.role-chip:hover{border-color:#BFCFDE}
-.role-chip.act{background:rgba(56,178,172,.1);border-color:var(--teal);color:var(--teal);font-weight:700}
+/* ══ E-09 指導者招待 ══ */
 .inv-row{
   display:flex;align-items:center;gap:11px;padding:11px;
   border:1px solid var(--border);border-radius:10px;background:#FAFCFE;margin-bottom:8px;
@@ -1313,15 +1306,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
     <div class="screen" id="s-invite">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
         <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
-          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">📨 新しいスタッフを招待</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.55">同じチームを管理するコーチ・スタッフを招待できます。招待リンクは7日間有効です。</div>
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px">📨 新しい指導者を招待</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.55">同じチームを管理する指導者を招待できます。招待リンクは7日間有効です。</div>
           <label style="display:block;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px">招待先メールアドレス <span style="color:var(--danger)">*</span></label>
-          <input id="inv-email" type="email" placeholder="coach@example.com" style="width:100%;height:42px;padding:0 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:10px" />
-          <label style="display:block;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px">役割</label>
-          <div style="display:flex;gap:7px;margin-bottom:14px">
-            <button type="button" class="role-chip act" data-role="coach" onclick="selectInvRole(this,'coach')">👔 指導者</button>
-            <button type="button" class="role-chip" data-role="assistant" onclick="selectInvRole(this,'assistant')">🤝 アシスタント</button>
-          </div>
+          <input id="inv-email" type="email" placeholder="coach@example.com" style="width:100%;height:42px;padding:0 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:14px" />
           <label style="display:block;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px">メッセージ（任意）</label>
           <textarea id="inv-msg" rows="3" placeholder="一緒にチームを盛り上げましょう！" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-family:inherit;outline:none;resize:vertical;margin-bottom:14px"></textarea>
           <button class="tb-btn tb-teal" style="width:100%" onclick="sendInvite()">📤 招待を送信</button>
@@ -1332,8 +1320,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
         <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="font-size:13px;font-weight:800;color:var(--text)">👥 招待中のスタッフ</div>
-            <div style="font-size:10px;color:var(--muted)">合計 3名</div>
+            <div style="font-size:13px;font-weight:800;color:var(--text)">👥 招待中の指導者</div>
+            <div style="font-size:10px;color:var(--muted)">合計 2名</div>
           </div>
           <div id="invite-list">
             <div class="inv-row">
@@ -1343,7 +1331,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
                 <div style="font-size:10px;color:var(--muted)">yamada@example.com</div>
               </div>
               <div class="inv-tag inv-tag-ok">✓ 参加済</div>
-              <div style="font-size:10px;color:var(--muted);margin-left:8px">指導者</div>
             </div>
             <div class="inv-row">
               <div class="inv-av" style="background:linear-gradient(135deg,#5DADE2,#1E6FD9)">佐</div>
@@ -1352,17 +1339,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
                 <div style="font-size:10px;color:var(--muted)">sato@example.com</div>
               </div>
               <div class="inv-tag inv-tag-pending">⏳ 招待中</div>
-              <div style="font-size:10px;color:var(--muted);margin-left:8px">指導者</div>
-              <button class="inv-x" onclick="cancelInvite(this)" title="招待を取り消す">✕</button>
-            </div>
-            <div class="inv-row">
-              <div class="inv-av" style="background:linear-gradient(135deg,#A78BFA,#7C3AED)">小</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:var(--text)">小林 美咲</div>
-                <div style="font-size:10px;color:var(--muted)">kobayashi@example.com</div>
-              </div>
-              <div class="inv-tag inv-tag-pending">⏳ 招待中</div>
-              <div style="font-size:10px;color:var(--muted);margin-left:8px">アシスタント</div>
               <button class="inv-x" onclick="cancelInvite(this)" title="招待を取り消す">✕</button>
             </div>
           </div>
@@ -1370,24 +1346,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       </div>
 
       <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
-        <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">権限の違い</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <thead>
-            <tr style="background:#F5F8FB">
-              <th style="text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">権限項目</th>
-              <th style="text-align:center;padding:9px 12px;border-bottom:1px solid var(--border);color:var(--teal);font-weight:700">指導者</th>
-              <th style="text-align:center;padding:9px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:700">アシスタント</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="padding:8px 12px;border-bottom:1px solid #F0F4F7">選手データの閲覧</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:var(--ok)">✓</td></tr>
-            <tr><td style="padding:8px 12px;border-bottom:1px solid #F0F4F7">アラート対応</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:var(--ok)">✓</td></tr>
-            <tr><td style="padding:8px 12px;border-bottom:1px solid #F0F4F7">レポート出力</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:var(--ok)">✓</td></tr>
-            <tr><td style="padding:8px 12px;border-bottom:1px solid #F0F4F7">加入申請の承認</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:#CBD5E0">―</td></tr>
-            <tr><td style="padding:8px 12px;border-bottom:1px solid #F0F4F7">スタッフ招待</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:#CBD5E0">―</td></tr>
-            <tr><td style="padding:8px 12px">チーム設定の変更</td><td style="text-align:center;color:var(--ok)">✓</td><td style="text-align:center;color:#CBD5E0">―</td></tr>
-          </tbody>
-        </table>
+        <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px">指導者の権限</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.55">招待された指導者は、チームに参加すると以下の操作が可能になります。</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">選手データの閲覧</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">アラート対応</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">レポート出力</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">加入申請の承認</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">スタッフ招待</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:#FAFCFE"><span style="color:var(--ok);font-size:14px">✓</span><span style="font-size:11px;color:var(--text);font-weight:600">チーム設定の変更</span></div>
+        </div>
       </div>
     </div>
 
@@ -1994,22 +1962,14 @@ function _refreshApprEmpty(){
 }
 
 // ══════════════════════════════════════════════════
-// E-09 スタッフ招待
+// E-09 指導者招待
 // ══════════════════════════════════════════════════
-var _invRole = 'coach';
-function selectInvRole(btn, role){
-  document.querySelectorAll('.role-chip').forEach(function(b){ b.classList.remove('act'); });
-  btn.classList.add('act');
-  _invRole = role;
-}
-
 function sendInvite(){
   var email = (document.getElementById('inv-email') || {}).value || '';
   if(!email || email.indexOf('@') === -1){
     toast('⚠ 有効なメールアドレスを入力してください');
     return;
   }
-  var roleLbl = _invRole === 'coach' ? '指導者' : 'アシスタント';
   var initial = email.charAt(0).toUpperCase();
   var colors = ['#FF6B6B,#FF9B7A', '#5DADE2,#1E6FD9', '#A78BFA,#7C3AED', '#38B2AC,#0FB8A0', '#F6AD55,#E8A030'];
   var color = colors[Math.floor(Math.random() * colors.length)];
@@ -2022,7 +1982,6 @@ function sendInvite(){
       +   '<div style="font-size:10px;color:var(--muted)">' + email + '</div>'
       + '</div>'
       + '<div class="inv-tag inv-tag-pending">⏳ 招待中</div>'
-      + '<div style="font-size:10px;color:var(--muted);margin-left:8px">' + roleLbl + '</div>'
       + '<button class="inv-x" onclick="cancelInvite(this)" title="招待を取り消す">✕</button>'
       + '</div>';
     list.insertAdjacentHTML('afterbegin', html);
