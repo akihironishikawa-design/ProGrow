@@ -44,7 +44,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .s-done{background:#06C755;color:var(--navy)}
 .s-act{background:white;color:var(--navy);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
 .s-todo{background:rgba(255,255,255,.15);color:rgba(255,255,255,.4)}
-.s-lbl{font-size:8px;color:rgba(255,255,255,.5);margin-top:3px;white-space:nowrap}
+.s-lbl{font-size:7.5px;color:rgba(255,255,255,.5);margin-top:3px;text-align:center;line-height:1.2;letter-spacing:-0.02em;max-width:70px}
 .s-line{flex:1;height:2px;margin:0 2px;margin-bottom:14px}
 .s-line-done{background:#06C755}
 .s-line-todo{background:rgba(255,255,255,.15)}
@@ -104,12 +104,13 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 
 /* 食事3食 */
 .meal-section{margin-top:6px}
-.meal-row{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.meal-row{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
 .meal-card{
   border-radius:11px;border:1.5px solid var(--border);
   background:#FAFCFE;padding:11px 12px;
-  display:flex;align-items:center;gap:11px;
+  display:flex;flex-direction:column;gap:9px;
 }
+.meal-hdr{display:flex;align-items:center;gap:11px}
 .meal-ico{
   width:36px;height:36px;border-radius:10px;
   background:#F2F4F6;display:flex;align-items:center;justify-content:center;
@@ -119,16 +120,18 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .meal-name{font-size:12px;font-weight:700;color:var(--text)}
 .meal-time-lbl{font-size:9px;color:var(--muted);margin-top:1px}
 .meal-choices{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:170px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:5px;
 }
 .meal-choice{
-  height:28px;border-radius:6px;border:1px solid var(--border);
-  background:white;font-size:9px;font-weight:600;cursor:pointer;
+  min-height:42px;border-radius:7px;border:1px solid var(--border);
+  background:white;font-size:10px;font-weight:600;cursor:pointer;
   color:var(--sub);transition:all .15s;font-family:var(--font);
-  display:flex;align-items:center;justify-content:center;line-height:1;padding:0 2px;
-  white-space:nowrap;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.1;padding:5px 2px;
 }
+.mc-lbl{font-weight:700;white-space:nowrap}
+.mc-g{font-size:9px;opacity:.7;font-family:var(--mono);white-space:nowrap}
 .meal-choice:hover{border-color:#BFCFDE}
+.meal-choice.sel-none{background:#F0F4F8;border-color:#8FA3B8;color:#5A6F84;font-weight:700}
 .meal-choice.sel-short{background:var(--danger-bg);border-color:var(--danger);color:var(--danger);font-weight:700}
 .meal-choice.sel-ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:700}
 .meal-choice.sel-over{background:var(--warn-bg);border-color:var(--warn);color:var(--warn);font-weight:700}
@@ -178,7 +181,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="steps">
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">身体測定</div></div>
         <div class="s-line s-line-done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">2</div><div class="s-lbl">食事</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-act">2</div><div class="s-lbl">食事（タンパク質）</div></div>
         <div class="s-line s-line-todo"></div>
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-todo">3</div><div class="s-lbl">生活習慣</div></div>
         <div class="s-line s-line-todo"></div>
@@ -248,43 +251,52 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="meal-row">
           <!-- 朝食 -->
           <div class="meal-card" data-meal="breakfast">
-            <div class="meal-ico">🍞</div>
-            <div class="meal-info">
-              <div class="meal-name">朝食</div>
-              <div class="meal-time-lbl">〜10時</div>
+            <div class="meal-hdr">
+              <div class="meal-ico">🍞</div>
+              <div class="meal-info">
+                <div class="meal-name">朝食</div>
+                <div class="meal-time-lbl">〜10時</div>
+              </div>
             </div>
             <div class="meal-choices">
-              <button type="button" class="meal-choice sel-short" data-val="short" onclick="setMealChoice(this,'breakfast','short')">足りない</button>
-              <button type="button" class="meal-choice" data-val="ok" onclick="setMealChoice(this,'breakfast','ok')">足りた</button>
-              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'breakfast','over')">必要以上</button>
+              <button type="button" class="meal-choice" data-val="none" onclick="setMealChoice(this,'breakfast','none')"><span class="mc-lbl">食べてない</span><span class="mc-g">0g</span></button>
+              <button type="button" class="meal-choice sel-short" data-val="short" onclick="setMealChoice(this,'breakfast','short')"><span class="mc-lbl">足りない</span><span class="mc-g">〜8g</span></button>
+              <button type="button" class="meal-choice" data-val="ok" onclick="setMealChoice(this,'breakfast','ok')"><span class="mc-lbl">足りた</span><span class="mc-g">15g</span></button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'breakfast','over')"><span class="mc-lbl">必要以上</span><span class="mc-g">22g+</span></button>
             </div>
           </div>
 
           <!-- 昼食 -->
           <div class="meal-card" data-meal="lunch">
-            <div class="meal-ico">🍱</div>
-            <div class="meal-info">
-              <div class="meal-name">昼食</div>
-              <div class="meal-time-lbl">11〜15時</div>
+            <div class="meal-hdr">
+              <div class="meal-ico">🍱</div>
+              <div class="meal-info">
+                <div class="meal-name">昼食</div>
+                <div class="meal-time-lbl">11〜15時</div>
+              </div>
             </div>
             <div class="meal-choices">
-              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'lunch','short')">足りない</button>
-              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'lunch','ok')">足りた</button>
-              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'lunch','over')">必要以上</button>
+              <button type="button" class="meal-choice" data-val="none" onclick="setMealChoice(this,'lunch','none')"><span class="mc-lbl">食べてない</span><span class="mc-g">0g</span></button>
+              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'lunch','short')"><span class="mc-lbl">足りない</span><span class="mc-g">〜8g</span></button>
+              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'lunch','ok')"><span class="mc-lbl">足りた</span><span class="mc-g">15g</span></button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'lunch','over')"><span class="mc-lbl">必要以上</span><span class="mc-g">22g+</span></button>
             </div>
           </div>
 
           <!-- 夕食 -->
           <div class="meal-card" data-meal="dinner">
-            <div class="meal-ico">🍛</div>
-            <div class="meal-info">
-              <div class="meal-name">夕食</div>
-              <div class="meal-time-lbl">17時〜</div>
+            <div class="meal-hdr">
+              <div class="meal-ico">🍛</div>
+              <div class="meal-info">
+                <div class="meal-name">夕食</div>
+                <div class="meal-time-lbl">17時〜</div>
+              </div>
             </div>
             <div class="meal-choices">
-              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'dinner','short')">足りない</button>
-              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'dinner','ok')">足りた</button>
-              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'dinner','over')">必要以上</button>
+              <button type="button" class="meal-choice" data-val="none" onclick="setMealChoice(this,'dinner','none')"><span class="mc-lbl">食べてない</span><span class="mc-g">0g</span></button>
+              <button type="button" class="meal-choice" data-val="short" onclick="setMealChoice(this,'dinner','short')"><span class="mc-lbl">足りない</span><span class="mc-g">〜8g</span></button>
+              <button type="button" class="meal-choice sel-ok" data-val="ok" onclick="setMealChoice(this,'dinner','ok')"><span class="mc-lbl">足りた</span><span class="mc-g">15g</span></button>
+              <button type="button" class="meal-choice" data-val="over" onclick="setMealChoice(this,'dinner','over')"><span class="mc-lbl">必要以上</span><span class="mc-g">22g+</span></button>
             </div>
           </div>
         </div>
@@ -383,7 +395,7 @@ function setMealChoice(btn, meal, val){
   var card = btn.closest('.meal-card');
   if(!card) return;
   card.querySelectorAll('.meal-choice').forEach(function(b){
-    b.classList.remove('sel-short','sel-ok','sel-over');
+    b.classList.remove('sel-none','sel-short','sel-ok','sel-over');
   });
   btn.classList.add('sel-' + val);
   _mealChoices[meal] = val;
@@ -396,8 +408,8 @@ function setMealChoice(btn, meal, val){
 function _renderIntakeSummary(){
   var need = recalcProteinNeed();
   // 各食事の推定タンパク質量
-  // short=8g, ok=15g, over=22g
-  var perMeal = { short:8, ok:15, over:22 };
+  // none=0g, short=8g, ok=15g, over=22g
+  var perMeal = { none:0, short:8, ok:15, over:22 };
   var fromMeals = (perMeal[_mealChoices.breakfast] || 0)
                 + (perMeal[_mealChoices.lunch] || 0)
                 + (perMeal[_mealChoices.dinner] || 0);
@@ -421,12 +433,18 @@ function _renderIntakeSummary(){
   } else if(ratio >= 0.7){
     box.classList.add('is-warn');
     ico.textContent = '⚠';
-    var missingMeals = [];
-    if(_mealChoices.breakfast === 'short') missingMeals.push('朝食');
-    if(_mealChoices.lunch === 'short') missingMeals.push('昼食');
-    if(_mealChoices.dinner === 'short') missingMeals.push('夕食');
-    if(missingMeals.length){
-      txt.textContent = missingMeals.join('・') + 'のタンパク質が不足しています';
+    var skippedMeals = [];
+    var lowMeals = [];
+    if(_mealChoices.breakfast === 'none') skippedMeals.push('朝食');
+    else if(_mealChoices.breakfast === 'short') lowMeals.push('朝食');
+    if(_mealChoices.lunch === 'none') skippedMeals.push('昼食');
+    else if(_mealChoices.lunch === 'short') lowMeals.push('昼食');
+    if(_mealChoices.dinner === 'none') skippedMeals.push('夕食');
+    else if(_mealChoices.dinner === 'short') lowMeals.push('夕食');
+    if(skippedMeals.length){
+      txt.textContent = skippedMeals.join('・') + 'を食べていません';
+    } else if(lowMeals.length){
+      txt.textContent = lowMeals.join('・') + 'のタンパク質が不足しています';
     } else {
       txt.textContent = 'もう少し摂取しましょう';
     }
@@ -473,7 +491,7 @@ function loadPrev(){
           if(mc[meal]){
             _mealChoices[meal] = mc[meal];
             document.querySelectorAll('.meal-card[data-meal="' + meal + '"] .meal-choice').forEach(function(b){
-              b.classList.remove('sel-short','sel-ok','sel-over');
+              b.classList.remove('sel-none','sel-short','sel-ok','sel-over');
               if(b.dataset.val === mc[meal]) b.classList.add('sel-' + mc[meal]);
             });
           }

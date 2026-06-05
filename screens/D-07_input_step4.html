@@ -81,7 +81,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .s-done{background:#06C755;color:var(--navy)}
 .s-act{background:white;color:var(--navy);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
 .s-todo{background:rgba(255,255,255,.15);color:rgba(255,255,255,.4)}
-.s-lbl{font-size:8px;color:rgba(255,255,255,.5);margin-top:3px;white-space:nowrap}
+.s-lbl{font-size:7.5px;color:rgba(255,255,255,.5);margin-top:3px;text-align:center;line-height:1.2;letter-spacing:-0.02em;max-width:70px}
 .s-line{flex:1;height:2px;margin:0 2px;margin-bottom:14px}
 .s-line-done{background:#06C755}
 .s-line-todo{background:rgba(255,255,255,.15)}
@@ -274,7 +274,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="steps">
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">身体測定</div></div>
         <div class="s-line s-line-done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">食事</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">食事（タンパク質）</div></div>
         <div class="s-line s-line-done"></div>
         <div style="display:flex;flex-direction:column;align-items:center"><div class="s-dot s-done">✓</div><div class="s-lbl">生活習慣</div></div>
         <div class="s-line s-line-done"></div>
@@ -337,8 +337,8 @@ window.addEventListener('load', function(){
       _set('sum-need-protein', need + ' g / 日');
     }
 
-    // 食事3択
-    var mealLbl = { short:'❌ 足りない', ok:'✓ 足りた', over:'⚠ 必要以上' };
+    // 食事4択
+    var mealLbl = { none:'🚫 食べてない', short:'❌ 足りない', ok:'✓ 足りた', over:'⚠ 必要以上' };
     if(saved.meal_choices){
       try{
         var mc = JSON.parse(saved.meal_choices);
