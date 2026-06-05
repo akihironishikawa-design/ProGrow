@@ -960,7 +960,7 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 
       <div class="kpi-row">
         <div class="kpi kpi-t"><div class="kpi-lbl">チーム平均身長</div><div class="kpi-val">163.2<span class="kpi-unit">cm</span></div><div class="kpi-diff kd-ok">↑ 先月比 +0.8cm</div></div>
-        <div class="kpi kpi-a"><div class="kpi-lbl">測定未入力</div><div class="kpi-val">3<span class="kpi-unit">名</span></div><div class="kpi-diff kd-warn">今月入力率 86%</div></div>
+        <div class="kpi kpi-a"><div class="kpi-lbl">本日未入力</div><div class="kpi-val">3<span class="kpi-unit">名</span></div><div class="kpi-diff kd-warn">直近7日入力率 86%</div></div>
         <div class="kpi kpi-d"><div class="kpi-lbl">要対応アラート</div><div class="kpi-val" style="color:var(--danger)">5<span class="kpi-unit">件</span></div><div class="kpi-diff kd-bad">↑ 先週比 +2件</div></div>
         <div class="kpi kpi-o"><div class="kpi-lbl">コンディション良好</div><div class="kpi-val">14<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">全体の 64%</div></div>
       </div>
@@ -1053,7 +1053,7 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
           </div>
         </div>
         <table class="tbl">
-          <thead><tr><th>選手</th><th>学年</th><th>身長</th><th>先月比</th><th>体重</th><th>総合</th><th>睡眠</th><th>栄養</th><th>練習負荷</th><th>最終入力</th><th style="text-align:right">操作</th></tr></thead>
+          <thead><tr><th>選手</th><th>学年</th><th>身長</th><th>先月比</th><th>体重</th><th>総合</th><th>睡眠</th><th>タンパク質</th><th>練習負荷</th><th>最終入力</th><th style="text-align:right">操作</th></tr></thead>
           <tbody>
             <tr style="cursor:pointer" onclick="go('detail','選手詳細',null)">
               <td><div class="pc"><div class="pav av-d">山</div><div><div class="pn">山田 太郎</div><div class="pm">東京FC</div></div></div></td>
@@ -1152,7 +1152,7 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
             <div class="c-hdr" style="margin-bottom:12px"><div class="c-title">💪 コンディション</div></div>
             <div style="display:flex;flex-direction:column;gap:9px">
               <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">睡眠</span><span style="color:var(--ok);font-weight:700">82点</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:82%;height:100%;background:var(--ok);border-radius:99px"></div></div></div>
-              <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">栄養</span><span style="color:var(--amber);font-weight:700">60点</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:60%;height:100%;background:var(--amber);border-radius:99px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">タンパク質</span><span style="color:var(--amber);font-weight:700">66%</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:66%;height:100%;background:var(--amber);border-radius:99px"></div></div></div>
               <div><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span style="color:var(--muted)">練習負荷</span><span style="color:var(--danger);font-weight:700">41点 ⚠</span></div><div style="height:6px;background:var(--card2);border-radius:99px;overflow:hidden"><div style="width:41%;height:100%;background:var(--danger);border-radius:99px"></div></div></div>
             </div>
           </div>
@@ -1464,7 +1464,7 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
           <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--teal),var(--sky));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:white">💡</div>
           <div>
             <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">申請承認のフロー</div>
-            <div style="font-size:11px;color:var(--muted);line-height:1.6">選手から加入申請を受けると未対応リストに表示されます。<strong>承認</strong>すると選手がチームに正式登録され、月次測定の対象になります。<strong>却下</strong>の場合は選手に通知されます。詳細データ（身長・体重・保護者連携など）は「詳細」ボタンから確認できます。</div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.6">選手から加入申請を受けると未対応リストに表示されます。<strong>承認</strong>すると選手がチームに正式登録され、毎日の入力データを閲覧できるようになります。<strong>却下</strong>の場合は選手に通知されます。詳細データ（身長・体重・保護者連携など）は「詳細」ボタンから確認できます。</div>
           </div>
         </div>
       </div>
@@ -2122,7 +2122,7 @@ function toast(msg){
 // CSV / Sheets / PDF 実出力機能
 // ══════════════════════════════════════════════════
 function _buildTeamCSV(){
-  const header = ['選手ID','氏名','学年','身長(cm)','先月比(cm)','体重(kg)','総合','睡眠','栄養','練習負荷','最終入力'];
+  const header = ['選手ID','氏名','学年','身長(cm)','先月比(cm)','体重(kg)','総合','睡眠','タンパク質達成率(%)','練習負荷','最終入力'];
   const rows = [
     ['ATH-0001','山田 太郎','中2','162.4','+1.2','52.8','要対応','82','60','41','2026/04/10'],
     ['ATH-0002','田中 一郎','中2','165.0','+0.9','58.2','良好','88','82','75','2026/04/14'],

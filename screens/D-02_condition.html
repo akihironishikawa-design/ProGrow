@@ -286,24 +286,24 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="ch-sm"><canvas id="c1"></canvas></div>
       </div>
 
-      <!-- 栄養スコア（簡易版：食事回数 + 食事の質 から算出） -->
+      <!-- タンパク質達成率 -->
       <div class="card">
-        <div class="card-hdr"><div class="card-title">🥗 栄養スコア</div><span class="badge b-warn">注意 60点</span></div>
+        <div class="card-hdr"><div class="card-title">🥩 タンパク質達成率</div><span class="badge b-warn">注意 66%</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div style="background:#FAFCFE;border-radius:10px;padding:9px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">直近30日平均</div><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy)">2.4<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:2px">/3食</span></div></div>
-          <div style="background:#FAFCFE;border-radius:10px;padding:9px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">食事の質（5段階）</div><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--warn)">3<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:2px">/5</span></div></div>
+          <div style="background:#FAFCFE;border-radius:10px;padding:9px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">今日の摂取量</div><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy)">69<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:2px">g</span></div></div>
+          <div style="background:#FAFCFE;border-radius:10px;padding:9px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">必要量（体重×2）</div><div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--warn)">105<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:2px">g</span></div></div>
         </div>
         <div style="background:var(--warn-bg);border:1px solid #F8C471;border-radius:9px;padding:10px 12px;font-size:11px;color:#8A4F00;line-height:1.5;display:flex;gap:8px;align-items:flex-start">
           <span>💡</span>
-          <span><strong>朝食の頻度が低め</strong>です。三食しっかり摂ることで栄養スコアは20点アップします。</span>
+          <span><strong>朝食のタンパク質</strong>が不足しています。卵・納豆・牛乳などで15g以上を目標に。</span>
         </div>
       </div>
 
       <div class="card">
         <div class="card-hdr"><div class="card-title">⚡ 練習負荷</div><span class="badge b-bad">過負荷 41点</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px">
-          <div style="background:var(--danger-bg);border-radius:11px;padding:11px;border:1px solid #F9BABA;text-align:center"><div style="font-size:9px;color:var(--danger);margin-bottom:3px">1日の練習時間</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--danger)">3.5h</div><div style="font-size:9px;color:var(--sub)">推奨: 2h以内</div></div>
-          <div style="background:var(--danger-bg);border-radius:11px;padding:11px;border:1px solid #F9BABA;text-align:center"><div style="font-size:9px;color:var(--danger);margin-bottom:3px">週の活動日数</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--danger)">7日</div><div style="font-size:9px;color:var(--sub)">推奨: 5日以内</div></div>
+          <div style="background:var(--danger-bg);border-radius:11px;padding:11px;border:1px solid #F9BABA;text-align:center"><div style="font-size:9px;color:var(--danger);margin-bottom:3px">今日の練習時間</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--danger)">3.5h</div><div style="font-size:9px;color:var(--sub)">推奨: 2h以内</div></div>
+          <div style="background:var(--danger-bg);border-radius:11px;padding:11px;border:1px solid #F9BABA;text-align:center"><div style="font-size:9px;color:var(--danger);margin-bottom:3px">直近7日連続入力</div><div style="font-family:var(--mono);font-size:22px;font-weight:800;color:var(--danger)">7日</div><div style="font-size:9px;color:var(--sub)">休養日: 0日</div></div>
         </div>
         <div class="banner bn-bad"><span>🚨</span><span><strong>休養日が0日</strong>が2週間継続。成長ホルモンは休養中に分泌されます。週2日以上の完全休養を。</span></div>
       </div>
