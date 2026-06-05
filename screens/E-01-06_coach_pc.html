@@ -547,6 +547,55 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .appr-empty-txt{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
 .appr-empty-sub{font-size:11px;color:var(--muted)}
 
+/* ══ E-10 チーム設定 ══ */
+.ts-input{
+  width:100%;height:38px;padding:0 12px;border:1.5px solid var(--border);
+  border-radius:9px;font-size:12px;font-family:inherit;color:var(--text);
+  background:#FAFCFE;outline:none;transition:all .15s;
+}
+.ts-input:focus{border-color:var(--teal);background:white;box-shadow:0 0 0 3px rgba(56,178,172,.1)}
+.ts-input:disabled{background:#F5F8FB;color:var(--muted);cursor:not-allowed}
+textarea.ts-input{height:auto;padding:10px 12px;resize:vertical;min-height:60px;line-height:1.5}
+select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 9L1 4h10z' fill='%238FA3B8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+
+.ts-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:1px solid #F0F4F7;gap:14px;
+}
+.ts-toggle-info{flex:1;min-width:0}
+.ts-toggle-title{font-size:12px;font-weight:700;color:var(--text)}
+.ts-toggle-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.45}
+.ts-tgl{
+  width:42px;height:24px;border-radius:99px;cursor:pointer;
+  position:relative;transition:background .2s;flex-shrink:0;
+}
+.ts-tgl::after{
+  content:'';position:absolute;width:18px;height:18px;border-radius:50%;
+  background:white;top:3px;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s;
+}
+.ts-tgl-on{background:var(--teal)}
+.ts-tgl-on::after{left:21px}
+.ts-tgl-off{background:#CBD5DF}
+.ts-tgl-off::after{left:3px}
+
+.ts-secondary-btn{
+  padding:9px 18px;border:1.5px solid var(--border);background:white;
+  border-radius:9px;font-size:11px;font-weight:700;font-family:inherit;
+  color:var(--text);cursor:pointer;transition:all .15s;
+}
+.ts-secondary-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(56,178,172,.04)}
+
+.ts-danger-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid #F0F4F7;gap:14px;
+}
+.ts-danger-btn{
+  padding:8px 16px;border:1.5px solid var(--danger);background:white;
+  border-radius:8px;font-size:11px;font-weight:700;font-family:inherit;
+  color:var(--danger);cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.ts-danger-btn:hover{background:var(--danger);color:white}
+
 /* ══ E-09 指導者招待 ══ */
 .inv-row{
   display:flex;align-items:center;gap:11px;padding:11px;
@@ -740,7 +789,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div class="sb-item" id="nav-invite" onclick="go('invite','指導者招待',this)">
         <div class="sb-icon">📨</div><div class="sb-lbl">指導者招待</div>
       </div>
-      <div class="sb-item" onclick="toast('チーム設定')">
+      <div class="sb-item" id="nav-settings" onclick="go('settings','チーム設定',this)">
         <div class="sb-icon">⚙️</div><div class="sb-lbl">チーム設定</div>
       </div>
     </div>
@@ -1398,6 +1447,168 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
     </div>
 
+    <!-- E-10 チーム設定 -->
+    <div class="screen" id="s-settings">
+      <div style="max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px">
+
+        <!-- 基本情報 -->
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div>
+              <div style="font-size:14px;font-weight:800;color:var(--text)">🏅 チーム基本情報</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">チーム名や活動拠点などを管理します</div>
+            </div>
+            <button class="tb-btn tb-teal" id="ts-edit-btn" onclick="tsToggleEdit()" style="font-size:11px;padding:7px 15px">✏️ 編集</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">チーム名</label>
+              <input class="ts-input" id="ts-name" type="text" value="東京FC ジュニア" disabled />
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">競技</label>
+              <select class="ts-input" id="ts-sport" disabled>
+                <option>サッカー</option>
+                <option>野球</option>
+                <option>バスケットボール</option>
+                <option>バレーボール</option>
+                <option>陸上</option>
+                <option>水泳</option>
+                <option>テニス</option>
+                <option>その他</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">対象年代</label>
+              <select class="ts-input" id="ts-age" disabled>
+                <option>小学生</option>
+                <option>中学生</option>
+                <option selected>U-15</option>
+                <option>U-12</option>
+                <option>高校生</option>
+                <option>混合</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">活動拠点</label>
+              <input class="ts-input" id="ts-pref" type="text" value="東京都" disabled />
+            </div>
+            <div style="grid-column:span 2">
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">チーム目標</label>
+              <textarea class="ts-input" id="ts-goal" rows="3" disabled>全選手の身体的成長をデータで支援し、怪我を防ぎながら全国大会を目指す</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 通知・アラート設定 -->
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
+          <div style="font-size:14px;font-weight:800;color:var(--text)">🔔 通知・アラート設定</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;margin-bottom:14px">どのアラートを受け取るかを指導者ごとに設定します</div>
+          <div class="ts-toggle-row">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">練習過負荷アラート</div>
+              <div class="ts-toggle-sub">週6日以上または1日3.5h超の練習が継続した時に通知</div>
+            </div>
+            <div class="ts-tgl ts-tgl-on" onclick="toggleTs(this)"></div>
+          </div>
+          <div class="ts-toggle-row">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">入力未提出アラート</div>
+              <div class="ts-toggle-sub">3日以上入力されていない選手がいる時に通知</div>
+            </div>
+            <div class="ts-tgl ts-tgl-on" onclick="toggleTs(this)"></div>
+          </div>
+          <div class="ts-toggle-row">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">タンパク質不足アラート</div>
+              <div class="ts-toggle-sub">必要量の70%未満が3日続いた時に通知</div>
+            </div>
+            <div class="ts-tgl ts-tgl-on" onclick="toggleTs(this)"></div>
+          </div>
+          <div class="ts-toggle-row">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">睡眠不足アラート</div>
+              <div class="ts-toggle-sub">7時間未満が3日続いた時に通知</div>
+            </div>
+            <div class="ts-tgl ts-tgl-off" onclick="toggleTs(this)"></div>
+          </div>
+          <div class="ts-toggle-row">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">怪我検知アラート</div>
+              <div class="ts-toggle-sub">入力フォームで怪我が報告された時に通知</div>
+            </div>
+            <div class="ts-tgl ts-tgl-on" onclick="toggleTs(this)"></div>
+          </div>
+          <div class="ts-toggle-row" style="border-bottom:none">
+            <div class="ts-toggle-info">
+              <div class="ts-toggle-title">日次サマリーメール</div>
+              <div class="ts-toggle-sub">毎朝8時に前日のチーム入力サマリーをメール送信</div>
+            </div>
+            <div class="ts-tgl ts-tgl-off" onclick="toggleTs(this)"></div>
+          </div>
+        </div>
+
+        <!-- データ管理 -->
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
+          <div style="font-size:14px;font-weight:800;color:var(--text)">📦 データ管理</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;margin-bottom:14px">チームのデータ保持期間やエクスポートを管理</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">データ保持期間</label>
+              <select class="ts-input" id="ts-retention">
+                <option>1年</option>
+                <option>3年</option>
+                <option selected>5年</option>
+                <option>無期限</option>
+              </select>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">保持期間を過ぎた古いデータは自動削除されます</div>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px">外部連携</label>
+              <select class="ts-input">
+                <option>未設定</option>
+                <option>Google スプレッドシート</option>
+                <option>Slack 通知</option>
+              </select>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">レポートを外部ツールに自動連携</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button class="ts-secondary-btn" onclick="toast('全選手データをCSVで出力します')">📥 全データCSV出力</button>
+            <button class="ts-secondary-btn" onclick="toast('バックアップを作成しています')">💾 バックアップ作成</button>
+          </div>
+        </div>
+
+        <!-- 危険ゾーン -->
+        <div style="background:white;border:1.5px solid rgba(229,62,62,.25);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(229,62,62,.06)">
+          <div style="font-size:14px;font-weight:800;color:var(--danger)">⚠ 危険ゾーン</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;margin-bottom:14px">取り返しのつかない操作のため、十分にご注意ください</div>
+
+          <div class="ts-danger-row">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">チーム情報のリセット</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">指導者・選手は残しつつ、過去の入力データを全削除</div>
+            </div>
+            <button class="ts-danger-btn" onclick="tsResetData()">リセット</button>
+          </div>
+
+          <div class="ts-danger-row" style="border-bottom:none">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">チームの削除</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">指導者・選手・入力データを含むすべての情報を削除します。元に戻せません。</div>
+            </div>
+            <button class="ts-danger-btn" onclick="tsDeleteTeam()">チームを削除</button>
+          </div>
+        </div>
+
+        <!-- 保存ボタン（編集モード時のみ） -->
+        <div id="ts-save-row" style="display:none;justify-content:flex-end;gap:10px;padding-top:8px">
+          <button class="ts-secondary-btn" onclick="tsCancelEdit()">キャンセル</button>
+          <button class="tb-btn tb-teal" onclick="tsSaveSettings()" style="font-size:12px">💾 変更を保存</button>
+        </div>
+      </div>
+    </div>
+
     <!-- E-08 指導者チーム作成申請 -->
     <div class="screen" id="s-register">
       <div class="reg-wrap">
@@ -1586,7 +1797,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div id="toast"></div>
 
 <script>
-const ALL = ['dashboard','players','detail','alerts','report','notify','approvals','invite','register'];
+const ALL = ['dashboard','players','detail','alerts','report','notify','approvals','invite','settings','register'];
 const TABS = ['dashboard','players','alerts','report'];
 
 function go(id, title, el){
@@ -2187,6 +2398,87 @@ function _updateInviteCount(){
   var counter = document.getElementById('invite-count');
   if(list && counter){
     counter.textContent = '合計 ' + list.children.length + '名';
+  }
+}
+
+// ══════════════════════════════════════════════════
+// E-10 チーム設定
+// ══════════════════════════════════════════════════
+var _tsEditMode = false;
+var _tsOriginal = {};
+
+function tsToggleEdit(){
+  _tsEditMode = true;
+  var ids = ['ts-name','ts-sport','ts-age','ts-pref','ts-goal'];
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    _tsOriginal[id] = el.value;
+    el.disabled = false;
+  });
+  document.getElementById('ts-edit-btn').style.display = 'none';
+  document.getElementById('ts-save-row').style.display = 'flex';
+  toast('編集モードに入りました');
+}
+
+function tsCancelEdit(){
+  _tsEditMode = false;
+  Object.keys(_tsOriginal).forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.value = _tsOriginal[id]; el.disabled = true; }
+  });
+  document.getElementById('ts-edit-btn').style.display = '';
+  document.getElementById('ts-save-row').style.display = 'none';
+  toast('編集をキャンセルしました');
+}
+
+function tsSaveSettings(){
+  var ids = ['ts-name','ts-sport','ts-age','ts-pref','ts-goal'];
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.disabled = true;
+  });
+  _tsEditMode = false;
+  document.getElementById('ts-edit-btn').style.display = '';
+  document.getElementById('ts-save-row').style.display = 'none';
+  toast('✓ チーム設定を保存しました');
+}
+
+function toggleTs(el){
+  if(el.classList.contains('ts-tgl-on')){
+    el.classList.remove('ts-tgl-on'); el.classList.add('ts-tgl-off');
+  } else {
+    el.classList.remove('ts-tgl-off'); el.classList.add('ts-tgl-on');
+  }
+}
+
+function tsResetData(){
+  var confirmTxt = prompt(
+    '【データリセット】\n\n' +
+    'この操作はチームの全選手の入力データ（身長・体重・食事・睡眠など）を完全削除します。\n' +
+    '指導者・選手アカウントは残りますが、過去のデータは取り戻せません。\n\n' +
+    '本当に実行する場合は「リセット」と入力してください。'
+  );
+  if(confirmTxt === 'リセット'){
+    toast('チームデータをリセットしました');
+  } else if(confirmTxt !== null){
+    toast('⚠ 入力が一致しないためキャンセルされました');
+  }
+}
+
+function tsDeleteTeam(){
+  var confirmTxt = prompt(
+    '【チーム削除】\n\n' +
+    'この操作はチームに紐づくすべての情報（指導者・選手・入力データ）を完全削除します。\n' +
+    'この操作は絶対に取り消せません。\n\n' +
+    '本当に削除する場合は、チーム名「東京FC ジュニア」を入力してください。'
+  );
+  if(confirmTxt === '東京FC ジュニア'){
+    if(confirm('最終確認：本当にチーム「東京FC ジュニア」を削除しますか？\nこの操作は取り消せません。')){
+      toast('チームを削除しました（実際の運用では運営に削除リクエストが送信されます）');
+    }
+  } else if(confirmTxt !== null){
+    toast('⚠ チーム名が一致しないためキャンセルされました');
   }
 }
 
