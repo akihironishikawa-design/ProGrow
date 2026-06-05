@@ -561,6 +561,29 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 }
 .inv-tag-ok{background:rgba(39,174,96,.12);color:#1A6B3A}
 .inv-tag-pending{background:rgba(232,160,48,.15);color:#8A4F00}
+.inv-tag-owner{background:linear-gradient(135deg,rgba(247,184,1,.18),rgba(232,160,48,.18));color:#8A4F00;border:1px solid rgba(232,160,48,.35)}
+.row-menu{position:relative;margin-left:6px}
+.row-menu-btn{
+  width:28px;height:28px;border:none;background:transparent;color:var(--muted);
+  font-size:18px;cursor:pointer;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-weight:700;line-height:1;padding:0;
+}
+.row-menu-btn:hover{background:#F0F4F7;color:var(--text)}
+.row-menu-pop{
+  position:absolute;top:32px;right:0;background:white;
+  border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 8px 24px rgba(11,29,53,.15);
+  min-width:172px;padding:5px;z-index:50;display:none;
+}
+.row-menu-pop.open{display:block;animation:fadeInRow .15s ease-out}
+.row-menu-item{
+  width:100%;text-align:left;padding:9px 11px;border:none;background:transparent;
+  font-size:11px;font-family:inherit;color:var(--text);font-weight:600;
+  cursor:pointer;border-radius:6px;display:flex;align-items:center;gap:6px;
+}
+.row-menu-item:hover{background:#F5F8FB}
+.row-menu-item.danger{color:var(--danger)}
+.row-menu-item.danger:hover{background:rgba(229,62,62,.06)}
 .inv-x{
   width:24px;height:24px;border:none;background:transparent;color:var(--muted);
   font-size:14px;cursor:pointer;border-radius:50%;display:flex;align-items:center;
@@ -1325,22 +1348,28 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
               <div style="font-size:10px;color:var(--muted)" id="member-count">合計 2名</div>
             </div>
             <div id="member-list">
-              <div class="inv-row">
+              <div class="inv-row" data-role="owner" data-name="田中 コーチ">
                 <div class="inv-av" style="background:linear-gradient(135deg,#38B2AC,#0FB8A0)">田</div>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:12px;font-weight:700;color:var(--text)">田中 コーチ <span style="font-size:9px;color:var(--teal);font-weight:700;margin-left:4px;padding:1px 6px;border-radius:99px;background:rgba(56,178,172,.12)">自分</span></div>
                   <div style="font-size:10px;color:var(--muted)">tanaka@progrow.app</div>
                 </div>
-                <div class="inv-tag inv-tag-ok">✓ オーナー</div>
+                <div class="inv-tag inv-tag-owner">👑 オーナー</div>
               </div>
-              <div class="inv-row">
+              <div class="inv-row" data-role="member" data-name="山田 太郎">
                 <div class="inv-av" style="background:linear-gradient(135deg,#FF6B6B,#FF9B7A)">山</div>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:12px;font-weight:700;color:var(--text)">山田 太郎</div>
                   <div style="font-size:10px;color:var(--muted)">yamada@example.com</div>
                 </div>
                 <div class="inv-tag inv-tag-ok">✓ 参加中</div>
-                <button class="inv-x" onclick="removeMember(this)" title="チームから削除">✕</button>
+                <div class="row-menu">
+                  <button class="row-menu-btn" onclick="toggleRowMenu(event,this)" title="操作メニュー">⋮</button>
+                  <div class="row-menu-pop">
+                    <button class="row-menu-item" onclick="transferOwnership(this)">👑 オーナーに譲渡</button>
+                    <button class="row-menu-item danger" onclick="removeMemberFromMenu(this)">✕ チームから削除</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2041,6 +2070,116 @@ function _updateMemberCount(){
   var counter = document.getElementById('member-count');
   if(list && counter){
     counter.textContent = '合計 ' + list.children.length + '名';
+  }
+}
+
+// ── 行メニュー（⋮ボタン）──
+function toggleRowMenu(ev, btn){
+  ev.stopPropagation();
+  var pop = btn.parentElement.querySelector('.row-menu-pop');
+  var open = pop.classList.contains('open');
+  // 他のメニューを閉じる
+  document.querySelectorAll('.row-menu-pop.open').forEach(function(p){ p.classList.remove('open'); });
+  if(!open) pop.classList.add('open');
+}
+document.addEventListener('click', function(){
+  document.querySelectorAll('.row-menu-pop.open').forEach(function(p){ p.classList.remove('open'); });
+});
+
+// メニュー経由での「チームから削除」
+function removeMemberFromMenu(btn){
+  var row = btn.closest('.inv-row');
+  var pop = btn.closest('.row-menu-pop');
+  if(pop) pop.classList.remove('open');
+  if(!row) return;
+  var name = row.dataset.name || 'この指導者';
+  if(!confirm(name + ' をチームから削除しますか？\nこの指導者は選手データへのアクセスができなくなります。')) return;
+  row.style.transition = 'all .3s';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(-20px)';
+  setTimeout(function(){
+    row.remove();
+    _updateMemberCount();
+    toast('チームから削除しました');
+  }, 300);
+}
+
+// ── オーナー譲渡 ──
+function transferOwnership(btn){
+  var row = btn.closest('.inv-row');
+  var pop = btn.closest('.row-menu-pop');
+  if(pop) pop.classList.remove('open');
+  if(!row) return;
+  var newOwnerName = row.dataset.name || 'この指導者';
+
+  // 2段階確認
+  if(!confirm(
+    '【オーナー譲渡】\n\n' +
+    newOwnerName + ' にオーナー権限を譲渡しますか？\n\n' +
+    '譲渡後、あなたは通常の指導者になり、以下の権限を失います：\n' +
+    '・チーム設定の変更\n' +
+    '・チームの削除\n' +
+    '・他の指導者のオーナー譲渡\n\n' +
+    'この操作は取り消せません。'
+  )) return;
+
+  // 最終確認
+  if(!confirm(
+    '本当に ' + newOwnerName + ' にオーナーを譲渡しますか？\n' +
+    'この操作の取り消しには、新オーナーの再譲渡が必要です。'
+  )) return;
+
+  // 現在のオーナー行を見つけて「参加中」に降格
+  var ownerRow = document.querySelector('.inv-row[data-role="owner"]');
+  if(ownerRow){
+    ownerRow.dataset.role = 'member';
+    var ownerTag = ownerRow.querySelector('.inv-tag');
+    if(ownerTag){
+      ownerTag.className = 'inv-tag inv-tag-ok';
+      ownerTag.textContent = '✓ 参加中';
+    }
+    // 自分バッジを残しつつメニューを追加
+    if(!ownerRow.querySelector('.row-menu')){
+      var menu = document.createElement('div');
+      menu.className = 'row-menu';
+      menu.innerHTML =
+        '<button class="row-menu-btn" onclick="toggleRowMenu(event,this)" title="操作メニュー">⋮</button>' +
+        '<div class="row-menu-pop">' +
+          '<button class="row-menu-item" onclick="leaveTeam(this)">🚪 チームから離脱</button>' +
+        '</div>';
+      ownerRow.appendChild(menu);
+    }
+  }
+
+  // 新オーナー行を昇格
+  row.dataset.role = 'owner';
+  var newTag = row.querySelector('.inv-tag');
+  if(newTag){
+    newTag.className = 'inv-tag inv-tag-owner';
+    newTag.textContent = '👑 オーナー';
+  }
+  // 新オーナーのメニューを削除（オーナー操作はオーナー自身のみが対象になるよう簡素化）
+  var newMenu = row.querySelector('.row-menu');
+  if(newMenu) newMenu.remove();
+
+  toast('👑 ' + newOwnerName + ' をオーナーに設定しました');
+}
+
+// 自分がオーナーでなくなった後のチーム離脱
+function leaveTeam(btn){
+  var row = btn.closest('.inv-row');
+  var pop = btn.closest('.row-menu-pop');
+  if(pop) pop.classList.remove('open');
+  if(!confirm('チームから離脱しますか？\n離脱するとチームの選手データにアクセスできなくなります。')) return;
+  if(row){
+    row.style.transition = 'all .3s';
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(-20px)';
+    setTimeout(function(){
+      toast('チームから離脱しました（実際の運用ではログイン画面に戻ります）');
+      row.remove();
+      _updateMemberCount();
+    }, 300);
   }
 }
 function _updateInviteCount(){
