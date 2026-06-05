@@ -1784,9 +1784,17 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
               </div>
 
               <div class="reg-row">
-                <label class="reg-lbl">指導者資格 <span class="reg-hint">任意 — JFA公認C級・JSPO公認 など</span></label>
-                <input class="reg-inp" id="reg-coach-cert" type="text" placeholder="例：JFA公認C級コーチ、JSPO公認指導員 など">
+                <label class="reg-lbl">指導歴 <span class="reg-hint">任意</span></label>
+                <select class="reg-sel" id="reg-exp">
+                  <option value="">選択してください</option>
+                  <option>1年未満</option>
+                  <option>1〜3年</option>
+                  <option>3〜5年</option>
+                  <option>5〜10年</option>
+                  <option>10年以上</option>
+                </select>
               </div>
+
             </div>
           </div>
 
@@ -1850,18 +1858,6 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
                     <option>51名以上</option>
                   </select>
                 </div>
-              </div>
-
-              <div class="reg-row">
-                <label class="reg-lbl">指導歴 <span class="reg-hint">任意</span></label>
-                <select class="reg-sel" id="reg-exp">
-                  <option value="">選択してください</option>
-                  <option>1年未満</option>
-                  <option>1〜3年</option>
-                  <option>3〜5年</option>
-                  <option>5〜10年</option>
-                  <option>10年以上</option>
-                </select>
               </div>
 
               <div class="reg-row">
@@ -2696,7 +2692,6 @@ function submitTeamRegistration(){
   const coachTel = (document.getElementById('reg-coach-tel')||{}).value || '';
   const coachOrg = (document.getElementById('reg-coach-org')||{}).value || '';
   const coachRole = (document.getElementById('reg-coach-role')||{}).value || '';
-  const coachCert = (document.getElementById('reg-coach-cert')||{}).value || '—';
 
   // チーム情報
   const name = (document.getElementById('reg-team-name')||{}).value || '';
@@ -2728,14 +2723,13 @@ function submitTeamRegistration(){
       '<dt>電話番号</dt><dd>' + escapeHtml(coachTel) + '</dd>' +
       '<dt>所属組織</dt><dd>' + escapeHtml(coachOrg) + '</dd>' +
       '<dt>役職</dt><dd>' + escapeHtml(coachRole) + '</dd>' +
-      '<dt>指導者資格</dt><dd>' + escapeHtml(coachCert) + '</dd>' +
+      '<dt>指導歴</dt><dd>' + escapeHtml(exp) + '</dd>' +
       '<dt style="color:var(--teal);font-weight:700;margin-top:8px">― チーム情報 ―</dt><dd></dd>' +
       '<dt>チーム名</dt><dd>' + escapeHtml(name) + '</dd>' +
       '<dt>競技</dt><dd>' + escapeHtml(sport) + '</dd>' +
       '<dt>対象年代</dt><dd>' + escapeHtml(age) + '</dd>' +
       '<dt>活動拠点</dt><dd>' + escapeHtml(pref) + '</dd>' +
       '<dt>選手規模</dt><dd>' + escapeHtml(size) + '</dd>' +
-      '<dt>指導歴</dt><dd>' + escapeHtml(exp) + '</dd>' +
       '<dt>チーム目標</dt><dd style="white-space:pre-wrap">' + escapeHtml(goal) + '</dd>' +
       '<dt>申請日</dt><dd>' + new Date().toISOString().slice(0,10) + '</dd>';
   }
@@ -2745,9 +2739,9 @@ function submitTeamRegistration(){
     localStorage.setItem('progrow_team_application', JSON.stringify({
       coach: {
         name: coachName, kana: coachKana, email: coachEmail, tel: coachTel,
-        org: coachOrg, role: coachRole, cert: coachCert
+        org: coachOrg, role: coachRole, exp: exp
       },
-      name, sport, age, pref, size, exp, goal, msg,
+      name, sport, age, pref, size, goal, msg,
       appliedAt: new Date().toISOString(),
       status: 'pending'
     }));
