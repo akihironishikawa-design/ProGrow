@@ -291,8 +291,37 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="field"><label class="f-lbl">学年 <span style="font-size:10px;color:var(--ok);font-weight:600;margin-left:4px">自動</span></label><input id="grade-auto" class="f-inp filled" value="中学2年" readonly style="background:#F0FBF4;color:var(--navy);font-weight:600"></div>
         <div class="field"><label class="f-lbl">年齢 <span style="font-size:10px;color:var(--ok);font-weight:600;margin-left:4px">自動</span></label><input id="age-auto" class="f-inp filled" value="13歳" readonly style="background:#F0FBF4;color:var(--navy);font-weight:600"></div>
       </div>
-      <div class="field" style="margin-bottom:20px"><label class="f-lbl">競技種別 <span class="f-req">*</span></label><select class="f-inp f-select filled"><option>バスケットボール</option><option>サッカー</option><option>野球</option><option>陸上競技</option><option>水泳</option><option>テニス</option><option>バレーボール</option><option>柔道・剣道</option><option>その他</option></select></div>
-      <button class="btn btn-blue" onclick="window.location.href='B-01_team_join.html'">次へ → チームに参加する</button>
+      <div class="field"><label class="f-lbl">競技種別 <span class="f-req">*</span></label><select class="f-inp f-select filled"><option>バスケットボール</option><option>サッカー</option><option>野球</option><option>陸上競技</option><option>水泳</option><option>テニス</option><option>バレーボール</option><option>柔道・剣道</option><option>その他</option></select></div>
+
+      <!-- 両親の身長セクション（任意） -->
+      <div style="background:linear-gradient(135deg,#FFFDF5,#FFF7E6);border:1px solid rgba(232,160,48,.25);border-radius:12px;padding:12px 14px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+          <span style="font-size:14px">👨‍👩‍👦</span>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">両親の身長</div>
+          <span style="font-size:9px;color:var(--sub);font-weight:600;padding:1px 7px;border-radius:99px;background:rgba(11,29,53,.06)">任意</span>
+        </div>
+        <div style="font-size:10px;color:var(--sub);margin-bottom:11px;line-height:1.5">
+          入力すると <strong>遺伝予想身長（Maxポテンシャル）</strong> の精度が上がります。後から設定画面でも変更できます。
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label class="f-lbl" style="font-size:10px;margin-bottom:4px">👨 父親の身長</label>
+            <div style="position:relative">
+              <input id="father-height" class="f-inp" type="number" inputmode="decimal" placeholder="172" min="100" max="250" step="0.1" style="padding-right:32px">
+              <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--sub);pointer-events:none">cm</span>
+            </div>
+          </div>
+          <div>
+            <label class="f-lbl" style="font-size:10px;margin-bottom:4px">👩 母親の身長</label>
+            <div style="position:relative">
+              <input id="mother-height" class="f-inp" type="number" inputmode="decimal" placeholder="158" min="100" max="250" step="0.1" style="padding-right:32px">
+              <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--sub);pointer-events:none">cm</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:var(--muted);margin-top:7px;text-align:center;display:none" id="genetic-preview">遺伝予想身長: <strong style="color:var(--blue)" id="genetic-val">— cm</strong></div>
+      </div>
+      <button class="btn btn-blue" onclick="saveAndProceed()">次へ → チームに参加する</button>
       <button class="btn btn-ghost" onclick="location.href='A-02_role_select.html'">← 戻る</button>
     </div>
   </div>
@@ -358,6 +387,42 @@ function updateAgeAndGrade(){
 
 // 初期表示時に計算
 window.addEventListener('load', updateAgeAndGrade);
+
+// ── 両親の身長：リアルタイム遺伝予想プレビュー ──
+function _renderGeneticPreview(){
+  var father = parseFloat((document.getElementById('father-height') || {}).value);
+  var mother = parseFloat((document.getElementById('mother-height') || {}).value);
+  var previewBox = document.getElementById('genetic-preview');
+  var previewVal = document.getElementById('genetic-val');
+  if(!previewBox || !previewVal) return;
+  if(isNaN(father) || isNaN(mother)){
+    previewBox.style.display = 'none';
+    return;
+  }
+  // 性別による予測式（ターナー法・男子: (父+母+13)/2、女子: (父+母-13)/2）
+  // ※デフォルト男子で計算
+  var pred = Math.round((father + mother + 13) / 2 * 10) / 10;
+  previewVal.textContent = pred.toFixed(1) + ' cm';
+  previewBox.style.display = 'block';
+}
+
+var _fatherEl = document.getElementById('father-height');
+var _motherEl = document.getElementById('mother-height');
+if(_fatherEl) _fatherEl.addEventListener('input', _renderGeneticPreview);
+if(_motherEl) _motherEl.addEventListener('input', _renderGeneticPreview);
+
+// ── 「次へ」ボタン押下時：両親身長を含むプロフィールを localStorage に保存 ──
+function saveAndProceed(){
+  try{
+    var father = parseFloat((document.getElementById('father-height') || {}).value);
+    var mother = parseFloat((document.getElementById('mother-height') || {}).value);
+    var existing = JSON.parse(localStorage.getItem('nobita_profile') || '{}');
+    if(!isNaN(father)) existing.father_height = father;
+    if(!isNaN(mother)) existing.mother_height = mother;
+    localStorage.setItem('nobita_profile', JSON.stringify(existing));
+  }catch(e){}
+  window.location.href = 'B-01_team_join.html';
+}
 </script>
 </body>
 </html>
