@@ -1719,6 +1719,77 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
             </div>
           </div>
 
+          <!-- 指導者情報セクション -->
+          <div class="card">
+            <div class="c-hdr"><div class="c-title">👤 指導者情報</div></div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+              運営が承認判断を行うため、ご本人と所属組織の情報を入力してください。
+              <strong>氏名・メールアドレス</strong>は Google アカウントから自動取得しています。
+            </div>
+
+            <!-- Google認証済みバナー -->
+            <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;background:rgba(56,178,172,.08);border:1px solid rgba(56,178,172,.25);border-radius:10px;margin-bottom:14px">
+              <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink:0">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              <div style="font-size:11px;color:var(--text);flex:1">
+                <strong style="color:var(--teal)">✓ Google アカウントで認証済み</strong>
+              </div>
+            </div>
+
+            <div class="reg-form">
+              <div class="reg-row two">
+                <div>
+                  <label class="reg-lbl">氏名 <span class="req">*</span><span class="reg-hint">Google から取得</span></label>
+                  <input class="reg-inp" id="reg-coach-name" type="text" value="田中 健太" readonly style="background:#F5F8FB;color:var(--text);cursor:not-allowed">
+                </div>
+                <div>
+                  <label class="reg-lbl">氏名（ふりがな） <span class="req">*</span></label>
+                  <input class="reg-inp" id="reg-coach-kana" type="text" placeholder="たなか けんた">
+                </div>
+              </div>
+
+              <div class="reg-row two">
+                <div>
+                  <label class="reg-lbl">メールアドレス <span class="reg-hint">Google から取得</span></label>
+                  <input class="reg-inp" id="reg-coach-email" type="email" value="tanaka.kenta@gmail.com" readonly style="background:#F5F8FB;color:var(--text);cursor:not-allowed">
+                </div>
+                <div>
+                  <label class="reg-lbl">電話番号 <span class="req">*</span></label>
+                  <input class="reg-inp" id="reg-coach-tel" type="tel" placeholder="090-1234-5678">
+                </div>
+              </div>
+
+              <div class="reg-row two">
+                <div>
+                  <label class="reg-lbl">所属組織 <span class="req">*</span><span class="reg-hint">学校名・クラブ名など</span></label>
+                  <input class="reg-inp" id="reg-coach-org" type="text" placeholder="例：○○中学校 / ○○FC ジュニア">
+                </div>
+                <div>
+                  <label class="reg-lbl">役職・立場 <span class="req">*</span></label>
+                  <select class="reg-sel" id="reg-coach-role">
+                    <option value="">選択してください</option>
+                    <option>監督</option>
+                    <option>コーチ</option>
+                    <option>顧問教員</option>
+                    <option>副顧問</option>
+                    <option>外部指導者</option>
+                    <option>保護者コーチ</option>
+                    <option>その他</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="reg-row">
+                <label class="reg-lbl">指導者資格 <span class="reg-hint">任意 — JFA公認C級・JSPO公認 など</span></label>
+                <input class="reg-inp" id="reg-coach-cert" type="text" placeholder="例：JFA公認C級コーチ、JSPO公認指導員 など">
+              </div>
+            </div>
+          </div>
+
           <div class="card">
             <div class="c-hdr"><div class="c-title">📝 チーム情報</div></div>
             <div class="reg-form">
@@ -2618,6 +2689,16 @@ function tsDeleteTeam(){
 // E-08 指導者チーム作成申請
 // ══════════════════════════════════════════════════
 function submitTeamRegistration(){
+  // 指導者情報
+  const coachName = (document.getElementById('reg-coach-name')||{}).value || '';
+  const coachKana = (document.getElementById('reg-coach-kana')||{}).value || '';
+  const coachEmail = (document.getElementById('reg-coach-email')||{}).value || '';
+  const coachTel = (document.getElementById('reg-coach-tel')||{}).value || '';
+  const coachOrg = (document.getElementById('reg-coach-org')||{}).value || '';
+  const coachRole = (document.getElementById('reg-coach-role')||{}).value || '';
+  const coachCert = (document.getElementById('reg-coach-cert')||{}).value || '—';
+
+  // チーム情報
   const name = (document.getElementById('reg-team-name')||{}).value || '';
   const sport = (document.getElementById('reg-sport')||{}).value || '';
   const age = (document.getElementById('reg-age')||{}).value || '';
@@ -2628,8 +2709,12 @@ function submitTeamRegistration(){
   const msg = (document.getElementById('reg-message')||{}).value || '（未記入）';
 
   // 必須チェック
+  if(!coachKana.trim() || !coachTel.trim() || !coachOrg.trim() || !coachRole){
+    toast('⚠ 指導者情報の必須項目を入力してください');
+    return;
+  }
   if(!name.trim() || !sport || !age || !pref || !size || !goal.trim()){
-    toast('⚠ 必須項目を入力してください');
+    toast('⚠ チーム情報の必須項目を入力してください');
     return;
   }
 
@@ -2637,6 +2722,14 @@ function submitTeamRegistration(){
   const summary = document.getElementById('reg-summary-card');
   if(summary){
     summary.innerHTML =
+      '<dt style="color:var(--teal);font-weight:700">― 指導者情報 ―</dt><dd></dd>' +
+      '<dt>氏名</dt><dd>' + escapeHtml(coachName) + ' （' + escapeHtml(coachKana) + '）</dd>' +
+      '<dt>メール</dt><dd>' + escapeHtml(coachEmail) + '</dd>' +
+      '<dt>電話番号</dt><dd>' + escapeHtml(coachTel) + '</dd>' +
+      '<dt>所属組織</dt><dd>' + escapeHtml(coachOrg) + '</dd>' +
+      '<dt>役職</dt><dd>' + escapeHtml(coachRole) + '</dd>' +
+      '<dt>指導者資格</dt><dd>' + escapeHtml(coachCert) + '</dd>' +
+      '<dt style="color:var(--teal);font-weight:700;margin-top:8px">― チーム情報 ―</dt><dd></dd>' +
       '<dt>チーム名</dt><dd>' + escapeHtml(name) + '</dd>' +
       '<dt>競技</dt><dd>' + escapeHtml(sport) + '</dd>' +
       '<dt>対象年代</dt><dd>' + escapeHtml(age) + '</dd>' +
@@ -2650,6 +2743,10 @@ function submitTeamRegistration(){
   // localStorageに保存（Mockup用）
   try{
     localStorage.setItem('progrow_team_application', JSON.stringify({
+      coach: {
+        name: coachName, kana: coachKana, email: coachEmail, tel: coachTel,
+        org: coachOrg, role: coachRole, cert: coachCert
+      },
       name, sport, age, pref, size, exp, goal, msg,
       appliedAt: new Date().toISOString(),
       status: 'pending'
