@@ -60,8 +60,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 .sb-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0}
 .sbb-red{background:rgba(238,75,75,.18);color:var(--danger);border:1px solid rgba(238,75,75,.3)}
 .sbb-teal{background:rgba(15,184,160,.15);color:var(--teal);border:1px solid rgba(15,184,160,.25)}
-.sb-foot{padding:12px 18px;border-top:1px solid var(--bdr)}
+.sb-foot{padding:12px 18px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:10px}
 .sb-user{display:flex;align-items:center;gap:9px}
+.sb-logout-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);
+  background:white;color:var(--muted);border-radius:9px;
+  font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;
+  transition:all .15s;
+}
+.sb-logout-btn:hover{border-color:var(--danger);color:var(--danger);background:rgba(229,62,62,.04)}
+.sb-logout-btn svg{flex-shrink:0;transition:transform .15s}
+.sb-logout-btn:hover svg{transform:translateX(2px)}
 .sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,rgba(15,184,160,.3),rgba(59,143,232,.3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--teal);border:1.5px solid rgba(15,184,160,.3);flex-shrink:0}
 .sb-uname{font-size:11px;font-weight:600;color:var(--text)}
 .sb-urole{font-size:9px;color:var(--muted);margin-top:1px}
@@ -853,8 +863,16 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
   <div class="sb-foot">
     <div class="sb-user">
       <div class="sb-av">田</div>
-      <div><div class="sb-uname">田中 コーチ</div><div class="sb-urole">東京FC ジュニア ／ 指導者</div></div>
+      <div style="flex:1;min-width:0"><div class="sb-uname">田中 コーチ</div><div class="sb-urole">東京FC ジュニア ／ 指導者</div></div>
     </div>
+    <button class="sb-logout-btn" onclick="coachLogout()" title="ログアウト">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      <span>ログアウト</span>
+    </button>
   </div>
 </div>
 
@@ -2554,6 +2572,15 @@ function _fallbackCopy(text){
     toast('📋 チームID「' + text + '」をコピーしました');
   }catch(e){
     toast('⚠ コピーに失敗しました');
+  }
+}
+
+// ── 指導者ログアウト ──
+function coachLogout(){
+  if(confirm('ログアウトしますか？')){
+    // 申請キャッシュ等のセッション情報をクリア（任意）
+    try{ localStorage.removeItem('progrow_team_application'); }catch(e){}
+    window.location.href = '../index.html';
   }
 }
 
