@@ -230,14 +230,6 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
           <div class="chip chip-idle" id="chip-before"   onclick="toggleChip('before')">就寝前</div>
           <div class="chip chip-idle" id="chip-morning"  onclick="toggleChip('morning')">朝食時</div>
         </div>
-
-        <label class="f-lbl" style="margin-bottom:7px;margin-top:6px">服用頻度</label>
-        <div class="chip-row">
-          <div class="chip chip-sel"  id="freq-daily" onclick="setFreq('daily')">毎日</div>
-          <div class="chip chip-idle" id="freq-half"  onclick="setFreq('half')">週2〜3日</div>
-          <div class="chip chip-idle" id="freq-rare"  onclick="setFreq('rare')">週1日以下</div>
-          <div class="chip chip-idle" id="freq-none"  onclick="setFreq('none')">使ってない</div>
-        </div>
       </div>
 
       <!-- 食事入力 -->
@@ -374,21 +366,7 @@ function toggleChip(key){
 }
 
 // ══════════════════════════════════════════════════
-// プロテイン服用頻度（単一選択）
-// ══════════════════════════════════════════════════
-var _freq = 'daily';
-function setFreq(key){
-  ['daily','half','rare','none'].forEach(function(k){
-    var el = document.getElementById('freq-' + k);
-    if(!el) return;
-    if(k === key){ el.classList.add('chip-sel'); el.classList.remove('chip-idle'); }
-    else { el.classList.remove('chip-sel'); el.classList.add('chip-idle'); }
-  });
-  _freq = key;
-}
-
-// ══════════════════════════════════════════════════
-// 食事3択（足りない/足りた/必要以上）
+// 食事4択（食べてない/足りない/足りた/必要以上）
 // ══════════════════════════════════════════════════
 var _mealChoices = { breakfast:'short', lunch:'ok', dinner:'ok' };
 function setMealChoice(btn, meal, val){
@@ -481,8 +459,6 @@ function loadPrev(){
         if(_CHIPS[k]) toggleChip(k);
       });
     }
-    // 服用頻度
-    if(saved.freq) setFreq(saved.freq);
     // 食事の前回値
     if(saved.meal_choices){
       try{
@@ -508,7 +484,6 @@ function saveCurrent(){
     var pg = document.getElementById('pg');
     if(pg) existing.pg = pg.value;
     existing.timing = Array.from(_selectedChips).join(',');
-    existing.freq = _freq;
     existing.meal_choices = JSON.stringify(_mealChoices);
     localStorage.setItem(_STORE, JSON.stringify(existing));
   }catch(e){}
