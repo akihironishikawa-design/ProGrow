@@ -344,6 +344,33 @@ html,body{
 .auth-info-txt{font-size:12px;color:var(--text);line-height:1.45}
 .auth-info-txt strong{color:var(--blue);font-weight:700}
 
+/* デモ用：管理画面遷移セクション */
+.demo-admin-section{
+  margin-top:14px;padding:12px 14px;
+  background:repeating-linear-gradient(45deg,rgba(108,52,131,.04) 0,rgba(108,52,131,.04) 10px,rgba(108,52,131,.07) 10px,rgba(108,52,131,.07) 20px);
+  border:1px dashed rgba(108,52,131,.35);border-radius:11px;
+}
+.demo-admin-label{
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;color:#6C3483;font-weight:600;margin-bottom:8px;
+}
+.demo-badge{
+  font-size:9px;font-weight:800;letter-spacing:.08em;
+  background:#6C3483;color:white;padding:2px 7px;border-radius:99px;
+}
+.demo-admin-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 14px;background:linear-gradient(135deg,#6C3483,#9B4FB5);
+  color:white;border:none;border-radius:9px;
+  font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 4px 12px rgba(108,52,131,.25);transition:all .15s;
+}
+.demo-admin-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(108,52,131,.32)}
+.demo-admin-btn:active{transform:translateY(0)}
+.demo-admin-ico{font-size:14px}
+.demo-admin-arrow{margin-left:4px;font-size:14px;transition:transform .15s}
+.demo-admin-btn:hover .demo-admin-arrow{transform:translateX(3px)}
+
 /* 登録リンク */
 .register-link{
   text-align:center;font-size:13px;color:var(--sub);
@@ -472,6 +499,19 @@ html,body{
           <span class="auth-info-emoji">👔</span>
           <div class="auth-info-txt"><strong>指導者</strong>の方は Google でログイン</div>
         </div>
+      </div>
+
+      <!-- デモ用：管理画面遷移ボタン（実装時は削除予定） -->
+      <div class="demo-admin-section">
+        <div class="demo-admin-label">
+          <span class="demo-badge">DEMO</span>
+          <span>モックアップ確認用</span>
+        </div>
+        <button class="demo-admin-btn" onclick="window.location.href='admin/index.html'">
+          <span class="demo-admin-ico">🛡️</span>
+          <span>管理者画面へ（デモ）</span>
+          <span class="demo-admin-arrow">→</span>
+        </button>
       </div>
 
       <div class="register-link">
