@@ -213,8 +213,16 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
           <div class="prot-ico">💊</div>
           <div style="flex:1">
             <div class="prot-ttl">今日のプロテイン</div>
-            <div class="prot-sub">使用量・タイミング・頻度を記録</div>
+            <div class="prot-sub">種類・使用量・タイミングを記録</div>
           </div>
+        </div>
+
+        <label class="f-lbl" style="margin-bottom:7px">プロテインの種類 <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">複数選択可</span></label>
+        <div class="chip-row" style="flex-wrap:wrap;gap:6px;margin-bottom:14px">
+          <div class="chip chip-sel"  id="prot-nobita-pro" onclick="toggleProteinType('nobita-pro')" style="flex:1 0 calc(50% - 4px);font-size:10.5px">NOBITA Pro</div>
+          <div class="chip chip-idle" id="prot-nobita"     onclick="toggleProteinType('nobita')"     style="flex:1 0 calc(50% - 4px);font-size:10.5px">NOBITA</div>
+          <div class="chip chip-idle" id="prot-whey"       onclick="toggleProteinType('whey')"       style="flex:1 0 calc(50% - 4px);font-size:10.5px">その他ホエイ</div>
+          <div class="chip chip-idle" id="prot-soy"        onclick="toggleProteinType('soy')"        style="flex:1 0 calc(50% - 4px);font-size:10.5px">その他ソイ</div>
         </div>
 
         <label class="f-lbl">今日プロテインで摂取したタンパク質量 <span class="f-req">*</span><span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">前回値が初期入力されます</span></label>
@@ -347,6 +355,30 @@ function adj(id, delta){
 }
 
 // ══════════════════════════════════════════════════
+// プロテインの種類（複数選択）
+// ══════════════════════════════════════════════════
+var _PROT_TYPES = {
+  'nobita-pro': 'NOBITA Pro',
+  'nobita':     'NOBITA',
+  'whey':       'その他ホエイ',
+  'soy':        'その他ソイ'
+};
+var _selectedProteinTypes = new Set(['nobita-pro']);
+function toggleProteinType(key){
+  var el = document.getElementById('prot-' + key);
+  if(!el) return;
+  if(_selectedProteinTypes.has(key)){
+    _selectedProteinTypes.delete(key);
+    el.classList.remove('chip-sel'); el.classList.add('chip-idle');
+    el.textContent = _PROT_TYPES[key];
+  } else {
+    _selectedProteinTypes.add(key);
+    el.classList.add('chip-sel'); el.classList.remove('chip-idle');
+    el.textContent = _PROT_TYPES[key] + ' ✓';
+  }
+}
+
+// ══════════════════════════════════════════════════
 // プロテイン服用タイミング（複数選択）
 // ══════════════════════════════════════════════════
 var _CHIPS = { 'pre-post':'練習前後', 'before':'就寝前', 'morning':'朝食時' };
@@ -445,6 +477,20 @@ function loadPrev(){
       var pg = document.getElementById('pg');
       if(pg) pg.value = saved.pg;
     }
+    // プロテインの種類
+    if(saved.prot_types){
+      var types = saved.prot_types.split(',').filter(Boolean);
+      _selectedProteinTypes = new Set();
+      ['nobita-pro','nobita','whey','soy'].forEach(function(k){
+        var el = document.getElementById('prot-' + k);
+        if(!el) return;
+        el.classList.remove('chip-sel'); el.classList.add('chip-idle');
+        el.textContent = _PROT_TYPES[k];
+      });
+      types.forEach(function(k){
+        if(_PROT_TYPES[k]) toggleProteinType(k);
+      });
+    }
     // 服用タイミング
     if(saved.timing){
       var chips = saved.timing.split(',').filter(Boolean);
@@ -483,6 +529,7 @@ function saveCurrent(){
     var existing = JSON.parse(localStorage.getItem(_STORE) || '{}');
     var pg = document.getElementById('pg');
     if(pg) existing.pg = pg.value;
+    existing.prot_types = Array.from(_selectedProteinTypes).join(',');
     existing.timing = Array.from(_selectedChips).join(',');
     existing.meal_choices = JSON.stringify(_mealChoices);
     localStorage.setItem(_STORE, JSON.stringify(existing));

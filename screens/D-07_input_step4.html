@@ -297,6 +297,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="sum-row"><div class="sum-lbl">朝食</div><span class="sum-val" id="sum-meal-bf">足りない</span></div>
         <div class="sum-row"><div class="sum-lbl">昼食</div><span class="sum-val" id="sum-meal-lc">足りた</span></div>
         <div class="sum-row"><div class="sum-lbl">夕食</div><span class="sum-val" id="sum-meal-dn">足りた</span></div>
+        <div class="sum-row"><div class="sum-lbl">プロテインの種類</div><span class="sum-val" id="sum-prot-types">NOBITA Pro</span></div>
         <div class="sum-row"><div class="sum-lbl">プロテイン摂取量</div><span class="sum-val" id="sum-pg">20 g</span></div>
       </div>
       <div class="card" style="margin-bottom:10px">
@@ -348,6 +349,14 @@ window.addEventListener('load', function(){
       }catch(e){}
     }
     if(saved.pg)  _set('sum-pg', saved.pg + ' g');
+
+    // プロテインの種類
+    var protLbl = { 'nobita-pro':'NOBITA Pro', 'nobita':'NOBITA', 'whey':'その他ホエイ', 'soy':'その他ソイ' };
+    if(saved.prot_types){
+      var keys = saved.prot_types.split(',').filter(Boolean);
+      var names = keys.map(function(k){ return protLbl[k] || k; });
+      _set('sum-prot-types', names.length ? names.join('・') : '未選択');
+    }
 
     // 生活習慣
     if(saved.sleep) _set('sum-slp', saved.sleep + 'h');
