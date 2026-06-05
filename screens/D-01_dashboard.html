@@ -248,17 +248,22 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .per-tab{flex:1;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:500;color:var(--sub);cursor:pointer}
 .per-tab.act{background:white;color:var(--blue);font-weight:700;box-shadow:0 1px 4px rgba(11,29,53,.1)}
 
-/* Maxポテンシャルカード */
+/* Maxポテンシャルカード（ヘッダー埋め込み版・暗背景用） */
 .max-pot-card{
-  background:linear-gradient(135deg,#E8FAF0,#EBF3FF);
-  border:1.5px solid rgba(6,199,85,.3);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:12px;
-  display:flex;align-items:center;gap:13px;
+  background:linear-gradient(135deg,rgba(6,199,85,.18),rgba(30,111,217,.18));
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  padding:11px 13px;
+  margin-top:9px;
+  display:flex;align-items:center;gap:11px;
   position:relative;overflow:hidden;
-  box-shadow:0 4px 14px rgba(11,29,53,.08);
+  box-shadow:0 3px 10px rgba(0,0,0,.18);
 }
+.max-pot-card .max-pot-lbl{color:rgba(255,255,255,.7) !important}
+.max-pot-card .max-pot-val{color:white !important}
+.max-pot-card .max-pot-unit{color:rgba(255,255,255,.7) !important}
+.max-pot-card .max-pot-sub{color:rgba(255,255,255,.65) !important}
+.max-pot-card .max-pot-delta{background:rgba(6,199,85,.25) !important;color:#A8E6CF !important}
 .max-pot-card::after{
   content:'';position:absolute;
   width:120px;height:120px;border-radius:50%;
@@ -476,6 +481,23 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="stat-box" title="最後に入力した骨端線幅"><div class="stat-u">骨端線幅</div><div class="stat-v" id="stat-epiphysis" style="color:#FFD580">3.2</div><div class="stat-l">mm</div></div>
         <div class="stat-box" title="体重 × 2 = 必要なタンパク質量"><div class="stat-u">タンパク質目安</div><div class="stat-v" id="stat-protein" style="color:#FFB088">104.6</div><div class="stat-l">g / 日</div></div>
       </div>
+
+      <!-- Maxポテンシャル身長（ヘッダー内） -->
+      <div class="max-pot-card">
+        <div class="max-pot-ico">🚀</div>
+        <div class="max-pot-body">
+          <div class="max-pot-lbl">Maxポテンシャル身長 <span class="max-pot-badge">PREDICTED</span></div>
+          <div class="max-pot-row">
+            <span class="max-pot-val" id="max-pot-val">188.0</span>
+            <span class="max-pot-unit">cm</span>
+          </div>
+          <div class="max-pot-sub">
+            <span>現在身長から</span>
+            <span class="max-pot-delta" id="max-pot-delta">+25.6 cm</span>
+            <span>の伸びしろ</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="scroll">
 
@@ -496,23 +518,6 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <span style="font-size:16px">✓</span>
         <span style="flex:1">今日の記録は完了しています</span>
         <span style="font-size:10px;color:var(--sub);font-weight:500;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();location.href='D-08_history.html'">修正</span>
-      </div>
-
-      <!-- Maxポテンシャル身長 -->
-      <div class="max-pot-card">
-        <div class="max-pot-ico">🚀</div>
-        <div class="max-pot-body">
-          <div class="max-pot-lbl">Maxポテンシャル身長 <span class="max-pot-badge">PREDICTED</span></div>
-          <div class="max-pot-row">
-            <span class="max-pot-val" id="max-pot-val">188.0</span>
-            <span class="max-pot-unit">cm</span>
-          </div>
-          <div class="max-pot-sub">
-            <span>現在身長から</span>
-            <span class="max-pot-delta" id="max-pot-delta">+25.6 cm</span>
-            <span>の伸びしろ</span>
-          </div>
-        </div>
       </div>
 
       <div class="card">
