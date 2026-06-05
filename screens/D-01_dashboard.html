@@ -479,6 +479,25 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
     </div>
     <div class="scroll">
 
+      <!-- 今日の入力CTA（未入力時のみ表示） -->
+      <div id="today-cta" style="display:none;background:linear-gradient(135deg,#1E6FD9,#06C755);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:white;box-shadow:0 4px 16px rgba(30,111,217,.25);cursor:pointer" onclick="location.href='D-04_input_step1.html'">
+        <div style="display:flex;align-items:center;gap:13px">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">✏️</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:800;letter-spacing:-.01em">今日の記録がまだです</div>
+            <div style="font-size:11px;opacity:.9;margin-top:2px">タップして約2分で入力 ›</div>
+          </div>
+          <div style="font-size:18px;font-weight:300;opacity:.7">→</div>
+        </div>
+      </div>
+
+      <!-- 今日の入力済み表示（入力済時） -->
+      <div id="today-done" style="display:none;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ok);font-weight:600">
+        <span style="font-size:16px">✓</span>
+        <span style="flex:1">今日の記録は完了しています</span>
+        <span style="font-size:10px;color:var(--sub);font-weight:500;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();location.href='D-08_history.html'">修正</span>
+      </div>
+
       <!-- Maxポテンシャル身長 -->
       <div class="max-pot-card">
         <div class="max-pot-ico">🚀</div>
@@ -518,7 +537,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="card-hdr"><div class="card-title">💪 コンディション</div><span class="more-link" onclick="location.href='D-02_condition.html'" style="cursor:pointer">詳細 ›</span></div>
         <div class="cond-grid">
           <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#27AE60" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="24.9" stroke-linecap="round"/></svg><div class="ring-val">82</div></div><div class="cond-name">睡眠</div><div class="cond-bdg" style="background:var(--ok-bg);color:var(--ok)">良好</div></div>
-          <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#E8A030" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="55.3" stroke-linecap="round"/></svg><div class="ring-val" style="color:var(--warn)">60</div></div><div class="cond-name">栄養</div><div class="cond-bdg" style="background:var(--warn-bg);color:var(--warn)">注意</div></div>
+          <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" id="prot-ring" stroke="#E8A030" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="55.3" stroke-linecap="round"/></svg><div class="ring-val" id="prot-ring-val" style="color:var(--warn)">66</div></div><div class="cond-name" style="font-size:9.5px">タンパク質</div><div class="cond-bdg" id="prot-ring-bdg" style="background:var(--warn-bg);color:var(--warn)">注意</div></div>
           <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#E53E3E" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="81.4" stroke-linecap="round"/></svg><div class="ring-val" style="color:var(--danger)">41</div></div><div class="cond-name">練習</div><div class="cond-bdg" style="background:var(--danger-bg);color:var(--danger)">過負荷</div></div>
         </div>
       </div>
@@ -526,12 +545,12 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="prot-card">
         <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
           <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1E6FD9,#06C755);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💊</div>
-          <div><div style="font-size:13px;font-weight:700;color:var(--navy)">NOBITAプロテイン 使用中</div><div style="font-size:10px;color:var(--sub)">開始から90日目</div></div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--navy)" id="prot-card-ttl">プロテイン記録</div><div style="font-size:10px;color:var(--sub)" id="prot-card-sub">使用中：NOBITA Pro</div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
-          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">開始日</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">2026/1/10</div></div>
-          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">使用量</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">20g/日</div></div>
-          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">身長増加</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ok)">+3.2cm</div></div>
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">今日の量</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)" id="prot-card-today">20g</div></div>
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">直近30日平均</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">18g/日</div></div>
+          <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">使用日数</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)">27/30日</div></div>
         </div>
       </div>
     </div>
@@ -626,6 +645,101 @@ function renderHeaderStats(){
   } catch(e){}
 }
 window.addEventListener('load', renderHeaderStats);
+
+// ══════════════════════════════════════════════════════════════
+// ホーム画面最適化：今日の入力CTA / プロテインカード / タンパク質達成率
+// ══════════════════════════════════════════════════════════════
+function _todayStr(){
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// 今日の入力済みかチェックして CTA / 完了表示を切り替え
+function renderTodayCta(){
+  try{
+    var hist = JSON.parse(localStorage.getItem('nobita_history') || '[]');
+    var today = _todayStr();
+    var done = hist.indexOf(today) !== -1;
+    var ctaEl = document.getElementById('today-cta');
+    var doneEl = document.getElementById('today-done');
+    if(ctaEl)  ctaEl.style.display  = done ? 'none' : 'block';
+    if(doneEl) doneEl.style.display = done ? 'flex' : 'none';
+  }catch(e){
+    // エラー時はCTA表示
+    var ctaEl = document.getElementById('today-cta');
+    if(ctaEl) ctaEl.style.display = 'block';
+  }
+}
+
+// プロテインカードを localStorage の最新値で更新
+function renderProteinCard(){
+  try{
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    var todayEl = document.getElementById('prot-card-today');
+    var subEl = document.getElementById('prot-card-sub');
+
+    // 今日の摂取量
+    if(todayEl){
+      if(s.pg !== undefined) todayEl.textContent = s.pg + 'g';
+      else todayEl.textContent = '— g';
+    }
+
+    // 使用中の種類（複数選択を併記）
+    if(subEl && s.prot_types){
+      var protLbl = { 'nobita-pro':'NOBITA Pro', 'nobita':'NOBITA', 'whey':'その他ホエイ', 'soy':'その他ソイ' };
+      var keys = (s.prot_types || '').split(',').filter(Boolean);
+      var names = keys.map(function(k){ return protLbl[k] || k; });
+      subEl.textContent = names.length ? '使用中：' + names.join('・') : '種類未選択';
+    }
+  }catch(e){}
+}
+
+// タンパク質達成率リング（今日の摂取 / 必要量）
+function renderProteinRing(){
+  try{
+    var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
+    var weight = parseFloat(s.wt) || 52.3;
+    var need = weight * 2;  // 必要量 g
+
+    // 今日の摂取量を集計（食事3食 + プロテイン）
+    var perMeal = { none:0, short:8, ok:15, over:22 };
+    var mealTotal = 0;
+    if(s.meal_choices){
+      try{
+        var mc = JSON.parse(s.meal_choices);
+        mealTotal = (perMeal[mc.breakfast] || 0) + (perMeal[mc.lunch] || 0) + (perMeal[mc.dinner] || 0);
+      }catch(e){}
+    } else {
+      // 未入力時のデフォルト
+      mealTotal = 38;  // 朝足りない+昼足りた+夜足りた = 8+15+15
+    }
+    var pg = parseFloat(s.pg) || 20;
+    var total = mealTotal + pg;
+    var pct = Math.min(100, Math.round(total / need * 100));
+
+    // リング更新
+    var circumference = 138.2;
+    var offset = circumference * (1 - pct / 100);
+    var ring = document.getElementById('prot-ring');
+    var val = document.getElementById('prot-ring-val');
+    var bdg = document.getElementById('prot-ring-bdg');
+    if(ring) ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+    if(val) val.textContent = pct;
+
+    // 色とバッジ
+    var color, bg, bdgTxt;
+    if(pct >= 100){ color = 'var(--ok)'; bg = 'var(--ok-bg)'; bdgTxt = '達成'; }
+    else if(pct >= 70){ color = 'var(--warn)'; bg = 'var(--warn-bg)'; bdgTxt = '注意'; }
+    else { color = 'var(--danger)'; bg = 'var(--danger-bg)'; bdgTxt = '不足'; }
+    if(ring) ring.setAttribute('stroke', color === 'var(--ok)' ? '#27AE60' : color === 'var(--warn)' ? '#E8A030' : '#E53E3E');
+    if(val) val.style.color = color;
+    if(bdg){ bdg.textContent = bdgTxt; bdg.style.background = bg; bdg.style.color = color; }
+  }catch(e){}
+}
+
+window.addEventListener('load', renderTodayCta);
+window.addEventListener('load', renderProteinCard);
+window.addEventListener('load', renderProteinRing);
 
 // ══════════════════════════════════════════════════════════════
 // 通知ドロップダウン
