@@ -465,7 +465,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="hdr-top" style="margin-top:6px">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5DADE2,#06C755);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--navy);border:2px solid rgba(255,255,255,.3)">山</div>
-          <div><div style="font-size:14px;font-weight:700;color:white">山田 太郎</div><div style="font-size:10px;color:rgba(255,255,255,.55)">中学2年 ／ 東京FC ジュニア</div></div>
+          <div><div style="font-size:14px;font-weight:700;color:white">山田 太郎</div><div style="font-size:10px;color:rgba(255,255,255,.55)" id="user-team-line">中学2年 ／ 東京FC ジュニア</div></div>
         </div>
         <div class="hdr-actions">
           <div class="bell-wrap" id="bell-trigger" onclick="toggleNotif(event)" role="button" aria-label="通知" tabindex="0">
@@ -506,6 +506,25 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
     </div>
     <div class="scroll">
 
+      <!-- 未所属時の「チームに参加」CTA -->
+      <div id="no-team-cta" style="display:none;background:linear-gradient(135deg,#E8A030,#C47010);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:white;box-shadow:0 4px 16px rgba(232,160,48,.3);cursor:pointer" onclick="location.href='B-01_team_join.html'">
+        <div style="display:flex;align-items:center;gap:13px">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">🏅</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:800;letter-spacing:-.01em">チームに参加してより充実した管理を</div>
+            <div style="font-size:11px;opacity:.9;margin-top:2px">指導者からのアドバイスを受け取れます ›</div>
+          </div>
+          <div style="font-size:18px;font-weight:300;opacity:.7">→</div>
+        </div>
+      </div>
+
+      <!-- デモ用：所属状態切替バナー（実装時は削除推奨） -->
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(11,29,53,.04);border:1px dashed rgba(11,29,53,.18);border-radius:9px;padding:8px 11px;margin-bottom:12px;font-size:10px;color:var(--sub)">
+        <span>🔄</span>
+        <span style="flex:1">デモ：所属状態を切り替えて表示確認</span>
+        <button onclick="toggleTeamStatus()" id="team-status-btn" style="padding:4px 10px;border:1px solid var(--border);background:white;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--blue)">所属中</button>
+      </div>
+
       <!-- 今日の入力CTA（未入力時のみ表示） -->
       <div id="today-cta" style="display:none;background:linear-gradient(135deg,#1E6FD9,#06C755);border-radius:14px;padding:14px 16px;margin-bottom:12px;color:white;box-shadow:0 4px 16px rgba(30,111,217,.25);cursor:pointer" onclick="location.href='D-04_input_step1.html'">
         <div style="display:flex;align-items:center;gap:13px">
@@ -544,7 +563,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
           <div class="cond-box"><div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="22" fill="none" stroke="#EEF2F7" stroke-width="6"/><circle cx="29" cy="29" r="22" fill="none" stroke="#E53E3E" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="81.4" stroke-linecap="round"/></svg><div class="ring-val" style="color:var(--danger)">41</div></div><div class="cond-name">練習</div><div class="cond-bdg" style="background:var(--danger-bg);color:var(--danger)">過負荷</div></div>
         </div>
       </div>
-      <div class="al al-r"><div class="al-top"><div class="al-ico">🔴</div><div style="flex:1"><div class="al-ttl">練習過負荷<span class="badge b-bad">未対応</span></div><div class="al-meta">週7日・3.5h継続中</div></div></div><div style="font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;margin-top:3px"><span onclick="location.href='D-03_alerts.html'" style="cursor:pointer">→ アラート一覧を見る</span></div></div>
+      <div class="al al-r" id="alert-overload"><div class="al-top"><div class="al-ico">🔴</div><div style="flex:1"><div class="al-ttl">練習過負荷<span class="badge b-bad">未対応</span></div><div class="al-meta">週7日・3.5h継続中</div></div></div><div style="font-size:11px;color:var(--blue);font-weight:600;cursor:pointer;margin-top:3px"><span onclick="location.href='D-03_alerts.html'" style="cursor:pointer">→ アラート一覧を見る</span></div></div>
       <div class="prot-card">
         <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
           <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1E6FD9,#06C755);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💊</div>
@@ -668,6 +687,62 @@ function _todayStr(){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
+// ══════════════════════════════════════════════════════════════
+// 所属状態モード切替（B-02を統合）
+// localStorage キー: progrow_team_status
+//   'joined'   : チームに所属中（デフォルト・通常表示）
+//   'no_team'  : 未所属（チーム参加CTA表示・アラート非表示）
+// ══════════════════════════════════════════════════════════════
+function applyTeamStatus(){
+  var status = 'joined';
+  try { status = localStorage.getItem('progrow_team_status') || 'joined'; } catch(e){}
+  var isNoTeam = (status === 'no_team');
+
+  // ヘッダーのチーム名行
+  var teamLine = document.getElementById('user-team-line');
+  if(teamLine){
+    teamLine.textContent = isNoTeam
+      ? '中学2年 ／ ⚠ 未所属'
+      : '中学2年 ／ 東京FC ジュニア';
+  }
+
+  // 未所属時CTA表示
+  var noTeamCta = document.getElementById('no-team-cta');
+  if(noTeamCta) noTeamCta.style.display = isNoTeam ? 'block' : 'none';
+
+  // 練習過負荷アラートは指導者判定なので未所属時は非表示
+  var alertOverload = document.getElementById('alert-overload');
+  if(alertOverload) alertOverload.style.display = isNoTeam ? 'none' : '';
+
+  // 通知ベルは未所属時は表示するが、通知件数のロジック上「コーチからの通知」分は減る
+  // モックアップではバッジ件数を 3→0 に変更
+  var bellBadge = document.getElementById('bell-badge');
+  if(bellBadge){
+    if(isNoTeam){
+      bellBadge.textContent = '';
+      bellBadge.classList.add('hidden');
+    }
+  }
+
+  // デモトグルボタンのラベル更新
+  var btn = document.getElementById('team-status-btn');
+  if(btn) btn.textContent = isNoTeam ? '未所属' : '所属中';
+}
+
+// デモ用：トグル
+function toggleTeamStatus(){
+  var current = 'joined';
+  try { current = localStorage.getItem('progrow_team_status') || 'joined'; } catch(e){}
+  var next = current === 'joined' ? 'no_team' : 'joined';
+  try { localStorage.setItem('progrow_team_status', next); } catch(e){}
+  applyTeamStatus();
+  // 通知データ・プロテイン・各種カードも再レンダリングして整合性確保
+  try{ if(typeof _renderNotif === 'function') _renderNotif(); }catch(e){}
+  toast(next === 'no_team' ? '👤 未所属モードに切替' : '🏅 所属中モードに切替');
+}
+
+window.addEventListener('load', applyTeamStatus);
+
 // 今日の入力済みかチェックして CTA を表示／非表示
 function renderTodayCta(){
   try{
@@ -762,7 +837,8 @@ var _NOTIFICATIONS = [
     desc:'プロフィール登録の練習時間（3.5h/日・週7日）が推奨を超えています。休息日の確保を検討してください。',
     time:'3日前',
     tagCls:'notif-tag-r', tagText:'重要',
-    href:'D-03_alerts.html'
+    href:'D-03_alerts.html',
+    coachOnly:true
   },
   {
     id:'n3', icoCls:'notif-ico-y', ico:'🍱',
@@ -786,7 +862,8 @@ var _NOTIFICATIONS = [
     desc:'田中コーチ：「毎日の入力ありがとう。練習前後のプロテイン摂取を続けてください。」',
     time:'1週間前',
     tagCls:'notif-tag-g', tagText:'コメント',
-    href:'D-02_condition.html'
+    href:'D-02_condition.html',
+    coachOnly:true
   }
 ];
 
@@ -808,7 +885,16 @@ function _renderNotif(){
   var unreadCount = 0;
   var html = '';
 
-  _NOTIFICATIONS.forEach(function(n){
+  // 所属状態によるフィルタ
+  var status = 'joined';
+  try { status = localStorage.getItem('progrow_team_status') || 'joined'; } catch(e){}
+  var isNoTeam = (status === 'no_team');
+
+  var visibleNotifs = _NOTIFICATIONS.filter(function(n){
+    return !(isNoTeam && n.coachOnly);
+  });
+
+  visibleNotifs.forEach(function(n){
     var isUnread = readIds.indexOf(n.id) === -1;
     if(isUnread) unreadCount++;
     html +=
@@ -827,7 +913,7 @@ function _renderNotif(){
       '</div>';
   });
 
-  if(_NOTIFICATIONS.length === 0){
+  if(visibleNotifs.length === 0){
     html =
       '<div class="notif-empty">' +
         '<div class="notif-empty-ico">🔕</div>' +
