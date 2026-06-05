@@ -87,6 +87,62 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 
 /* ─ KPI ─ */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+
+/* ══ チームIDバナー ══ */
+.team-id-banner{
+  background:linear-gradient(135deg,#0FB8A0 0%,#1E6FD9 100%);
+  border-radius:16px;padding:20px 24px;margin-bottom:20px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;
+  box-shadow:0 8px 24px rgba(15,184,160,.22);position:relative;overflow:hidden;
+}
+.team-id-banner::after{
+  content:'';position:absolute;width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.06);right:-60px;top:-60px;pointer-events:none;
+}
+.team-id-banner::before{
+  content:'';position:absolute;width:140px;height:140px;border-radius:50%;
+  background:rgba(255,255,255,.04);left:30%;bottom:-70px;pointer-events:none;
+}
+.tid-left{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.tid-icon{
+  width:54px;height:54px;border-radius:14px;background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  border:1.5px solid rgba(255,255,255,.25);flex-shrink:0;
+}
+.tid-info{color:white;min-width:0}
+.tid-team-name{font-size:18px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.tid-team-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:3px;font-weight:500}
+
+.tid-center{text-align:center;position:relative;z-index:1;color:white}
+.tid-label{
+  font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);margin-bottom:6px;
+}
+.tid-value{
+  font-family:var(--mono);font-size:32px;font-weight:800;letter-spacing:.05em;
+  background:rgba(255,255,255,.15);border:1.5px dashed rgba(255,255,255,.4);
+  padding:6px 22px;border-radius:12px;display:inline-block;color:white;
+  text-shadow:0 1px 2px rgba(0,0,0,.15);
+}
+
+.tid-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;position:relative;z-index:1}
+.tid-copy-btn{
+  display:flex;align-items:center;gap:6px;padding:9px 18px;
+  background:white;color:var(--teal);border:none;border-radius:10px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);transition:all .15s;
+}
+.tid-copy-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.tid-copy-btn:active{transform:translateY(0)}
+.tid-copy-ico{font-size:14px}
+.tid-hint{font-size:10px;color:rgba(255,255,255,.8);font-weight:500;text-align:right}
+
+/* 1200px以下では中央寄せに */
+@media (max-width:1200px){
+  .team-id-banner{grid-template-columns:1fr;text-align:center;gap:14px;padding:18px 20px}
+  .tid-left{justify-content:center}
+  .tid-right{align-items:center}
+}
 .kpi{background:var(--card);border-radius:13px;padding:16px 18px;border:1px solid var(--bdr);position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(11,29,53,.05)}
 .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:13px 13px 0 0}
 .kpi-t::before{background:linear-gradient(90deg,var(--teal),var(--sky))}
@@ -862,6 +918,28 @@ select.ts-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg 
 
     <!-- E-01 ダッシュボード -->
     <div class="screen active" id="s-dashboard">
+
+      <!-- チームIDバナー -->
+      <div class="team-id-banner">
+        <div class="tid-left">
+          <div class="tid-icon">🏅</div>
+          <div class="tid-info">
+            <div class="tid-team-name">東京FC ジュニア</div>
+            <div class="tid-team-sub">サッカー ／ U-15 ／ 東京都</div>
+          </div>
+        </div>
+        <div class="tid-center">
+          <div class="tid-label">チームID</div>
+          <div class="tid-value" id="tid-value">TKY-FC-J-2026-001</div>
+        </div>
+        <div class="tid-right">
+          <button class="tid-copy-btn" onclick="copyTeamId()" title="チームIDをコピー">
+            <span class="tid-copy-ico">📋</span><span class="tid-copy-lbl">コピー</span>
+          </button>
+          <div class="tid-hint">選手の加入時に共有してください</div>
+        </div>
+      </div>
+
       <div class="kpi-row">
         <div class="kpi kpi-t"><div class="kpi-lbl">チーム平均身長</div><div class="kpi-val">163.2<span class="kpi-unit">cm</span></div><div class="kpi-diff kd-ok">↑ 先月比 +0.8cm</div></div>
         <div class="kpi kpi-a"><div class="kpi-lbl">測定未入力</div><div class="kpi-val">3<span class="kpi-unit">名</span></div><div class="kpi-diff kd-warn">今月入力率 86%</div></div>
@@ -2449,6 +2527,33 @@ function toggleTs(el){
     el.classList.remove('ts-tgl-on'); el.classList.add('ts-tgl-off');
   } else {
     el.classList.remove('ts-tgl-off'); el.classList.add('ts-tgl-on');
+  }
+}
+
+// ── チームIDをコピー ──
+function copyTeamId(){
+  var idEl = document.getElementById('tid-value');
+  if(!idEl) return;
+  var id = idEl.textContent.trim();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(id).then(function(){
+      toast('📋 チームID「' + id + '」をコピーしました');
+    }).catch(function(){
+      _fallbackCopy(id);
+    });
+  } else {
+    _fallbackCopy(id);
+  }
+}
+function _fallbackCopy(text){
+  try{
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    toast('📋 チームID「' + text + '」をコピーしました');
+  }catch(e){
+    toast('⚠ コピーに失敗しました');
   }
 }
 
