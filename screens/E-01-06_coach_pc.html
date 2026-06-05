@@ -1318,28 +1318,50 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
           </div>
         </div>
 
-        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(11,29,53,.04)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="font-size:13px;font-weight:800;color:var(--text)">👥 招待中の指導者</div>
-            <div style="font-size:10px;color:var(--muted)">合計 2名</div>
-          </div>
-          <div id="invite-list">
-            <div class="inv-row">
-              <div class="inv-av" style="background:linear-gradient(135deg,#FF6B6B,#FF9B7A)">山</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:var(--text)">山田 太郎</div>
-                <div style="font-size:10px;color:var(--muted)">yamada@example.com</div>
-              </div>
-              <div class="inv-tag inv-tag-ok">✓ 参加済</div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(11,29,53,.04);display:flex;flex-direction:column;gap:14px">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:800;color:var(--text)">👥 参加中の指導者</div>
+              <div style="font-size:10px;color:var(--muted)" id="member-count">合計 2名</div>
             </div>
-            <div class="inv-row">
-              <div class="inv-av" style="background:linear-gradient(135deg,#5DADE2,#1E6FD9)">佐</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:12px;font-weight:700;color:var(--text)">佐藤 健</div>
-                <div style="font-size:10px;color:var(--muted)">sato@example.com</div>
+            <div id="member-list">
+              <div class="inv-row">
+                <div class="inv-av" style="background:linear-gradient(135deg,#38B2AC,#0FB8A0)">田</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:700;color:var(--text)">田中 コーチ <span style="font-size:9px;color:var(--teal);font-weight:700;margin-left:4px;padding:1px 6px;border-radius:99px;background:rgba(56,178,172,.12)">自分</span></div>
+                  <div style="font-size:10px;color:var(--muted)">tanaka@progrow.app</div>
+                </div>
+                <div class="inv-tag inv-tag-ok">✓ オーナー</div>
               </div>
-              <div class="inv-tag inv-tag-pending">⏳ 招待中</div>
-              <button class="inv-x" onclick="cancelInvite(this)" title="招待を取り消す">✕</button>
+              <div class="inv-row">
+                <div class="inv-av" style="background:linear-gradient(135deg,#FF6B6B,#FF9B7A)">山</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:700;color:var(--text)">山田 太郎</div>
+                  <div style="font-size:10px;color:var(--muted)">yamada@example.com</div>
+                </div>
+                <div class="inv-tag inv-tag-ok">✓ 参加中</div>
+                <button class="inv-x" onclick="removeMember(this)" title="チームから削除">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:var(--border)"></div>
+
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:800;color:var(--text)">⏳ 招待中の指導者</div>
+              <div style="font-size:10px;color:var(--muted)" id="invite-count">合計 1名</div>
+            </div>
+            <div id="invite-list">
+              <div class="inv-row">
+                <div class="inv-av" style="background:linear-gradient(135deg,#5DADE2,#1E6FD9)">佐</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;font-weight:700;color:var(--text)">佐藤 健</div>
+                  <div style="font-size:10px;color:var(--muted)">sato@example.com</div>
+                </div>
+                <div class="inv-tag inv-tag-pending">⏳ 招待中</div>
+                <button class="inv-x" onclick="cancelInvite(this)" title="招待を取り消す">✕</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1979,6 +2001,7 @@ function sendInvite(){
   var msgInput = document.getElementById('inv-msg');
   if(emailInput) emailInput.value = '';
   if(msgInput) msgInput.value = '';
+  _updateInviteCount();
   toast('📤 ' + email + ' に招待を送信しました');
 }
 
@@ -1989,7 +2012,42 @@ function cancelInvite(btn){
     row.style.transition = 'all .3s';
     row.style.opacity = '0';
     row.style.transform = 'translateX(-20px)';
-    setTimeout(function(){ row.remove(); toast('招待を取り消しました'); }, 300);
+    setTimeout(function(){
+      row.remove();
+      _updateInviteCount();
+      toast('招待を取り消しました');
+    }, 300);
+  }
+}
+
+function removeMember(btn){
+  var row = btn.closest('.inv-row');
+  if(!row) return;
+  var nameEl = row.querySelector('div[style*="font-weight:700"]');
+  var name = nameEl ? (nameEl.textContent || '').replace('自分','').trim() : '';
+  if(!confirm((name || 'この指導者') + ' をチームから削除しますか？\nこの指導者は選手データへのアクセスができなくなります。')) return;
+  row.style.transition = 'all .3s';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(-20px)';
+  setTimeout(function(){
+    row.remove();
+    _updateMemberCount();
+    toast('チームから削除しました');
+  }, 300);
+}
+
+function _updateMemberCount(){
+  var list = document.getElementById('member-list');
+  var counter = document.getElementById('member-count');
+  if(list && counter){
+    counter.textContent = '合計 ' + list.children.length + '名';
+  }
+}
+function _updateInviteCount(){
+  var list = document.getElementById('invite-list');
+  var counter = document.getElementById('invite-count');
+  if(list && counter){
+    counter.textContent = '合計 ' + list.children.length + '名';
   }
 }
 
