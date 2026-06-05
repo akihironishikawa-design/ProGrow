@@ -332,6 +332,18 @@ html,body{
 .submit-btn.loading .btn-text{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+/* 認証方式案内 */
+.auth-info{
+  margin-top:18px;padding:14px 16px;
+  background:linear-gradient(135deg,#EBF3FF,#E8FAF0);
+  border:1px solid rgba(30,111,217,.15);border-radius:11px;
+  display:flex;flex-direction:column;gap:9px;
+}
+.auth-info-row{display:flex;align-items:center;gap:10px}
+.auth-info-emoji{font-size:18px;flex-shrink:0;width:22px;text-align:center}
+.auth-info-txt{font-size:12px;color:var(--text);line-height:1.45}
+.auth-info-txt strong{color:var(--blue);font-weight:700}
+
 /* 登録リンク */
 .register-link{
   text-align:center;font-size:13px;color:var(--sub);
@@ -450,44 +462,17 @@ html,body{
         </button>
       </div>
 
-      <div class="divider">またはメールアドレスで</div>
-
-      <!-- メールフォーム -->
-      <div class="field">
-        <label class="field-label" for="email">メールアドレス</label>
-        <div class="field-wrap">
-          <input class="field-input" id="email" type="email"
-            placeholder="example@email.com"
-            oninput="clearError(this)"
-            onkeydown="if(event.key==='Enter')document.getElementById('password').focus()">
-          <span class="field-icon">✉</span>
+      <!-- 認証方式の案内 -->
+      <div class="auth-info">
+        <div class="auth-info-row">
+          <span class="auth-info-emoji">📱</span>
+          <div class="auth-info-txt"><strong>選手・保護者</strong>の方は LINE でログイン</div>
         </div>
-        <div class="field-error" id="email-error">
-          <span>⚠</span><span>メールアドレスを正しく入力してください</span>
+        <div class="auth-info-row">
+          <span class="auth-info-emoji">👔</span>
+          <div class="auth-info-txt"><strong>指導者</strong>の方は Google でログイン</div>
         </div>
       </div>
-
-      <div class="field">
-        <div class="pw-row">
-          <label class="field-label" for="password" style="margin-bottom:0">パスワード</label>
-          <a class="forgot" onclick="showToast('パスワードリセットメールを送信しました')">パスワードを忘れた方</a>
-        </div>
-        <div class="field-wrap">
-          <input class="field-input" id="password" type="password"
-            placeholder="8文字以上"
-            oninput="clearError(this)"
-            onkeydown="if(event.key==='Enter')submitLogin()">
-          <button class="field-toggle" onclick="togglePw()" id="pw-toggle" tabindex="-1">👁</button>
-        </div>
-        <div class="field-error" id="pw-error">
-          <span>⚠</span><span>パスワードを入力してください</span>
-        </div>
-      </div>
-
-      <button class="submit-btn" id="submit-btn" onclick="submitLogin()">
-        <div class="spinner"></div>
-        <span class="btn-text">ログイン　→</span>
-      </button>
 
       <div class="register-link">
         アカウントをお持ちでない方は
@@ -508,52 +493,6 @@ html,body{
 <div id="toast"></div>
 
 <script>
-let pwVisible = false;
-
-function togglePw(){
-  pwVisible = !pwVisible;
-  const inp = document.getElementById('password');
-  const btn = document.getElementById('pw-toggle');
-  inp.type = pwVisible ? 'text' : 'password';
-  btn.textContent = pwVisible ? '🙈' : '👁';
-}
-
-function clearError(el){
-  el.classList.remove('error');
-  const err = document.getElementById(el.id + '-error');
-  if(err) err.classList.remove('show');
-}
-
-function validateEmail(v){
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-}
-
-function submitLogin(){
-  const email = document.getElementById('email');
-  const pw    = document.getElementById('password');
-  let ok = true;
-
-  if(!validateEmail(email.value)){
-    email.classList.add('error');
-    document.getElementById('email-error').classList.add('show');
-    ok = false;
-  }
-  if(pw.value.length < 1){
-    pw.classList.add('error');
-    document.getElementById('pw-error').classList.add('show');
-    ok = false;
-  }
-  if(!ok) return;
-
-  // ローディング
-  const btn = document.getElementById('submit-btn');
-  btn.classList.add('loading');
-
-  setTimeout(() => {
-    window.location.href = 'screens/D-01_dashboard.html';
-  }, 1000);
-}
-
 function handleLogin(type){
   const btn = event.currentTarget;
   btn.style.opacity = '.7';
