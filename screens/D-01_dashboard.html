@@ -518,14 +518,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         </div>
       </div>
 
-      <!-- 今日の入力済み表示（入力済時） -->
-      <div id="today-done" style="display:none;background:rgba(39,174,96,.08);border:1px solid rgba(39,174,96,.25);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--ok);font-weight:600">
-        <span style="font-size:16px">✓</span>
-        <span style="flex:1">今日の記録は完了しています</span>
-        <span style="font-size:10px;color:var(--sub);font-weight:500;cursor:pointer;text-decoration:underline" onclick="event.stopPropagation();location.href='D-08_history.html'">修正</span>
-      </div>
-
-      <div class="card">
+<div class="card">
         <div class="card-hdr"><div class="card-title">📈 身長・体重推移</div><span class="more-link" onclick="location.href='D-02_condition.html'" style="cursor:pointer">詳細 ›</span></div>
         <div style="display:flex;gap:14px;justify-content:center;margin-bottom:8px;font-size:10px">
           <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#1E6FD9;border-radius:99px;display:inline-block"></span><span style="color:var(--sub);font-weight:600">身長(cm)</span></div>
@@ -675,18 +668,15 @@ function _todayStr(){
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-// 今日の入力済みかチェックして CTA / 完了表示を切り替え
+// 今日の入力済みかチェックして CTA を表示／非表示
 function renderTodayCta(){
   try{
     var hist = JSON.parse(localStorage.getItem('nobita_history') || '[]');
     var today = _todayStr();
     var done = hist.indexOf(today) !== -1;
     var ctaEl = document.getElementById('today-cta');
-    var doneEl = document.getElementById('today-done');
-    if(ctaEl)  ctaEl.style.display  = done ? 'none' : 'block';
-    if(doneEl) doneEl.style.display = done ? 'flex' : 'none';
+    if(ctaEl) ctaEl.style.display = done ? 'none' : 'block';
   }catch(e){
-    // エラー時はCTA表示
     var ctaEl = document.getElementById('today-cta');
     if(ctaEl) ctaEl.style.display = 'block';
   }
