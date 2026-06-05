@@ -248,22 +248,28 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 .per-tab{flex:1;text-align:center;padding:6px;border-radius:7px;font-size:11px;font-weight:500;color:var(--sub);cursor:pointer}
 .per-tab.act{background:white;color:var(--blue);font-weight:700;box-shadow:0 1px 4px rgba(11,29,53,.1)}
 
-/* Maxポテンシャルカード（ヘッダー埋め込み版・暗背景用） */
+/* Maxポテンシャルカード（ヘッダー埋め込み版・暗背景・コンパクト） */
 .max-pot-card{
   background:linear-gradient(135deg,rgba(6,199,85,.18),rgba(30,111,217,.18));
   border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;
-  padding:11px 13px;
-  margin-top:9px;
-  display:flex;align-items:center;gap:11px;
+  border-radius:10px;
+  padding:6px 10px;
+  margin-top:7px;
+  display:flex;align-items:center;gap:9px;
   position:relative;overflow:hidden;
-  box-shadow:0 3px 10px rgba(0,0,0,.18);
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
 }
-.max-pot-card .max-pot-lbl{color:rgba(255,255,255,.7) !important}
-.max-pot-card .max-pot-val{color:white !important}
-.max-pot-card .max-pot-unit{color:rgba(255,255,255,.7) !important}
-.max-pot-card .max-pot-sub{color:rgba(255,255,255,.65) !important}
-.max-pot-card .max-pot-delta{background:rgba(6,199,85,.25) !important;color:#A8E6CF !important}
+.max-pot-card .max-pot-ico{
+  width:30px;height:30px;border-radius:9px;font-size:16px;
+  box-shadow:0 2px 8px rgba(6,199,85,.3);
+}
+.max-pot-card .max-pot-lbl{color:rgba(255,255,255,.7) !important;font-size:9px;margin-bottom:0}
+.max-pot-card .max-pot-badge{font-size:7px;padding:1px 5px}
+.max-pot-card .max-pot-row{margin-bottom:0;gap:4px}
+.max-pot-card .max-pot-val{color:white !important;font-size:18px}
+.max-pot-card .max-pot-unit{color:rgba(255,255,255,.7) !important;font-size:10px}
+.max-pot-card .max-pot-sub{color:rgba(255,255,255,.65) !important;font-size:9px;margin-left:auto;flex-shrink:0}
+.max-pot-card .max-pot-delta{background:rgba(6,199,85,.25) !important;color:#A8E6CF !important;font-size:9px;padding:1px 5px}
 .max-pot-card::after{
   content:'';position:absolute;
   width:120px;height:120px;border-radius:50%;
@@ -482,20 +488,19 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="stat-box" title="体重 × 2 = 必要なタンパク質量"><div class="stat-u">タンパク質目安</div><div class="stat-v" id="stat-protein" style="color:#FFB088">104.6</div><div class="stat-l">g / 日</div></div>
       </div>
 
-      <!-- Maxポテンシャル身長（ヘッダー内） -->
+      <!-- Maxポテンシャル身長（ヘッダー内・コンパクト1行） -->
       <div class="max-pot-card">
         <div class="max-pot-ico">🚀</div>
-        <div class="max-pot-body">
-          <div class="max-pot-lbl">Maxポテンシャル身長 <span class="max-pot-badge">PREDICTED</span></div>
+        <div class="max-pot-body" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+          <div class="max-pot-lbl" style="white-space:nowrap">Maxポテンシャル</div>
           <div class="max-pot-row">
             <span class="max-pot-val" id="max-pot-val">188.0</span>
             <span class="max-pot-unit">cm</span>
           </div>
-          <div class="max-pot-sub">
-            <span>現在身長から</span>
-            <span class="max-pot-delta" id="max-pot-delta">+25.6 cm</span>
-            <span>の伸びしろ</span>
-          </div>
+        </div>
+        <div class="max-pot-sub">
+          <span class="max-pot-delta" id="max-pot-delta">+25.6 cm</span>
+          <span style="margin-left:4px;white-space:nowrap">の伸びしろ</span>
         </div>
       </div>
     </div>
