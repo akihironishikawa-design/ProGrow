@@ -304,10 +304,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
   <div class="sb-scroll">
     <div class="sb-sec">
       <div class="sb-sec-lbl">運用管理</div>
-      <div class="sb-item act" id="nav-dashboard" onclick="go('dashboard','監視ダッシュボード',this)">
-        <div class="sb-icon">📊</div><div class="sb-lbl">監視ダッシュボード</div>
-      </div>
-      <div class="sb-item" id="nav-teams" onclick="go('teams','チーム管理',this)">
+      <div class="sb-item act" id="nav-teams" onclick="go('teams','チーム管理',this)">
         <div class="sb-icon">🏅</div><div class="sb-lbl">チーム管理</div>
         <div class="sb-badge sbb-purple">214</div>
       </div>
@@ -318,9 +315,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       <div class="sb-item" id="nav-approvals" onclick="go('approvals','チーム作成承認',this)">
         <div class="sb-icon">✅</div><div class="sb-lbl">チーム作成承認</div>
         <div class="sb-badge sbb-red pulse">3</div>
-      </div>
-      <div class="sb-item" id="nav-export" onclick="go('export','データエクスポート',this)">
-        <div class="sb-icon">⬇️</div><div class="sb-lbl">データエクスポート</div>
       </div>
     </div>
     <div class="sb-sec" style="margin-top:10px">
@@ -354,52 +348,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <!-- ════ メイン ════ -->
 <div class="main">
   <div class="topbar">
-    <div class="tb-title" id="page-title">監視ダッシュボード</div>
+    <div class="tb-title" id="page-title">チーム管理</div>
     <div style="font-size:10px;color:var(--muted)">運営本部 ／ 全体管理</div>
     <div class="last-update" id="last-update" title="最終データ同期">2分前 同期</div>
     <div class="tb-spacer"></div>
-    <button class="tb-btn tb-purple" onclick="go('export','データエクスポート',null)">⬇️ エクスポート</button>
   </div>
 
   <div class="content">
 
-    <!-- F-01 監視ダッシュボード（運用監視＋KPI） -->
-    <div class="screen active" id="s-dashboard">
-      <div class="kpi-row">
-        <div class="kpi kpi-u"><div class="kpi-lbl">登録ユーザー総数</div><div class="kpi-val">5,184<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">↑ 今月 +127名</div></div>
-        <div class="kpi kpi-o"><div class="kpi-lbl">月次測定 完了率</div><div class="kpi-val">87.2<span class="kpi-unit">%</span></div><div class="kpi-diff kd-ok">↑ 先月比 +3.5pt</div></div>
-        <div class="kpi kpi-a"><div class="kpi-lbl">プロテイン使用者</div><div class="kpi-val">1,842<span class="kpi-unit">名</span></div><div class="kpi-diff kd-ok">全体の 35.5%</div></div>
-      </div>
-
-      <div class="g2b">
-        <div class="card">
-          <div class="c-hdr"><div class="c-title">🛡 システムステータス</div></div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">API稼働率</div><span class="badge b-ok">✓ 99.98%</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">DB応答時間</div><span class="badge b-ok">✓ 24ms</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">LINE API</div><span class="badge b-ok">✓ 正常</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">Google API</div><span class="badge b-wn">⚠ 遅延あり</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr2)"><div style="font-size:11px;color:var(--text)">ストレージ使用率</div><span class="badge b-ok">✓ 42%</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0"><div style="font-size:11px;color:var(--text)">最終バックアップ</div><span class="badge b-ok">✓ 2時間前</span></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="c-hdr"><div class="c-title">📜 最新ログ（直近の操作）</div></div>
-          <div style="display:flex;flex-direction:column;gap:0">
-            <div class="log-row"><span class="log-time">14:32:18</span><span class="log-type log-ok">SUCCESS</span><span class="log-msg">バックアップ完了 (5,184件)</span></div>
-            <div class="log-row"><span class="log-time">14:28:05</span><span class="log-type log-info">INFO</span><span class="log-msg">CSVエクスポート (admin@progrow.app)</span></div>
-            <div class="log-row"><span class="log-time">14:15:42</span><span class="log-type log-warn">WARN</span><span class="log-msg">Google API レート制限警告</span></div>
-            <div class="log-row"><span class="log-time">13:50:11</span><span class="log-type log-info">INFO</span><span class="log-msg">ユーザー権限変更: sasaki@progrow.app</span></div>
-            <div class="log-row"><span class="log-time">12:45:33</span><span class="log-type log-info">INFO</span><span class="log-msg">Sheets出力 (admin@progrow.app)</span></div>
-            <div class="log-row"><span class="log-time">11:20:08</span><span class="log-type log-ok">SUCCESS</span><span class="log-msg">月次バッチ処理完了</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- F-02 チーム管理 -->
-    <div class="screen" id="s-teams">
+    <div class="screen active" id="s-teams">
       <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
         <div class="kpi kpi-u"><div class="kpi-lbl">承認済みチーム</div><div class="kpi-val">214<span class="kpi-unit">チーム</span></div><div class="kpi-diff kd-ok">↑ 今月 +8</div></div>
         <div class="kpi kpi-o"><div class="kpi-lbl">稼働中チーム</div><div class="kpi-val">198<span class="kpi-unit">/214</span></div><div class="kpi-diff kd-ok">稼働率 92.5%</div></div>
@@ -735,58 +693,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
       </div>
     </div>
 
-    <!-- F-04 データエクスポート（CSV/Sheetsのみ） -->
-    <div class="screen" id="s-export">
-      <div class="card">
-        <div class="c-hdr"><div class="c-title">⬇️ データエクスポート設定</div></div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">出力するデータと形式を選択してください</div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">対象データ（複数選択可）</div>
-        <div class="chk-list">
-          <div class="chk-row sel" onclick="toggleExportItem(this,'athletes')"><div class="chk-mark"></div><div class="chk-lbl">選手データ一覧</div><div class="chk-cnt">5,184件</div></div>
-          <div class="chk-row sel" onclick="toggleExportItem(this,'measurements')"><div class="chk-mark"></div><div class="chk-lbl">身体測定データ（身長・体重・骨端線幅）</div><div class="chk-cnt">62,208件</div></div>
-          <div class="chk-row" onclick="toggleExportItem(this,'lifestyle')"><div class="chk-mark"></div><div class="chk-lbl">生活習慣データ（睡眠・食事・練習）</div><div class="chk-cnt">58,440件</div></div>
-          <div class="chk-row" onclick="toggleExportItem(this,'proteins')"><div class="chk-mark"></div><div class="chk-lbl">プロテイン使用データ</div><div class="chk-cnt">22,104件</div></div>
-          <div class="chk-row" onclick="toggleExportItem(this,'alerts')"><div class="chk-mark"></div><div class="chk-lbl">アラート発生履歴</div><div class="chk-cnt">8,820件</div></div>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">出力形式</div>
-        <div class="g2b" style="margin-bottom:14px">
-          <div class="export-card" onclick="exportData('csv')">
-            <div class="export-ico export-ico-csv">📊</div>
-            <div class="export-title">CSV ファイル</div>
-            <div class="export-desc">汎用的なCSV形式。Excel等で開けます</div>
-            <button class="export-btn" type="button">⬇️ ダウンロード</button>
-          </div>
-          <div class="export-card" onclick="exportData('sheets')">
-            <div class="export-ico export-ico-sheets">🟩</div>
-            <div class="export-title">Google Sheets</div>
-            <div class="export-desc">Sheets APIで直接スプレッドシートに出力</div>
-            <button class="export-btn" type="button">🔗 Sheets出力</button>
-          </div>
-        </div>
-
-        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;margin-top:6px">期間指定</div>
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
-          <input type="month" value="2025-11" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--card2);padding:0 12px;font-size:12px;color:var(--text);font-family:var(--font)">
-          <span style="color:var(--muted)">〜</span>
-          <input type="month" value="2026-04" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--bdr);background:var(--card2);padding:0 12px;font-size:12px;color:var(--text);font-family:var(--font)">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="c-hdr"><div class="c-title">📦 過去のエクスポート履歴</div></div>
-        <table class="tbl">
-          <thead><tr><th>実行日時</th><th>対象データ</th><th>形式</th><th>サイズ</th><th>実行者</th><th style="text-align:right">操作</th></tr></thead>
-          <tbody>
-            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-15 14:28</td><td style="font-size:10px">選手+測定 (2026年4月)</td><td><span class="badge b-ok">CSV</span></td><td style="font-family:var(--mono);font-size:10px">2.4 MB</td><td style="font-size:10px">運営管理者</td><td style="text-align:right"><button class="ab ab-p" onclick="exportData('csv')">↓ 再DL</button></td></tr>
-            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-12 10:05</td><td style="font-size:10px">プロテイン使用 (全期間)</td><td><span class="badge b-tl">Sheets</span></td><td style="font-family:var(--mono);font-size:10px">—</td><td style="font-size:10px">運営管理者</td><td style="text-align:right"><button class="ab ab-p" onclick="toast('Sheetsを開きました')">🔗 開く</button></td></tr>
-            <tr><td style="font-family:var(--mono);font-size:9px;color:var(--muted)">2026-04-01 09:00</td><td style="font-size:10px">月次バックアップ（自動）</td><td><span class="badge b-ok">CSV</span></td><td style="font-family:var(--mono);font-size:10px">12.8 MB</td><td style="font-size:10px">自動バッチ</td><td style="text-align:right"><button class="ab ab-p" onclick="exportData('csv')">↓ 再DL</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
   </div><!-- /content -->
 </div><!-- /main -->
 </div><!-- /app -->
@@ -794,7 +700,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--b
 <div id="toast"></div>
 
 <script>
-const ALL = ['dashboard','teams','players','approvals','export'];
+const ALL = ['teams','players','approvals'];
 
 function filterPlayers(){
   var q = ((document.getElementById('player-search')||{}).value || '').toLowerCase();
@@ -940,60 +846,6 @@ function resumeTeam(btn){
     actionTd.innerHTML = '<button class="ab ab-p" onclick="toast(\'チーム詳細を表示\')">詳細</button> <button class="ab ab-g" onclick="suspendTeam(this)">停止</button>';
   }
   toast('✓ ' + teamName + ' を再開しました');
-}
-
-// ── F-04 エクスポート対象選択 ──
-const selectedExports = new Set(['athletes','measurements']);
-function toggleExportItem(el, key){
-  el.classList.toggle('sel');
-  if(el.classList.contains('sel')) selectedExports.add(key);
-  else selectedExports.delete(key);
-}
-
-// ── CSV / Sheets 出力（実機能） ──
-function exportData(format){
-  if(selectedExports.size === 0){
-    toast('⚠ 対象データを1つ以上選択してください');
-    return;
-  }
-  if(format === 'csv'){ downloadCSV(); }
-  else if(format === 'sheets'){ openSheets(); }
-}
-
-function buildSampleAthletesCSV(){
-  const header = ['選手ID','氏名','性別','学年','競技','チーム','身長(cm)','体重(kg)','骨端線幅(mm)','最終測定日'];
-  const rows = [
-    ['ATH-0001','山田 太郎','男','中2','サッカー','東京FC ジュニア','162.4','52.8','3.2','2026-04-15'],
-    ['ATH-0002','田中 一郎','男','中2','サッカー','東京FC ジュニア','165.0','58.2','2.8','2026-04-14'],
-    ['ATH-0003','伊藤 大輝','男','中2','サッカー','東京FC ジュニア','160.8','54.1','2.5','2026-04-12'],
-    ['ATH-0004','佐藤 花子','女','中1','サッカー','横浜SP U-14','156.2','46.8','3.5','2026-04-13'],
-    ['ATH-0005','高橋 勇気','男','中3','サッカー','東京FC ジュニア','172.5','64.0','2.1','2026-04-15']
-  ];
-  const lines = [header.join(','), ...rows.map(r => r.join(','))];
-  return '﻿' + lines.join('\n');
-}
-
-function downloadCSV(){
-  const csv = buildSampleAthletesCSV();
-  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const ts = new Date().toISOString().slice(0,10);
-  a.href = url;
-  a.download = `progrow_export_${ts}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  toast('✓ CSVファイルをダウンロードしました');
-}
-
-function openSheets(){
-  toast('🟩 Google Sheetsに転送中...');
-  setTimeout(() => {
-    window.open('https://docs.google.com/spreadsheets/create', '_blank');
-    toast('✓ Google Sheetsを開きました');
-  }, 800);
 }
 
 // ── テーブルソート ──
