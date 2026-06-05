@@ -503,10 +503,14 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
           <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#E8A030;border-radius:99px;display:inline-block"></span><span style="color:var(--sub);font-weight:600">体重(kg)</span></div>
           <div style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:2px;background:rgba(72,201,176,.6);border-radius:99px;display:inline-block;border-top:1px dashed rgba(72,201,176,.6)"></span><span style="color:var(--sub);font-weight:600">予想身長</span></div>
         </div>
-        <div class="per-tabs"><div class="per-tab">3ヶ月</div><div class="per-tab act">6ヶ月</div><div class="per-tab">1年</div></div>
+        <div class="per-tabs">
+          <div class="per-tab"     data-period="3m" onclick="setHeightWeightPeriod('3m',this)">3ヶ月</div>
+          <div class="per-tab act" data-period="6m" onclick="setHeightWeightPeriod('6m',this)">6ヶ月</div>
+          <div class="per-tab"     data-period="1y" onclick="setHeightWeightPeriod('1y',this)">1年</div>
+        </div>
         <div class="ch"><canvas id="c1"></canvas></div>
         <div class="grow-grid">
-          <div class="grow-item"><div class="gi-lbl">半年の成長</div><div class="gi-val">+5.8<span style="font-size:12px;font-weight:400"> cm</span></div><div class="gi-sub" style="color:var(--ok);font-weight:600">↑ 目標比 115%</div></div>
+          <div class="grow-item"><div class="gi-lbl" id="growth-lbl">半年の成長</div><div class="gi-val" id="growth-val">+5.8<span style="font-size:12px;font-weight:400"> cm</span></div><div class="gi-sub" id="growth-sub" style="color:var(--ok);font-weight:600">↑ 目標比 115%</div></div>
           <div class="grow-item"><div class="gi-lbl">予想到達身長</div><div class="gi-val">175<span style="font-size:12px;font-weight:400"> cm</span></div><div class="gi-sub" style="color:var(--warn);font-weight:600">あと 12.6cm</div></div>
         </div>
       </div>
@@ -790,44 +794,122 @@ document.addEventListener('DOMContentLoaded', function(){
   _renderNotif();
 });
 
-window.addEventListener('load',()=>{
-  const c=document.getElementById('c1');
-  new Chart(c,{
+// ══ 身長・体重グラフ：期間切替対応 ══
+var _hwChart = null;
+
+// 各期間のデータセット（モックデータ）
+var _hwPresets = {
+  '3m': {
+    labels:['1月','2月','3月'],
+    height:[159.8, 161.2, 162.4],
+    expect:[164, 165, 166.5],   // 半年予測のうち直近3ヶ月分
+    weight:[50.6, 51.5, 52.8],
+    yHmin:158, yHmax:168,
+    yWmin:48, yWmax:55,
+    growthLbl:'3ヶ月の成長',
+    growthDiff:'+2.6 cm',
+    growthSub:'↑ 目標比 108%',
+    growthSubColor:'var(--ok)'
+  },
+  '6m': {
+    labels:['10月','11月','12月','1月','2月','3月'],
+    height:[156.6, 157.4, 158.5, 159.8, 161.2, 162.4],
+    expect:[162, 163, 164, 165, 166, 167],
+    weight:[48.2, 49.1, 49.8, 50.6, 51.5, 52.8],
+    yHmin:154, yHmax:170,
+    yWmin:44, yWmax:58,
+    growthLbl:'半年の成長',
+    growthDiff:'+5.8 cm',
+    growthSub:'↑ 目標比 115%',
+    growthSubColor:'var(--ok)'
+  },
+  '1y': {
+    labels:['4月','5月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'],
+    height:[152.5, 153.4, 154.2, 154.8, 155.4, 156.0, 156.6, 157.4, 158.5, 159.8, 161.2, 162.4],
+    expect:[157, 158, 159, 160, 161, 161.5, 162, 163, 164, 165, 166, 167],
+    weight:[45.0, 45.7, 46.4, 47.0, 47.6, 47.9, 48.2, 49.1, 49.8, 50.6, 51.5, 52.8],
+    yHmin:150, yHmax:170,
+    yWmin:42, yWmax:58,
+    growthLbl:'1年の成長',
+    growthDiff:'+9.9 cm',
+    growthSub:'↑ 目標比 124%',
+    growthSubColor:'var(--ok)'
+  }
+};
+
+function setHeightWeightPeriod(period, el){
+  if(!_hwPresets[period]) return;
+  // タブのアクティブ状態を更新
+  document.querySelectorAll('.per-tab').forEach(function(t){ t.classList.remove('act'); });
+  if(el) el.classList.add('act');
+
+  var p = _hwPresets[period];
+
+  // グラフ更新
+  if(_hwChart){
+    _hwChart.data.labels = p.labels;
+    _hwChart.data.datasets[0].data = p.height;
+    _hwChart.data.datasets[1].data = p.expect;
+    _hwChart.data.datasets[2].data = p.weight;
+    _hwChart.options.scales.yH.min = p.yHmin;
+    _hwChart.options.scales.yH.max = p.yHmax;
+    _hwChart.options.scales.yW.min = p.yWmin;
+    _hwChart.options.scales.yW.max = p.yWmax;
+    // 1年表示時は点を小さく
+    var ptR = period === '1y' ? 3 : 4;
+    _hwChart.data.datasets[0].pointRadius = ptR;
+    _hwChart.data.datasets[2].pointRadius = ptR;
+    _hwChart.update('active');
+  }
+
+  // 「成長」カード更新
+  var lbl = document.getElementById('growth-lbl');
+  var val = document.getElementById('growth-val');
+  var sub = document.getElementById('growth-sub');
+  if(lbl) lbl.textContent = p.growthLbl;
+  if(val){
+    // "+5.8 cm" → 数値部分とcmスパンに分割
+    var parts = p.growthDiff.split(' ');
+    val.innerHTML = parts[0] + '<span style="font-size:12px;font-weight:400"> ' + (parts[1] || 'cm') + '</span>';
+  }
+  if(sub){
+    sub.textContent = p.growthSub;
+    sub.style.color = p.growthSubColor;
+  }
+}
+
+window.addEventListener('load', function(){
+  var c = document.getElementById('c1');
+  if(!c) return;
+  var p = _hwPresets['6m'];
+  _hwChart = new Chart(c, {
     type:'line',
     data:{
-      labels:['10月','11月','12月','1月','2月','3月'],
+      labels: p.labels,
       datasets:[
-        // 身長（実測・左軸）
         {
-          label:'身長',
-          data:[156.6,157.4,158.5,159.8,161.2,162.4],
-          borderColor:'#1E6FD9',
-          backgroundColor:'rgba(30,111,217,.08)',
-          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#1E6FD9',
-          fill:true,tension:.4,yAxisID:'yH'
+          label:'身長', data:p.height,
+          borderColor:'#1E6FD9', backgroundColor:'rgba(30,111,217,.08)',
+          borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#1E6FD9',
+          fill:true, tension:.4, yAxisID:'yH'
         },
-        // 予想身長（破線・左軸）
         {
-          label:'予想身長',
-          data:[162,163,164,165,166,167],
+          label:'予想身長', data:p.expect,
           borderColor:'rgba(72,201,176,.6)',
-          borderWidth:1.5,pointRadius:0,
-          fill:false,tension:.4,borderDash:[5,3],yAxisID:'yH'
+          borderWidth:1.5, pointRadius:0,
+          fill:false, tension:.4, borderDash:[5,3], yAxisID:'yH'
         },
-        // 体重（実測・右軸）
         {
-          label:'体重',
-          data:[48.2,49.1,49.8,50.6,51.5,52.8],
-          borderColor:'#E8A030',
-          backgroundColor:'rgba(232,160,48,.08)',
-          borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#E8A030',
-          fill:false,tension:.4,yAxisID:'yW'
+          label:'体重', data:p.weight,
+          borderColor:'#E8A030', backgroundColor:'rgba(232,160,48,.08)',
+          borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#E8A030',
+          fill:false, tension:.4, yAxisID:'yW'
         }
       ]
     },
     options:{
-      responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
       plugins:{
         legend:{display:false},
         tooltip:{
@@ -840,21 +922,9 @@ window.addEventListener('load',()=>{
         }
       },
       scales:{
-        x:{grid:{display:false},ticks:{font:{size:9},color:'#8FA3B8'}},
-        // 左軸：身長
-        yH:{
-          position:'left',
-          grid:{color:'rgba(0,0,0,.04)'},
-          ticks:{font:{size:9},color:'#1E6FD9',callback:v=>v+'cm'},
-          min:154,max:170
-        },
-        // 右軸：体重
-        yW:{
-          position:'right',
-          grid:{display:false},
-          ticks:{font:{size:9},color:'#E8A030',callback:v=>v+'kg'},
-          min:44,max:58
-        }
+        x:{grid:{display:false}, ticks:{font:{size:9}, color:'#8FA3B8'}},
+        yH:{position:'left', grid:{color:'rgba(0,0,0,.04)'}, ticks:{font:{size:9}, color:'#1E6FD9', callback:function(v){ return v + 'cm'; }}, min:p.yHmin, max:p.yHmax},
+        yW:{position:'right', grid:{display:false}, ticks:{font:{size:9}, color:'#E8A030', callback:function(v){ return v + 'kg'; }}, min:p.yWmin, max:p.yWmax}
       }
     }
   });
