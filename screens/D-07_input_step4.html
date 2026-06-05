@@ -305,7 +305,6 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
         <div class="sum-row"><div class="sum-lbl">睡眠</div><div><span class="sum-val" id="sum-slp">7.5h</span><span class="sum-ok">✓ 推奨内</span></div></div>
         <div class="sum-row"><div class="sum-lbl">体調</div><span class="sum-val" id="sum-mood">😊 普通</span></div>
         <div class="sum-row"><div class="sum-lbl">練習時間</div><div><span class="sum-val" id="sum-pt">2.0h</span></div></div>
-        <div class="sum-row"><div class="sum-lbl">週活動日数</div><div><span class="sum-val" id="sum-days">5日</span></div></div>
         <div class="sum-row"><div class="sum-lbl">怪我</div><span class="sum-val" id="sum-injury">なし</span></div>
       </div>
       <div class="banner bn-warn" style="margin-bottom:18px"><span>⚠</span><span>朝食のタンパク質が不足しています。改善のヒントが送信後に表示されます。</span></div>
@@ -361,10 +360,8 @@ window.addEventListener('load', function(){
     // 生活習慣
     if(saved.sleep) _set('sum-slp', saved.sleep + 'h');
     if(saved.ptime) _set('sum-pt', saved.ptime + 'h');
-    if(saved.pdays) _set('sum-days', saved.pdays + '日');
     if(saved.slp)   _set('sum-slp', saved.slp + 'h');
     if(saved.pt)    _set('sum-pt', saved.pt + 'h');
-    if(saved.days)  _set('sum-days', saved.days + '日');
 
     // 体調
     var moodLbl = {1:'😞 不調', 2:'😕 いまいち', 3:'😊 普通', 4:'😄 好調', 5:'🤩 絶好調'};

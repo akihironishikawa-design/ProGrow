@@ -152,25 +152,13 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 
       <!-- 練習 -->
       <div class="sec-lbl"><div class="sec-lbl-dot"></div>🏃 今日の練習</div>
-      <div class="sec-sub">今日の練習時間と週活動日数を入力してください</div>
+      <div class="sec-sub">今日の練習時間を入力してください</div>
       <div class="practice-card">
-        <div class="practice-row">
-          <div>
-            <label class="f-lbl">練習時間</label>
-            <div class="num-wrap">
-              <button type="button" class="nm-btn" onclick="adj('ptime',-0.5)">−</button>
-              <div class="nm-c"><input class="nm-v" id="ptime" value="2.0"><span class="nm-u">h</span></div>
-              <button type="button" class="nm-btn" onclick="adj('ptime',0.5)">＋</button>
-            </div>
-          </div>
-          <div>
-            <label class="f-lbl">週の活動日数</label>
-            <div class="num-wrap">
-              <button type="button" class="nm-btn" onclick="adj('pdays',-1)">−</button>
-              <div class="nm-c"><input class="nm-v" id="pdays" value="5"><span class="nm-u">日</span></div>
-              <button type="button" class="nm-btn" onclick="adj('pdays',1)">＋</button>
-            </div>
-          </div>
+        <label class="f-lbl">練習時間</label>
+        <div class="num-wrap">
+          <button type="button" class="nm-btn" onclick="adj('ptime',-0.5)">−</button>
+          <div class="nm-c"><input class="nm-v" id="ptime" value="2.0"><span class="nm-u">h</span></div>
+          <button type="button" class="nm-btn" onclick="adj('ptime',0.5)">＋</button>
         </div>
       </div>
 
@@ -205,8 +193,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
 <script>
 var _numCfg = {
   sleep: { step:.5, min:0, max:14, dec:1 },
-  ptime: { step:.5, min:0, max:8, dec:1 },
-  pdays: { step:1, min:0, max:7, dec:0 }
+  ptime: { step:.5, min:0, max:8, dec:1 }
 };
 function adj(id, delta){
   var inp = document.getElementById(id);
@@ -258,7 +245,6 @@ function loadPrev(){
     var s = JSON.parse(localStorage.getItem(_STORE) || '{}');
     if(s.sleep !== undefined){ var sl = document.getElementById('sleep'); if(sl) sl.value = s.sleep; }
     if(s.ptime !== undefined){ var pt = document.getElementById('ptime'); if(pt) pt.value = s.ptime; }
-    if(s.pdays !== undefined){ var pd = document.getElementById('pdays'); if(pd) pd.value = s.pdays; }
     if(s.mood !== undefined){
       var mv = parseInt(s.mood, 10);
       document.querySelectorAll('.mood').forEach(function(m){
@@ -292,7 +278,6 @@ function saveCurrent(){
     var existing = JSON.parse(localStorage.getItem(_STORE) || '{}');
     var sl = document.getElementById('sleep'); if(sl) existing.sleep = sl.value;
     var pt = document.getElementById('ptime'); if(pt) existing.ptime = pt.value;
-    var pd = document.getElementById('pdays'); if(pd) existing.pdays = pd.value;
     existing.mood = _mood;
     existing.injuries = JSON.stringify(Array.from(_injuries));
     localStorage.setItem(_STORE, JSON.stringify(existing));
