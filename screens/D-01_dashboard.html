@@ -545,7 +545,7 @@ html,body{height:100%;font-family:var(--font);background:#1A2840;display:flex;al
       <div class="prot-card">
         <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
           <div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#1E6FD9,#06C755);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💊</div>
-          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--navy)" id="prot-card-ttl">プロテイン記録</div><div style="font-size:10px;color:var(--sub)" id="prot-card-sub">使用中：NOBITA Pro</div></div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--navy)" id="prot-card-ttl">プロテイン記録</div></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px">
           <div style="background:white;border-radius:9px;padding:8px;text-align:center;border:1px solid var(--border)"><div style="font-size:9px;color:var(--sub)">今日の量</div><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy)" id="prot-card-today">20g</div></div>
@@ -676,20 +676,11 @@ function renderProteinCard(){
   try{
     var s = JSON.parse(localStorage.getItem('nobita_input') || '{}');
     var todayEl = document.getElementById('prot-card-today');
-    var subEl = document.getElementById('prot-card-sub');
 
     // 今日の摂取量
     if(todayEl){
       if(s.pg !== undefined) todayEl.textContent = s.pg + 'g';
       else todayEl.textContent = '— g';
-    }
-
-    // 使用中の種類（複数選択を併記）
-    if(subEl && s.prot_types){
-      var protLbl = { 'nobita-pro':'NOBITA Pro', 'nobita':'NOBITA', 'whey':'その他ホエイ', 'soy':'その他ソイ' };
-      var keys = (s.prot_types || '').split(',').filter(Boolean);
-      var names = keys.map(function(k){ return protLbl[k] || k; });
-      subEl.textContent = names.length ? '使用中：' + names.join('・') : '種類未選択';
     }
   }catch(e){}
 }
